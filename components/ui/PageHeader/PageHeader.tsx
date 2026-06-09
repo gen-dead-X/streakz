@@ -23,12 +23,9 @@ export function PageHeader({ user }: PageHeaderProps) {
 
   return (
     <header
-      className="fixed top-0 left-1/2 z-40 flex items-center justify-between px-4"
+      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:hidden"
       style={{
-        width: '100%',
-        maxWidth: 430,
         height: 64,
-        transform: 'translateX(-50%)',
         background: 'var(--color-bg-sunken)',
         borderBottom: '1px solid rgba(255,255,255,0.06)',
       }}

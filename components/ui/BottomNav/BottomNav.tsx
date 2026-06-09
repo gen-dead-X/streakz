@@ -17,12 +17,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-1/2 z-40 flex items-center"
+      className="fixed bottom-0 left-0 right-0 z-40 flex items-center md:hidden"
       style={{
-        width: '100%',
-        maxWidth: 430,
         height: 64,
-        transform: 'translateX(-50%)',
         background: 'var(--color-bg-sunken)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
