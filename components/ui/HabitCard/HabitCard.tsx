@@ -2,6 +2,7 @@
 import { Typography } from 'antd';
 import { Flame, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import { StreakDots } from '@/components/ui/StreakDots';
 import { CheckInButton } from '@/components/ui/CheckInButton';
 import type { HabitCardProps } from './HabitCard.types';
@@ -20,12 +21,20 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
   }
 
   return (
-    <div
+    <motion.div
       className="flex flex-col gap-2 rounded-2xl px-4 py-3"
       style={{
         background: 'var(--color-bg-surface)',
         border: '1px solid rgba(255,255,255,0.05)',
       }}
+      layout
+      animate={{
+        borderColor: habit.isCompletedToday
+          ? 'rgba(29, 185, 84, 0.3)'
+          : 'rgba(255,255,255,0.05)',
+      }}
+      transition={{ duration: 0.25 }}
+      whileTap={{ scale: 0.98 }}
     >
       {/* Top row */}
       <div className="flex items-center gap-3">
@@ -91,6 +100,6 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
           {habit.isCompletedToday ? 'Done today ✓' : 'Tap to check in'}
         </Text>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { HabitWithStreak } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
+import { notify } from '@/lib/snackbar';
 
 interface HabitsState {
   habits: HabitWithStreak[];
@@ -53,6 +54,11 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     if (!res.ok) {
       // Rollback on failure
       await get().fetchHabits();
+      if (res.status !== 409) {
+        notify('Check-in failed. Try again.', 'error');
+      }
+    } else {
+      notify('✓ Checked in!', 'success');
     }
   },
 
@@ -81,13 +87,19 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
   },
 
   async createHabit(data) {
-    const res = await fetch('/api/habits', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error('Failed to create habit');
-    await get().fetchHabits();
+    try {
+      const res = await fetch('/api/habits', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to create habit');
+      await get().fetchHabits();
+      notify('Habit created!', 'success');
+    } catch {
+      notify('Failed to create habit.', 'error');
+      throw new Error('Failed to create habit');
+    }
   },
 
   async updateHabit(id, data) {
@@ -102,6 +114,7 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
 
   async archiveHabit(id) {
     set((s) => ({ habits: s.habits.filter((h) => h._id !== id) }));
+    notify('Habit removed', 'info');
     const res = await fetch(`/api/habits/${id}`, { method: 'DELETE' });
     if (!res.ok) await get().fetchHabits();
   },

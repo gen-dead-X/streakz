@@ -1,0 +1,1 @@
+export { SnackbarRegistrar } from './SnackbarRegistrar';

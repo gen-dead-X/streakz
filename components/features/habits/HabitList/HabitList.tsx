@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Skeleton, Typography } from 'antd';
 import { format } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
 import { HabitCard } from '@/components/ui/HabitCard';
 import { useHabitsStore } from '@/store/habits/habits.store';
 
@@ -30,7 +31,12 @@ export function HabitList() {
 
   if (loading && habits.length === 0) {
     return (
-      <div className="flex flex-col gap-3">
+      <motion.div
+        className="flex flex-col gap-3"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
         {[1, 2, 3].map((i) => (
           <Skeleton
             key={i}
@@ -39,7 +45,7 @@ export function HabitList() {
             style={{ background: 'var(--color-bg-surface)', borderRadius: 16, padding: 16 }}
           />
         ))}
-      </div>
+      </motion.div>
     );
   }
 
@@ -80,16 +86,26 @@ export function HabitList() {
         )}
       </div>
       <div className="flex flex-col gap-3">
-        {habits.map((habit) => (
-          <HabitCard
-            key={habit._id}
-            habit={habit}
-            today={today}
-            onCheckIn={handleCheckIn}
-            onUncheck={handleUncheck}
-            loading={pendingId === habit._id}
-          />
-        ))}
+        <AnimatePresence initial={false}>
+          {habits.map((habit, i) => (
+            <motion.div
+              key={habit._id}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -20, scale: 0.97 }}
+              transition={{ duration: 0.2, delay: i * 0.04 }}
+              layout
+            >
+              <HabitCard
+                habit={habit}
+                today={today}
+                onCheckIn={handleCheckIn}
+                onUncheck={handleUncheck}
+                loading={pendingId === habit._id}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   );
