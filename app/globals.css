@@ -214,15 +214,27 @@
   /* GRADIENTS */
   --gradient-brand: linear-gradient(135deg, #00a03d 0%, #191414 100%);
   --gradient-accent: linear-gradient(135deg, #191414 0%, #3f3a3a 100%);
-  --gradient-hero: linear-gradient(135deg, #00a03d 0%, #1db954 50%, #191414 100%);
+  --gradient-hero: linear-gradient(
+    135deg,
+    #00a03d 0%,
+    #1db954 50%,
+    #191414 100%
+  );
   --gradient-surface: linear-gradient(to bottom, #1a1a1a 0%, #121212 100%);
-  --gradient-card: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+  --gradient-card: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
 
   /* SHADOWS */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
   --shadow-brand: 0 0 20px rgb(29 185 84 / 0.2);
 
   /* RADIUS */
@@ -236,7 +248,8 @@
 
   /* TYPOGRAPHY */
   --font-family-sans: Inter, system-ui, -apple-system, sans-serif;
-  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-base: 16px;
@@ -309,7 +322,12 @@
     color: var(--color-text-body);
     font-family: var(--font-sans);
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: var(--color-text-heading);
     font-weight: 700;
   }
@@ -319,11 +337,21 @@
 }
 
 @layer utilities {
-  .text-balance { text-wrap: balance; }
-  .text-pretty { text-wrap: pretty; }
-  .bg-elevated { background-color: var(--color-bg-elevated); }
-  .bg-sunken { background-color: var(--color-bg-sunken); }
-  .shadow-brand { box-shadow: var(--shadow-brand); }
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .bg-elevated {
+    background-color: var(--color-bg-elevated);
+  }
+  .bg-sunken {
+    background-color: var(--color-bg-sunken);
+  }
+  .shadow-brand {
+    box-shadow: var(--shadow-brand);
+  }
 }
 
 /* ============================================
@@ -355,7 +383,9 @@
   color: var(--color-text-muted);
   font-size: 14px;
   font-weight: 500;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
   padding: 6px 8px;
 }
 
@@ -410,14 +440,36 @@
   font-size: 13px;
   font-weight: 400;
   color: var(--color-text-body);
-  aspect-ratio: 1;
+  /* aspect-ratio alone drives the square — no fixed height */
+  aspect-ratio: 1 / 1;
+  max-width: 44px;
+  width: 100%;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
-  height: 36px;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  box-sizing: border-box;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
   position: relative;
+}
+
+/* Constrain each month so tiles never exceed ~44px */
+.react-calendar__month-view__days {
+  justify-content: center;
+}
+
+.react-calendar__month-view__weekdays {
+  justify-content: center;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  max-width: 44px;
+  flex: 0 0 14.2857%;
+  /* text-align: center; */
 }
 
 .react-calendar__tile abbr {
