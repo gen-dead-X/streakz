@@ -305,6 +305,7 @@
 @layer base {
   * {
     box-sizing: border-box;
+    border-color: var(--color-border);
   }
   ::selection {
     background-color: var(--selection-background);

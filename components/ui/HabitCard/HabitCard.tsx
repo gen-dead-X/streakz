@@ -1,6 +1,7 @@
 'use client';
 import { Typography } from 'antd';
-import { Flame } from 'lucide-react';
+import { Flame, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { StreakDots } from '@/components/ui/StreakDots';
 import { CheckInButton } from '@/components/ui/CheckInButton';
 import type { HabitCardProps } from './HabitCard.types';
@@ -8,6 +9,8 @@ import type { HabitCardProps } from './HabitCard.types';
 const { Text } = Typography;
 
 export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: HabitCardProps) {
+  const router = useRouter();
+
   function handleToggle() {
     if (habit.isCompletedToday) {
       onUncheck(habit._id, today);
@@ -58,6 +61,15 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
             </Text>
           </div>
         </div>
+
+        {/* Edit button */}
+        <button
+          onClick={() => router.push(`/habits/${habit._id}/edit`)}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
+          aria-label="Edit habit"
+        >
+          <Settings size={15} style={{ color: 'var(--color-text-muted)' }} />
+        </button>
 
         {/* Check-in button */}
         <CheckInButton
