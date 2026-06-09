@@ -110,3 +110,22 @@ export async function undoCheckIn(
   const result = await CheckInModel.deleteOne({ habitId, userId, date });
   return result.deletedCount > 0;
 }
+
+export async function getCheckInDatesForMonth(
+  userId: string,
+  year: number,
+  month: number, // 1-based
+): Promise<string[]> {
+  await connectDB();
+  const start = `${year}-${String(month).padStart(2, '0')}-01`;
+  const lastDay = new Date(year, month, 0).getDate();
+  const end = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
+
+  const checkIns = await CheckInModel.find({
+    userId,
+    date: { $gte: start, $lte: end },
+  }).lean();
+
+  const unique = [...new Set((checkIns as unknown[]).map((ci) => (ci as { date: string }).date))];
+  return unique.sort();
+}
