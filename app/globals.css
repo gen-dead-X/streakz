@@ -1,4 +1,3 @@
-@import "react-day-picker/style.css";
 @import "tailwindcss";
 
 @theme {
@@ -282,12 +281,6 @@
   --ring: rgb(29 185 84 / 0.4);
   --skeleton: #1f1f1f;
 
-  /* REACT-DAY-PICKER OVERRIDES */
-  --rdp-accent-color: var(--color-brand);
-  --rdp-accent-background-color: rgba(29, 185, 84, 0.15);
-  --rdp-background-color: var(--color-bg-elevated);
-  --rdp-font-family: var(--font-sans);
-
   /* BRAND SHADES */
   --brand-50: hsl(129, 100%, 90%);
   --brand-100: hsl(128, 86%, 86%);
@@ -331,4 +324,173 @@
   .bg-elevated { background-color: var(--color-bg-elevated); }
   .bg-sunken { background-color: var(--color-bg-sunken); }
   .shadow-brand { box-shadow: var(--shadow-brand); }
+}
+
+/* ============================================
+   REACT-CALENDAR — CUSTOM DARK MINIMAL THEME
+   ============================================ */
+.react-calendar {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  color: var(--color-text-body);
+}
+
+/* Navigation bar */
+.react-calendar__navigation {
+  display: flex;
+  align-items: center;
+  height: 44px;
+  margin-bottom: 8px;
+  gap: 4px;
+}
+
+.react-calendar__navigation button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+  padding: 6px 8px;
+}
+
+.react-calendar__navigation button:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-heading);
+}
+
+.react-calendar__navigation button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.react-calendar__navigation__label {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-heading) !important;
+  text-align: center;
+}
+
+.react-calendar__navigation__prev2-button,
+.react-calendar__navigation__next2-button {
+  display: none;
+}
+
+/* Weekday headers */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 4px 0;
+}
+
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Day tiles */
+.react-calendar__tile {
+  background: none;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--color-text-body);
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  height: 36px;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  position: relative;
+}
+
+.react-calendar__tile abbr {
+  font-size: inherit;
+  pointer-events: none;
+}
+
+.react-calendar__tile:hover:not(:disabled) {
+  background: var(--color-bg-elevated);
+  color: var(--color-text-heading);
+}
+
+.react-calendar__tile:active:not(:disabled) {
+  transform: scale(0.92);
+}
+
+.react-calendar__tile:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+/* Today */
+.react-calendar__tile--now {
+  background: transparent;
+  color: var(--color-text-heading);
+  font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--color-brand);
+}
+
+.react-calendar__tile--now:hover {
+  background: var(--color-bg-elevated);
+}
+
+/* Selected (active) */
+.react-calendar__tile--active,
+.react-calendar__tile--hasActive {
+  background: var(--color-brand) !important;
+  color: var(--color-bg-page) !important;
+  font-weight: 600;
+}
+
+.react-calendar__tile--active:hover {
+  background: var(--color-brand-dark) !important;
+}
+
+/* Outside days (neighboring month) */
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: var(--color-border-strong);
+}
+
+/* Weekend */
+.react-calendar__month-view__days__day--weekend {
+  color: var(--color-text-body);
+}
+
+/* --- CUSTOM INTENSITY TILES (heatmap) --- */
+.tile-low {
+  background: rgba(29, 185, 84, 0.25) !important;
+  color: var(--color-text-body) !important;
+}
+
+.tile-mid {
+  background: rgba(29, 185, 84, 0.55) !important;
+  color: var(--color-text-heading) !important;
+}
+
+.tile-high {
+  background: rgba(29, 185, 84, 0.9) !important;
+  color: var(--color-bg-page) !important;
+  font-weight: 700;
+}
+
+/* Multi-month layout for HeatmapCalendar */
+.calendar-heatmap .react-calendar__navigation__label {
+  font-size: 13px;
 }
