@@ -1,3 +1,4 @@
+@import "react-day-picker/style.css";
 @import "tailwindcss";
 
 @theme {
@@ -280,6 +281,12 @@
   --overlay: rgba(0, 0, 0, 0.6);
   --ring: rgb(29 185 84 / 0.4);
   --skeleton: #1f1f1f;
+
+  /* REACT-DAY-PICKER OVERRIDES */
+  --rdp-accent-color: var(--color-brand);
+  --rdp-accent-background-color: rgba(29, 185, 84, 0.15);
+  --rdp-background-color: var(--color-bg-elevated);
+  --rdp-font-family: var(--font-sans);
 
   /* BRAND SHADES */
   --brand-50: hsl(129, 100%, 90%);
