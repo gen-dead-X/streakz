@@ -61,7 +61,7 @@ export default function RegisterPage() {
           </Text>
         </div>
 
-        {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+        {error && <Alert title={error} type="error" showIcon style={{ marginBottom: 16 }} />}
 
         <Form layout="vertical" onFinish={onFinish} requiredMark={false}>
           <Form.Item

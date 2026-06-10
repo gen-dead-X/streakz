@@ -67,6 +67,11 @@ async function getInstance(): Promise<ReturnType<typeof betterAuth>> {
 // Lazy proxy — callers use auth.api.* and auth.handler unchanged.
 // Real instance is created only after MongoDB connection is confirmed.
 export const auth = new Proxy({} as ReturnType<typeof betterAuth>, {
+  has(_target, prop: string | symbol) {
+    // toNextJsHandler checks `"handler" in auth`; without this trap the proxy
+    // would return false (empty target) and fall back to calling auth as a function.
+    return prop === 'handler' || prop === 'api';
+  },
   get(_target, prop: string) {
     if (prop === 'handler') {
       return async (request: Request): Promise<Response> => {

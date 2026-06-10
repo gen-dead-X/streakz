@@ -77,7 +77,7 @@ export function ProfileForm() {
 
       {saveError && (
         <Alert
-          message={saveError}
+          title={saveError}
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
@@ -87,7 +87,7 @@ export function ProfileForm() {
       )}
       {saveSuccess && (
         <Alert
-          message="Name updated successfully"
+          title="Name updated successfully"
           type="success"
           showIcon
           style={{ marginBottom: 16 }}

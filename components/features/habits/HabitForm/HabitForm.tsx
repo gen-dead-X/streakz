@@ -58,7 +58,7 @@ export function HabitForm({ initial, onSave, onCancel }: HabitFormProps) {
       onFinish={onFinish}
       requiredMark={false}
     >
-      {error && <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />}
+      {error && <Alert title={error} type="error" showIcon style={{ marginBottom: 16 }} />}
 
       {/* Emoji */}
       <Form.Item>
