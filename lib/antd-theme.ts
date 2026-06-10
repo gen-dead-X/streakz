@@ -42,8 +42,8 @@ export const antdTheme: ThemeConfig = {
     borderRadiusLG: 8,   // --radius-lg
     borderRadiusXS: 2,
 
-    // Typography — matches --font-family-sans loaded via next/font
-    fontFamily: "var(--font-family-sans), system-ui, -apple-system, sans-serif",
+    // Typography — Montserrat loaded by next/font; use literal name so antd CSS-in-JS can inline it
+    fontFamily: "'Montserrat', system-ui, -apple-system, sans-serif",
     fontSize: 14,
 
     // Subtle motion
