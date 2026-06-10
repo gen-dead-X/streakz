@@ -1,6 +1,7 @@
 'use client';
 import { Avatar, Typography } from 'antd';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 const { Text } = Typography;
 
@@ -9,6 +10,7 @@ interface PageHeaderProps {
 }
 
 export function PageHeader({ user }: PageHeaderProps) {
+  const router = useRouter();
   const now = new Date();
   const hour = now.getHours();
   const greeting =
@@ -49,13 +51,19 @@ export function PageHeader({ user }: PageHeaderProps) {
           {greeting}
         </Text>
       </div>
-      <Avatar
-        src={user.image ?? undefined}
-        style={{ background: 'var(--color-brand)', color: 'var(--color-bg-page)', fontWeight: 700 }}
-        size={40}
+      <button
+        onClick={() => router.push('/profile')}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, lineHeight: 0 }}
+        aria-label="Go to profile"
       >
-        {!user.image && initials}
-      </Avatar>
+        <Avatar
+          src={user.image ?? undefined}
+          style={{ background: 'var(--color-brand)', color: 'var(--color-bg-page)', fontWeight: 700 }}
+          size={40}
+        >
+          {!user.image && initials}
+        </Avatar>
+      </button>
     </header>
   );
 }

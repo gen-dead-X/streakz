@@ -125,7 +125,8 @@ export function SideNav({ user }: SideNavProps) {
       </button>
 
       {/* User */}
-      <div
+      <button
+        onClick={() => router.push('/profile')}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -133,6 +134,11 @@ export function SideNav({ user }: SideNavProps) {
           padding: '12px 8px',
           borderRadius: 12,
           background: 'var(--color-bg-elevated)',
+          border: 'none',
+          cursor: 'pointer',
+          width: '100%',
+          textAlign: 'left',
+          transition: 'background 0.15s ease',
         }}
       >
         <Avatar
@@ -162,7 +168,7 @@ export function SideNav({ user }: SideNavProps) {
             {user.name}
           </Text>
         </div>
-      </div>
+      </button>
     </aside>
   );
 }

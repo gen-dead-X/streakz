@@ -108,13 +108,13 @@ export default function LoginPage() {
         <Button
           size="large"
           block
-          loading={googleLoading}
-          onClick={onGoogle}
+          disabled
           style={{
             background: 'var(--color-bg-elevated)',
             borderColor: 'var(--color-border-subtle)',
-            color: 'var(--color-text-body)',
+            color: 'var(--color-text-muted)',
             marginBottom: 24,
+            cursor: 'not-allowed',
           }}
         >
           Continue with Google
