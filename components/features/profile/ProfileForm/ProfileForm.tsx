@@ -45,6 +45,21 @@ export function ProfileForm() {
 
   async function onLogout() {
     setLoggingOut(true);
+    // Clean up push subscription for this device before signing out
+    try {
+      const reg = await navigator.serviceWorker?.getRegistration('/sw.js');
+      const sub = await reg?.pushManager?.getSubscription();
+      if (sub) {
+        await sub.unsubscribe();
+        await fetch('/api/push/subscribe', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: sub.endpoint }),
+        });
+      }
+    } catch {
+      // Push cleanup failure must never block logout
+    }
     await signOut({ fetchOptions: { onSuccess: () => router.push('/login') } });
   }
 

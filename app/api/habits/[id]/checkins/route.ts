@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth/auth';
 import { headers } from 'next/headers';
 import { checkIn, undoCheckIn } from '@/services/habits/habits.service';
+import { checkAndUnlockAchievements } from '@/services/achievements/achievements.service';
 
 export async function POST(
   request: Request,
@@ -17,9 +18,18 @@ export async function POST(
   }
 
   try {
-    const ok = await checkIn(id, session.user.id, date);
-    if (!ok) return Response.json({ error: 'Already checked in' }, { status: 409 });
-    return Response.json({ success: true }, { status: 201 });
+    const result = await checkIn(id, session.user.id, date);
+    if (!result) return Response.json({ error: 'Already checked in' }, { status: 409 });
+
+    const newAchievements = await checkAndUnlockAchievements(
+      session.user.id,
+      id,
+      result.habitName,
+      result.newStreak,
+      result.totalCheckIns,
+    );
+
+    return Response.json({ success: true, newAchievements }, { status: 201 });
   } catch (err) {
     console.error(err);
     return Response.json({ error: 'Internal server error' }, { status: 500 });

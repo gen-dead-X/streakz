@@ -5,11 +5,13 @@ import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { HabitCard } from '@/components/ui/HabitCard';
 import { useHabitsStore } from '@/store/habits/habits.store';
+import { useCheckIn } from '@/hooks/checkin/useCheckIn';
 
 const { Text } = Typography;
 
 export function HabitList() {
-  const { habits, loading, fetchHabits, checkIn, uncheck } = useHabitsStore();
+  const { habits, loading, fetchHabits, uncheck } = useHabitsStore();
+  const { checkIn } = useCheckIn();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const today = format(new Date(), 'yyyy-MM-dd');
 

@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth/auth';
 import { headers } from 'next/headers';
 import { format } from 'date-fns';
 import { getHabitsForUser, createHabit } from '@/services/habits/habits.service';
+import { checkFirstHabitAchievement } from '@/services/achievements/achievements.service';
 import type { CreateHabitInput } from '@/types/api/habits.types';
 
 function today(): string {
@@ -33,6 +34,8 @@ export async function POST(request: Request) {
 
   try {
     const habit = await createHabit(session.user.id, body);
+    // Fire-and-forget: first_habit achievement (no await — don't block the response)
+    checkFirstHabitAchievement(session.user.id).catch(() => null);
     return Response.json({ habit }, { status: 201 });
   } catch (err) {
     console.error(err);

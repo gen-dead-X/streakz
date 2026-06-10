@@ -86,19 +86,40 @@ export async function archiveHabit(id: string, userId: string): Promise<boolean>
   return result.modifiedCount > 0;
 }
 
+export interface CheckInResult {
+  ok: true;
+  newStreak: number;
+  totalCheckIns: number;
+  habitName: string;
+}
+
 export async function checkIn(
   habitId: string,
   userId: string,
   date: string,
-): Promise<boolean> {
+): Promise<CheckInResult | null> {
   await connectDB();
   try {
     await CheckInModel.create({ habitId, userId, date });
-    return true;
   } catch {
     // Duplicate key — already checked in
-    return false;
+    return null;
   }
+
+  const habit = await HabitModel.findById(habitId).lean() as { name: string; frequency: { type: string; days: number[] } } | null;
+  const allDates = await CheckInModel.find({ habitId }).lean() as { date: string }[];
+  const totalCheckIns = await CheckInModel.countDocuments({ userId });
+
+  const newStreak = habit
+    ? calculateCurrentStreak(allDates.map((c) => c.date), habit.frequency as Parameters<typeof calculateCurrentStreak>[1], date)
+    : 0;
+
+  return {
+    ok: true,
+    newStreak,
+    totalCheckIns,
+    habitName: habit?.name ?? '',
+  };
 }
 
 export async function undoCheckIn(

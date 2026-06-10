@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { HabitWithStreak } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
+import type { CheckInWithAchievementsResponse } from '@/types/api/achievements.types';
 import { notify } from '@/lib/snackbar';
 
 interface HabitsState {
@@ -8,7 +9,7 @@ interface HabitsState {
   loading: boolean;
   error: string | null;
   fetchHabits: () => Promise<void>;
-  checkIn: (habitId: string, date: string) => Promise<void>;
+  checkIn: (habitId: string, date: string) => Promise<CheckInWithAchievementsResponse | null>;
   uncheck: (habitId: string, date: string) => Promise<void>;
   createHabit: (data: CreateHabitInput) => Promise<void>;
   updateHabit: (id: string, data: UpdateHabitInput) => Promise<void>;
@@ -57,9 +58,10 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
       if (res.status !== 409) {
         notify('Check-in failed. Try again.', 'error');
       }
-    } else {
-      notify('✓ Checked in!', 'success');
+      return null;
     }
+    notify('✓ Checked in!', 'success');
+    return res.json() as Promise<CheckInWithAchievementsResponse>;
   },
 
   async uncheck(habitId, date) {
