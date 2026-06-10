@@ -1,21 +1,26 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import { Providers } from './providers';
-import './globals.css';
+import type { Metadata } from "next";
+import { Montserrat } from "next/font/google";
+import { Providers } from "./providers";
+import "./globals.css";
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-family-sans',
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "900"],
+  variable: "--font-family-sans",
 });
 
 export const metadata: Metadata = {
-  title: 'Streak Counter',
-  description: 'Track your daily streaks',
+  title: "Streak Counter",
+  description: "Track your daily streaks",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>

@@ -16,7 +16,7 @@ export function TodaySummaryCard({ total, completed, pct, longestActive }: Today
 
   return (
     <Card
-      bordered={false}
+      variant="borderless"
       style={{ background: 'var(--color-bg-surface)', borderRadius: 20 }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -47,7 +47,7 @@ export function TodaySummaryCard({ total, completed, pct, longestActive }: Today
         strokeColor="var(--color-brand)"
         railColor="var(--color-bg-elevated)"
         showInfo={false}
-        strokeWidth={8}
+        size={{ height: 8 }}
         style={{ borderRadius: 99 }}
       />
     </Card>

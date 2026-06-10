@@ -1,14 +1,18 @@
-import { Typography } from 'antd';
 import { ProfileForm } from '@/components/features/profile/ProfileForm';
-
-const { Title } = Typography;
 
 export default function ProfilePage() {
   return (
     <>
-      <Title level={2} style={{ marginBottom: 24, color: 'var(--color-text-heading)' }}>
+      <h2
+        style={{
+          margin: '0 0 24px',
+          color: 'var(--color-text-heading)',
+          fontSize: 'var(--text-2xl)',
+          fontWeight: 700,
+        }}
+      >
         Profile
-      </Title>
+      </h2>
       <ProfileForm />
     </>
   );

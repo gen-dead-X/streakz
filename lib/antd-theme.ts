@@ -43,7 +43,7 @@ export const antdTheme: ThemeConfig = {
     borderRadiusXS: 2,
 
     // Typography — matches --font-family-sans loaded via next/font
-    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+    fontFamily: "var(--font-family-sans), system-ui, -apple-system, sans-serif",
     fontSize: 14,
 
     // Subtle motion
