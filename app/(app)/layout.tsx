@@ -38,7 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="md:hidden" style={{ height: 72 }} />
           {children}
           {/* Spacing for mobile bottom nav */}
-          <div className="md:hidden" style={{ height: 80 }} />
+          <div className="md:hidden" style={{ height: 92 }} />
         </main>
       </div>
 

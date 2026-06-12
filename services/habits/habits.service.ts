@@ -80,12 +80,20 @@ export async function updateHabit(
   data: UpdateHabitInput,
 ): Promise<Habit | null> {
   await connectDB();
-  const doc = await HabitModel.findOneAndUpdate(
-    { _id: id, userId },
-    { $set: data },
-    { new: true },
-  );
-  return doc ? toPlain(doc) : null;
+  const doc = await HabitModel.findOne({ _id: id, userId });
+  if (!doc) return null;
+
+  // Use doc.set() per-path so Mongoose casts + saves every field reliably
+  if (data.name        !== undefined) doc.set('name',         data.name);
+  if (data.icon        !== undefined) doc.set('icon',         data.icon);
+  if (data.description !== undefined) doc.set('description',  data.description);
+  if (data.tags        !== undefined) doc.set('tags',         data.tags);
+  if (data.cardStyle   !== undefined) doc.set('cardStyle',    data.cardStyle);
+  if (data.notifications !== undefined) doc.set('notifications', data.notifications);
+  if (data.frequency   !== undefined) doc.set('frequency',    data.frequency);
+
+  await doc.save();
+  return toPlain(doc);
 }
 
 export async function archiveHabit(id: string, userId: string): Promise<boolean> {
