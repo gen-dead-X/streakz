@@ -1,0 +1,103 @@
+.rte-wrapper {
+  border: 1.5px solid var(--color-bg-elevated);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--color-bg-elevated);
+  display: flex;
+  flex-direction: column;
+}
+
+.rte-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-bg-surface);
+}
+
+.rte-toolbar-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.12s, color 0.12s;
+  font-family: inherit;
+}
+.rte-toolbar-btn:hover {
+  background: var(--color-bg-elevated);
+}
+.rte-toolbar-btn.is-active {
+  background: var(--color-text-heading);
+  color: var(--color-bg-page);
+}
+.rte-toolbar-sep {
+  width: 1px;
+  height: 24px;
+  background: var(--color-border-subtle);
+  margin: 4px 4px;
+  align-self: center;
+}
+
+.rte-content {
+  flex: 1;
+  padding: 14px 16px;
+  min-height: 200px;
+  max-height: 60vh;
+  overflow-y: auto;
+  color: var(--color-text-heading);
+  font-size: 15px;
+  line-height: 1.6;
+  outline: none;
+}
+
+.rte-content .tiptap {
+  outline: none;
+  min-height: 160px;
+}
+
+.rte-content .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+.rte-content .tiptap p { margin: 0 0 0.6em; }
+.rte-content .tiptap p:last-child { margin-bottom: 0; }
+.rte-content .tiptap h1 { font-size: 1.4em; font-weight: 800; margin: 0 0 0.5em; }
+.rte-content .tiptap h2 { font-size: 1.2em; font-weight: 700; margin: 0 0 0.5em; }
+.rte-content .tiptap h3 { font-size: 1.05em; font-weight: 700; margin: 0 0 0.4em; }
+.rte-content .tiptap ul, .rte-content .tiptap ol { padding-left: 1.5em; margin: 0 0 0.6em; }
+.rte-content .tiptap blockquote {
+  border-left: 3px solid var(--color-border-strong);
+  padding-left: 1em;
+  color: var(--color-text-muted);
+  margin: 0 0 0.6em;
+}
+.rte-content .tiptap code {
+  font-family: monospace;
+  font-size: 0.875em;
+  background: var(--color-bg-surface);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+.rte-content .tiptap pre {
+  background: var(--color-bg-surface);
+  padding: 0.75em 1em;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0 0 0.6em;
+}
+.rte-content .tiptap pre code { background: none; padding: 0; }
+.rte-content .tiptap hr { border: none; border-top: 1px solid var(--color-border-subtle); margin: 0.75em 0; }
+.rte-content .tiptap a { text-decoration: underline; color: var(--color-brand); }
