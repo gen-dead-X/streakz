@@ -1,19 +1,14 @@
 export interface WeeklyDataPoint {
-  label: string;
+  label: string;  // '-8', '-7', ..., '-1', 'now'
   count: number;
 }
-
-export type CalendarDots = Record<string, { completed: number; missed: number }>;
-export type HabitsByDate = Record<string, Array<{ name: string; completed: boolean }>>;
 
 export interface InsightsResponse {
   longestStreak: number;
   totalCheckIns: number;
   activeStreaks: number;
-  avgConsistency: number;
-  weeklyData: WeeklyDataPoint[];
-  checkInDates: string[];
-  missedDates: string[];
-  calendarDots: CalendarDots;
-  habitsByDate: HabitsByDate;
+  avgConsistency: number; // 0-100, percentage over last 60 days
+  weeklyData: WeeklyDataPoint[]; // 9 entries, oldest first
+  checkInDates: string[]; // all 'YYYY-MM-DD' strings for heatmap
+  missedDates: string[];  // past dates since first habit, no check-ins
 }

@@ -7,7 +7,6 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { StreakCardPager } from '@/components/features/habits/StreakCardPager';
 import { HabitIcon } from '@/components/ui/HabitIcon';
-import { MiniCalendar } from '@/components/ui/MiniCalendar';
 import { useHabitsStore } from '@/store/habits/habits.store';
 import { useCheckIn } from '@/hooks/checkin/useCheckIn';
 import type { HabitWithStreak } from '@/types/models/habit.types';
@@ -63,12 +62,9 @@ function DesktopHabitRow({
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontSize: 14,
-          fontWeight: 600,
+          fontSize: 14, fontWeight: 600,
           color: 'var(--color-text-heading)',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           textDecoration: habit.isCompletedToday ? 'line-through' : 'none',
           opacity: habit.isCompletedToday ? 0.55 : 1,
           transition: 'opacity 0.2s',
@@ -122,7 +118,7 @@ function DesktopHabitRow({
 // ── Main export ──────────────────────────────────────────────────────────────
 
 export function HabitList() {
-  const { habits, calendarDots, habitsByDate, loading, fetchHabits, uncheck } = useHabitsStore();
+  const { habits, loading, fetchHabits, uncheck } = useHabitsStore();
   const { checkIn } = useCheckIn();
   const [pendingId, setPendingId] = useState<string | null>(null);
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -156,29 +152,18 @@ export function HabitList() {
 
   return (
     <>
-      {/* ── Mobile: card deck + calendar ───────────────────────── */}
-      <div className="md:hidden" style={{ display: 'flex', flexDirection: 'column', gap: 20, height: '100%' }}>
-        <div style={{ flex: '1 1 auto', minHeight: 0 }}>
-          <StreakCardPager
-            habits={habits}
-            today={today}
-            pendingId={pendingId}
-            onCheckIn={handleCheckIn}
-            onUncheck={handleUncheck}
-          />
-        </div>
-        {habits.length > 0 && (
-          <div style={{ flexShrink: 0 }}>
-            <MiniCalendar
-              calendarDots={calendarDots}
-              habitsByDate={habitsByDate}
-              today={today}
-            />
-          </div>
-        )}
+      {/* ── Mobile: full-height card deck ──────────────────────────── */}
+      <div className="md:hidden" style={{ height: '100%' }}>
+        <StreakCardPager
+          habits={habits}
+          today={today}
+          pendingId={pendingId}
+          onCheckIn={handleCheckIn}
+          onUncheck={handleUncheck}
+        />
       </div>
 
-      {/* ── Desktop: card deck (left) + list + calendar (right) ── */}
+      {/* ── Desktop: card deck (left) + compact list (right) ───────── */}
       <div className="hidden md:flex md:gap-6 md:items-start">
         {/* Card deck */}
         <div style={{ width: 340, flexShrink: 0, height: 500 }}>
@@ -191,7 +176,7 @@ export function HabitList() {
           />
         </div>
 
-        {/* Compact list + calendar */}
+        {/* Compact list */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
           {habits.length === 0 ? (
             <p style={{ color: 'var(--color-text-muted)', fontSize: 14, padding: '20px 0' }}>
@@ -214,15 +199,6 @@ export function HabitList() {
                 />
               </motion.div>
             ))
-          )}
-          {habits.length > 0 && (
-            <div style={{ marginTop: 8 }}>
-              <MiniCalendar
-                calendarDots={calendarDots}
-                habitsByDate={habitsByDate}
-                today={today}
-              />
-            </div>
           )}
         </div>
       </div>

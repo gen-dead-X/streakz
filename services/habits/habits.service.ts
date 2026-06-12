@@ -9,8 +9,6 @@ import {
 } from '@/lib/streak/calculator';
 import type { CardStyle, Habit, HabitWithStreak } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
-import type { CalendarDots, HabitsByDate } from '@/types/api/insights.types';
-import { format, eachDayOfInterval, startOfMonth, parseISO, subDays } from 'date-fns';
 
 const CARD_STYLES: CardStyle[] = ['wavy', 'geometric', 'blob'];
 
@@ -170,75 +168,4 @@ export async function getCheckInDatesForMonth(
 
   const unique = [...new Set((checkIns as unknown[]).map((ci) => (ci as { date: string }).date))];
   return unique.sort();
-}
-
-export interface HabitsWithCalendar {
-  habits: HabitWithStreak[];
-  calendarDots: CalendarDots;
-  habitsByDate: HabitsByDate;
-}
-
-export async function getHabitsWithCalendar(
-  userId: string,
-  today: string,
-): Promise<HabitsWithCalendar> {
-  await connectDB();
-  const habits = await HabitModel.find({ userId, archivedAt: null }).lean();
-  const habitIds = habits.map((h: any) => h._id);
-  const checkIns = await CheckInModel.find({ habitId: { $in: habitIds } }).lean();
-
-  const checkInsByHabit = new Map<string, string[]>();
-  for (const ci of checkIns as any[]) {
-    const key = String(ci.habitId);
-    if (!checkInsByHabit.has(key)) checkInsByHabit.set(key, []);
-    checkInsByHabit.get(key)!.push(ci.date);
-  }
-
-  const habitList: HabitWithStreak[] = habits.map((h: any) => {
-    const id = String(h._id);
-    const dates = checkInsByHabit.get(id) ?? [];
-    const habit = toPlain(h);
-    return {
-      ...habit,
-      currentStreak: calculateCurrentStreak(dates, habit.frequency, today),
-      longestStreak: calculateLongestStreak(dates, habit.frequency),
-      isCompletedToday: isCompletedToday(dates, today),
-      recentDots: getRecentDots(dates, today, 7),
-    };
-  });
-
-  const todayDate = parseISO(today);
-  const monthStart = startOfMonth(todayDate);
-  const yesterday = subDays(todayDate, 1);
-
-  const calendarDots: CalendarDots = {};
-  const habitsByDate: HabitsByDate = {};
-
-  if (habits.length > 0 && monthStart <= yesterday) {
-    const rangeEnd = yesterday < monthStart ? monthStart : yesterday;
-    const range = eachDayOfInterval({ start: monthStart, end: rangeEnd });
-
-    for (const day of range) {
-      const dateStr = format(day, 'yyyy-MM-dd');
-      const entries: Array<{ name: string; completed: boolean }> = [];
-      for (const h of habits as any[]) {
-        const createdStr = format(
-          new Date(h.createdAt ?? h._id.getTimestamp?.() ?? Date.now()),
-          'yyyy-MM-dd',
-        );
-        if (dateStr < createdStr) continue;
-        const dates = checkInsByHabit.get(String(h._id)) ?? [];
-        entries.push({ name: h.name as string, completed: dates.includes(dateStr) });
-      }
-      if (entries.length > 0) {
-        calendarDots[dateStr] = {
-          completed: entries.filter((e) => e.completed).length,
-          missed: entries.filter((e) => !e.completed).length,
-        };
-        habitsByDate[dateStr] = entries;
-      }
-    }
-  }
-
-  return { habits: habitList, calendarDots, habitsByDate };
 }

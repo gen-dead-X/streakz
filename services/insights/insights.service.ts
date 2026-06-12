@@ -6,22 +6,8 @@ import {
   calculateLongestStreak,
   calculateConsistency,
 } from '@/lib/streak/calculator';
-import type {
-  InsightsResponse,
-  WeeklyDataPoint,
-  CalendarDots,
-  HabitsByDate,
-} from '@/types/api/insights.types';
-import {
-  format,
-  subWeeks,
-  startOfWeek,
-  endOfWeek,
-  isWithinInterval,
-  parseISO,
-  eachDayOfInterval,
-  subDays,
-} from 'date-fns';
+import type { InsightsResponse, WeeklyDataPoint } from '@/types/api/insights.types';
+import { format, subWeeks, startOfWeek, endOfWeek, isWithinInterval, parseISO, eachDayOfInterval, subDays } from 'date-fns';
 
 export async function getInsights(
   userId: string,
@@ -57,6 +43,7 @@ export async function getInsights(
     const current = calculateCurrentStreak(dates, freq, today);
     const longest = calculateLongestStreak(dates, freq);
     const consistency = calculateConsistency(dates, freq, today, 60);
+
     if (longest > longestStreak) longestStreak = longest;
     if (current > 0) activeStreaks++;
     totalConsistency += consistency;
@@ -65,6 +52,7 @@ export async function getInsights(
   const avgConsistency =
     habits.length > 0 ? Math.round(totalConsistency / habits.length) : 0;
 
+  // Weekly data: last 9 weeks oldest first
   const todayDate = parseISO(today);
   const weeklyData: WeeklyDataPoint[] = [];
   for (let i = 8; i >= 0; i--) {
@@ -77,55 +65,21 @@ export async function getInsights(
   }
 
   const uniqueDates = [...new Set(allDates)].sort();
+
+  // Compute missed dates: past days since first habit created, with no check-ins
   const checkInSet = new Set(uniqueDates);
   let missedDates: string[] = [];
-
   if (habits.length > 0) {
     const firstHabitDate = (habits as any[]).reduce((earliest: Date, h: any) => {
       const d = new Date(h.createdAt ?? h._id.getTimestamp?.() ?? Date.now());
       return d < earliest ? d : earliest;
     }, new Date());
-    const yesterday = subDays(todayDate, 1);
+    const yesterday = subDays(parseISO(today), 1);
     if (firstHabitDate <= yesterday) {
       const allDaysInRange = eachDayOfInterval({ start: firstHabitDate, end: yesterday });
       missedDates = allDaysInRange
         .map((d) => format(d, 'yyyy-MM-dd'))
         .filter((d) => !checkInSet.has(d));
-    }
-  }
-
-  // calendarDots + habitsByDate: per-date breakdown across all habits
-  const calendarDots: CalendarDots = {};
-  const habitsByDate: HabitsByDate = {};
-
-  if (habits.length > 0) {
-    const firstHabitDate = (habits as any[]).reduce((earliest: Date, h: any) => {
-      const d = new Date(h.createdAt ?? h._id.getTimestamp?.() ?? Date.now());
-      return d < earliest ? d : earliest;
-    }, new Date());
-    const yesterday = subDays(todayDate, 1);
-    if (firstHabitDate <= yesterday) {
-      const range = eachDayOfInterval({ start: firstHabitDate, end: yesterday });
-      for (const day of range) {
-        const dateStr = format(day, 'yyyy-MM-dd');
-        const entries: Array<{ name: string; completed: boolean }> = [];
-        for (const habit of habits as any[]) {
-          const createdStr = format(
-            new Date(habit.createdAt ?? habit._id.getTimestamp?.() ?? Date.now()),
-            'yyyy-MM-dd',
-          );
-          if (dateStr < createdStr) continue;
-          const dates = checkInsByHabit.get(String(habit._id)) ?? [];
-          entries.push({ name: habit.name as string, completed: dates.includes(dateStr) });
-        }
-        if (entries.length > 0) {
-          calendarDots[dateStr] = {
-            completed: entries.filter((e) => e.completed).length,
-            missed: entries.filter((e) => !e.completed).length,
-          };
-          habitsByDate[dateStr] = entries;
-        }
-      }
     }
   }
 
@@ -137,7 +91,5 @@ export async function getInsights(
     weeklyData,
     checkInDates: uniqueDates,
     missedDates,
-    calendarDots,
-    habitsByDate,
   };
 }
