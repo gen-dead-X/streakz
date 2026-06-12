@@ -22,6 +22,11 @@ describe('habitSchema', () => {
     const result = habitSchema.safeParse({ name: 'Meditate' });
     expect(result.success).toBe(true);
   });
+  test('fails when name is only whitespace', () => {
+    const result = habitSchema.safeParse({ name: '   ' });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].message).toBe('Give your streak a name');
+  });
 });
 
 describe('loginSchema', () => {
@@ -66,6 +71,11 @@ describe('profileSchema', () => {
   });
   test('fails with empty name', () => {
     const result = profileSchema.safeParse({ name: '' });
+    expect(result.success).toBe(false);
+    expect(result.error?.issues[0].message).toBe('Enter a display name');
+  });
+  test('fails when name is only whitespace', () => {
+    const result = profileSchema.safeParse({ name: '   ' });
     expect(result.success).toBe(false);
     expect(result.error?.issues[0].message).toBe('Enter a display name');
   });
