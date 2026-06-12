@@ -69,7 +69,12 @@ export function InsightsSummary() {
       </div>
 
       {/* Heatmap */}
-      <HeatmapCalendar checkInDates={stats.checkInDates} missedDates={stats.missedDates} />
+      <HeatmapCalendar
+        checkInDates={stats.checkInDates}
+        missedDates={stats.missedDates}
+        calendarDots={stats.calendarDots ?? {}}
+        habitsByDate={stats.habitsByDate ?? {}}
+      />
     </div>
   );
 }
