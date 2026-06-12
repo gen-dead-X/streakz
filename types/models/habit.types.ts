@@ -1,3 +1,5 @@
+import type { JSONContent } from '@tiptap/core';
+
 export type FrequencyType = 'daily' | 'weekly' | 'specific';
 
 export interface Frequency {
@@ -12,7 +14,7 @@ export interface Habit {
   userId: string;
   name: string;
   icon: string; // Lucide icon name e.g. 'Flame'
-  description?: string;
+  description?: JSONContent | string;
   tags: string[];
   cardStyle: CardStyle;
   notifications: boolean;

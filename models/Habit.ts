@@ -13,7 +13,7 @@ const HabitSchema = new Schema(
     userId: { type: String, required: true, index: true },
     name: { type: String, required: true, maxlength: 50, trim: true },
     icon: { type: String, required: true },
-    description: { type: String, default: '' },
+    description: { type: Schema.Types.Mixed, default: null },
     tags: { type: [String], default: [] },
     cardStyle: { type: String, enum: ['wavy', 'geometric', 'blob'], default: 'wavy' },
     notifications: { type: Boolean, default: true },
