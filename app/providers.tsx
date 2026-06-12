@@ -1,15 +1,14 @@
 'use client';
 
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { ConfigProvider } from 'antd';
 import { SnackbarProvider } from 'notistack';
-import { antdTheme } from '@/lib/antd-theme';
+import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { SnackbarRegistrar } from '@/components/ui/SnackbarRegistrar';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <AntdRegistry>
-      <ConfigProvider theme={antdTheme}>
+      <ThemeProvider>
         <SnackbarProvider
           maxSnack={3}
           autoHideDuration={3000}
@@ -18,7 +17,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <SnackbarRegistrar />
           {children}
         </SnackbarProvider>
-      </ConfigProvider>
+      </ThemeProvider>
     </AntdRegistry>
   );
 }

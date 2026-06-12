@@ -1,7 +1,7 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
 import { Typography } from 'antd';
-import { CalendarDays, BarChart3, Plus } from 'lucide-react';
+import { CalendarDays, BarChart3, Plus, Settings2 } from 'lucide-react';
 
 const { Text } = Typography;
 
@@ -11,6 +11,7 @@ export function BottomNav() {
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
+  const isSettings = pathname.startsWith('/settings');
 
   const active = { color: 'var(--color-brand)' };
   const inactive = { color: 'var(--color-text-muted)' };
@@ -61,6 +62,16 @@ export function BottomNav() {
       >
         <BarChart3 size={22} style={isInsights ? active : inactive} />
         <Text style={{ fontSize: 11, ...(isInsights ? active : inactive) }}>Insights</Text>
+      </button>
+
+      {/* Settings */}
+      <button
+        onClick={() => router.push('/settings')}
+        className="flex-1 flex flex-col items-center justify-center gap-1 py-2"
+        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+      >
+        <Settings2 size={22} style={isSettings ? active : inactive} />
+        <Text style={{ fontSize: 11, ...(isSettings ? active : inactive) }}>Settings</Text>
       </button>
     </nav>
   );

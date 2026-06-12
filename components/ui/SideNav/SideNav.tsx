@@ -1,7 +1,7 @@
 'use client';
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, Typography } from 'antd';
-import { CalendarDays, BarChart3, Plus, Flame } from 'lucide-react';
+import { CalendarDays, BarChart3, Plus, Flame, Settings2 } from 'lucide-react';
 
 const { Text } = Typography;
 
@@ -15,6 +15,7 @@ export function SideNav({ user }: SideNavProps) {
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
+  const isSettings = pathname.startsWith('/settings');
 
   const initials = user.name
     .split(' ')
@@ -40,7 +41,7 @@ export function SideNav({ user }: SideNavProps) {
         borderRadius: 12,
         border: 'none',
         cursor: 'pointer',
-        background: active ? 'rgba(29,185,84,0.12)' : 'transparent',
+        background: active ? 'rgb(var(--brand-rgb) / 0.12)' : 'transparent',
         color: active ? 'var(--color-brand)' : 'var(--color-text-muted)',
         transition: 'all 0.15s ease',
         textAlign: 'left',
@@ -98,6 +99,12 @@ export function SideNav({ user }: SideNavProps) {
           'Insights',
           isInsights,
           () => router.push('/insights'),
+        )}
+        {navItem(
+          <Settings2 size={20} />,
+          'Settings',
+          isSettings,
+          () => router.push('/settings'),
         )}
       </nav>
 
