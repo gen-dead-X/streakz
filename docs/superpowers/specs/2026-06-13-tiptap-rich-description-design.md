@@ -1,14 +1,18 @@
-# TipTap Rich Text Description — Design Spec
+# TipTap Rich Description + react-hook-form + Zod — Design Spec
 
 **Date:** 2026-06-13
 **Branch:** feature/card-interactions
-**Status:** Approved
+**Status:** Approved (expanded scope)
 
 ---
 
 ## Overview
 
-Replace the plain-text `description` field on habits with a TipTap rich-text editor. Clicking the description area in `HabitForm` opens an AntD `Modal` containing the full editor. Stored as TipTap `JSONContent` in MongoDB. Rendered as formatted HTML on both the form preview and the `HabitCard`.
+Three interrelated changes delivered together:
+
+1. **TipTap rich-text description** — Replace the plain-text `description` field on habits with a TipTap editor. Clicking the field opens an AntD `Modal`. Stored as `JSONContent` in MongoDB. Rendered on `HabitCard` and in the form preview.
+2. **react-hook-form** — Replace AntD `Form`/`Form.useForm()` in all four forms with `useForm` from react-hook-form. AntD input components stay; they are wrapped in `Controller`.
+3. **Zod validation** — All form schemas defined as Zod objects in `lib/validation/`. Resolvers wired via `@hookform/resolvers/zod`.
 
 ---
 
@@ -30,6 +34,9 @@ Install with `bun add`:
 - `@tiptap/extension-underline`
 - `@tiptap/extension-link`
 - `@tiptap/extension-placeholder`
+- `react-hook-form` — form state management
+- `@hookform/resolvers` — Zod adapter for react-hook-form
+- `zod` — schema validation
 
 ---
 
@@ -74,9 +81,80 @@ interface RichTextPreviewProps {
 
 ---
 
-## 3. HabitForm Changes (`components/features/habits/HabitForm/HabitForm.tsx`)
+## 3. Zod Schemas (`lib/validation/`)
 
+One file per form domain. All schemas export the inferred TypeScript type alongside the schema.
+
+### `lib/validation/habit.schema.ts`
+```ts
+export const habitSchema = z.object({
+  name: z.string().min(1, 'Give your streak a name').max(50, 'Max 50 characters'),
+  tags: z.string().optional(),                   // raw "#fitness #health" string, split on submit
+  days: z.array(z.number()).optional(),
+  // description managed outside RHF (TipTap JSON state)
+});
+export type HabitFormValues = z.infer<typeof habitSchema>;
+```
+
+### `lib/validation/auth.schema.ts`
+```ts
+export const loginSchema = z.object({
+  email: z.string().email('Enter a valid email'),
+  password: z.string().min(1, 'Enter your password'),
+});
+
+export const registerSchema = z.object({
+  name: z.string().min(1, 'Enter your name'),
+  email: z.string().email('Enter a valid email'),
+  password: z.string().min(8, 'At least 8 characters'),
+  confirm: z.string().min(1, 'Confirm your password'),
+}).refine(d => d.password === d.confirm, {
+  message: 'Passwords do not match',
+  path: ['confirm'],
+});
+```
+
+### `lib/validation/profile.schema.ts`
+```ts
+export const profileSchema = z.object({
+  name: z.string().min(1, 'Enter a display name').trim(),
+});
+```
+
+---
+
+## 4. react-hook-form Integration Pattern
+
+All four forms follow the same pattern. AntD `Form` component is **removed**. AntD input components stay, wrapped in `Controller`. AntD `Form.Item` is kept solely for label + error display (it accepts `validateStatus` and `help` props independently of AntD Form).
+
+```tsx
+// Example pattern (login form)
+const { control, handleSubmit, formState: { errors } } = useForm<LoginValues>({
+  resolver: zodResolver(loginSchema),
+});
+
+<form onSubmit={handleSubmit(onSubmit)}>
+  <Form.Item validateStatus={errors.email ? 'error' : ''} help={errors.email?.message}>
+    <Controller
+      name="email"
+      control={control}
+      render={({ field }) => <Input {...field} size="large" placeholder="you@example.com" />}
+    />
+  </Form.Item>
+</form>
+```
+
+Note: `<form>` (native HTML) replaces `<Form>` (AntD). AntD `Form.Item` is used only as a layout/error wrapper.
+
+---
+
+## 5. HabitForm Changes (`components/features/habits/HabitForm/HabitForm.tsx`)
+
+- Replace AntD `Form`/`Form.useForm()` with `useForm<HabitFormValues>({ resolver: zodResolver(habitSchema) })`
 - Remove `Form.Item name="description"` with its `<Input maxLength={200} />`
+- `name` and `tags` fields become `Controller`-wrapped AntD `Input` components
+- `days` field becomes a `Controller`-wrapped AntD `Checkbox.Group`
+- `cardStyle`, `freqType`, `notifications`, `icon` remain local `useState` (they use custom button UIs, not standard inputs — simpler than Controller)
 - Add state:
   ```ts
   const [descriptionJson, setDescriptionJson] = useState<JSONContent | undefined>(
@@ -84,7 +162,7 @@ interface RichTextPreviewProps {
   );
   const [editorOpen, setEditorOpen] = useState(false);
   ```
-- Replace with a **clickable preview div**:
+- Replace description input with a **clickable preview div**:
   - Same styling as other inputs: `background: var(--color-bg-elevated)`, `border-radius: 14px`, `min-height: 52px`, `padding: 14px 16px`
   - Empty state: muted placeholder "Description (optional)" at `var(--color-text-muted)`
   - Filled state: `<RichTextPreview content={descriptionJson} />`
@@ -95,11 +173,30 @@ interface RichTextPreviewProps {
   - `width={680}`, `title="Edit Description"`, `footer={null}`
   - Body contains `<RichTextEditor value={descriptionJson} onChange={setDescriptionJson} />`
   - "Done" button below the editor (right-aligned) closes the modal
-- In `onFinish`: `description: descriptionJson ?? undefined`
+- In submit handler: `description: descriptionJson ?? undefined`
 
 ---
 
-## 4. HabitCard Changes (`components/ui/HabitCard/HabitCard.tsx`)
+## 6. Auth + Profile Form Changes
+
+### `app/(auth)/login/page.tsx`
+- Replace AntD `Form` with native `<form onSubmit={handleSubmit(onSubmit)}>`
+- Wire `loginSchema` via `zodResolver`
+- `email` and `password` fields → `Controller` + AntD `Input`/`Input.Password`
+- Inline `error` state (from BetterAuth response) stays — it's server error, not validation
+
+### `app/(auth)/register/page.tsx`
+- Same pattern with `registerSchema`
+- `password !== confirm` check moves into the Zod `.refine()` — remove the manual `if` check
+
+### `components/features/profile/ProfileForm/ProfileForm.tsx`
+- Replace AntD `Form` with `useForm` + `profileSchema`
+- Single `name` field → `Controller` + AntD `Input`
+- `useEffect` that calls `form.setFieldsValue` is removed; replaced with `reset({ name: user?.name })` when session loads
+
+---
+
+## 7. HabitCard Changes (`components/ui/HabitCard/HabitCard.tsx`)
 
 - Replace the description `<p>` block (current lines 152–165) with:
   ```tsx
@@ -120,7 +217,7 @@ interface RichTextPreviewProps {
 
 ---
 
-## 5. Backward Compatibility
+## 8. Backward Compatibility
 
 | Stored value | RichTextPreview output |
 |---|---|
@@ -132,9 +229,12 @@ No server-side migration. The Mongoose `Mixed` type preserves all existing value
 
 ---
 
-## 6. File Checklist
+## 9. File Checklist
 
 **New files:**
+- `lib/validation/habit.schema.ts`
+- `lib/validation/auth.schema.ts`
+- `lib/validation/profile.schema.ts`
 - `components/ui/RichTextEditor/RichTextEditor.tsx`
 - `components/ui/RichTextEditor/RichTextEditor.types.ts`
 - `components/ui/RichTextEditor/index.ts`
@@ -142,11 +242,14 @@ No server-side migration. The Mongoose `Mixed` type preserves all existing value
 - `components/ui/RichTextPreview/index.ts`
 
 **Modified files:**
-- `models/Habit.ts` — description field type
-- `types/models/habit.types.ts` — description type
-- `types/api/habits.types.ts` — description type
-- `components/features/habits/HabitForm/HabitForm.tsx` — editor modal integration
+- `models/Habit.ts` — description field type → Mixed
+- `types/models/habit.types.ts` — description type → JSONContent | string
+- `types/api/habits.types.ts` — description type → JSONContent | string
+- `components/features/habits/HabitForm/HabitForm.tsx` — RHF + Zod + TipTap modal
 - `components/ui/HabitCard/HabitCard.tsx` — RichTextPreview on card
+- `app/(auth)/login/page.tsx` — RHF + Zod
+- `app/(auth)/register/page.tsx` — RHF + Zod
+- `components/features/profile/ProfileForm/ProfileForm.tsx` — RHF + Zod
 
 **No changes needed:**
 - API routes — JSONContent passes through as opaque object; no route logic touches description content
