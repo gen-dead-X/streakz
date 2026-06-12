@@ -1,0 +1,39 @@
+/* HeatmapCalendar.css */
+
+/* Tiles become column-flex to stack date number above dot row */
+.calendar-heatmap .react-calendar__tile {
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 4px;
+  height: auto;
+  aspect-ratio: unset;
+}
+
+.calendar-heatmap .react-calendar__tile abbr,
+.calendar-heatmap .react-calendar__tile time {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.calendar-dot-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 8px;
+}
+
+.calendar-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.calendar-dot--completed {
+  background: hsl(142, 62%, 46%);
+}
+
+.calendar-dot--missed {
+  background: hsl(0, 72%, 58%);
+}

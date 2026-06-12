@@ -840,25 +840,9 @@
   color: var(--color-brand);
 }
 
-/* --- 3-STATE TILES --- */
-.tile-success {
-  background: hsl(142, 62%, 42%) !important;
-  color: hsl(0, 0%, 98%) !important;
-  font-weight: 600;
-}
-.tile-success abbr,
-.tile-success time {
-  color: hsl(0, 0%, 98%) !important;
-}
-
-.tile-missed {
-  background: hsl(0, 70%, 55%) !important;
-  color: hsl(0, 0%, 98%) !important;
-}
-.tile-missed abbr,
-.tile-missed time {
-  color: hsl(0, 0%, 98%) !important;
-}
+/* --- 3-STATE TILES — solid fills replaced by dot rendering in component CSS --- */
+.tile-success {}
+.tile-missed {}
 
 /* --- LEGACY INTENSITY TILES (kept for compatibility) --- */
 .tile-low {
