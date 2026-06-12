@@ -1,3 +1,4 @@
+'use client';
 import './RichTextPreview.css';
 import { generateHTML } from '@tiptap/core';
 import type { JSONContent } from '@tiptap/core';
