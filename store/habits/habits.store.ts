@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { HabitWithStreak } from '@/types/models/habit.types';
+import type { Habit, HabitWithStreak } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
 import type { CheckInWithAchievementsResponse } from '@/types/api/achievements.types';
 import { notify } from '@/lib/snackbar';
@@ -111,6 +111,13 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
       body: JSON.stringify(data),
     });
     if (!res.ok) throw new Error('Failed to update habit');
+    const { habit: updated } = (await res.json()) as { habit: Habit };
+    // Immediately reflect server response in store (preserves streak data)
+    set((s) => ({
+      habits: s.habits.map((h) =>
+        h._id === id ? ({ ...h, ...updated } as HabitWithStreak) : h,
+      ),
+    }));
     await get().fetchHabits();
   },
 

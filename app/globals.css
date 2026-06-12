@@ -155,88 +155,11 @@
   --card-padding: 24px;
 }
 
+/* ============================================
+   MODE-INDEPENDENT TOKENS
+   (radius, spacing, typography, status, accent)
+   ============================================ */
 :root {
-  /* BRAND */
-  --brand-default: hsl(141, 73%, 42%);
-  --brand-dark: hsl(143, 100%, 31%);
-  --brand-light: hsl(134, 78%, 65%);
-  --brand-subtle: hsl(141, 73%, 42%);
-  --brand-foreground: hsl(240, 6%, 10%);
-
-  /* ACCENT */
-  --accent-default: hsl(0, 11%, 9%);
-  --accent-dark: hsl(0, 0%, 0%);
-  --accent-light: hsl(0, 4%, 24%);
-  --accent-subtle: hsl(0, 11%, 9%);
-  --accent-foreground: hsl(0, 0%, 100%);
-
-  /* NEUTRAL */
-  --neutral-50: hsl(0, 0%, 98%);
-  --neutral-100: hsl(0, 0%, 86%);
-  --neutral-200: hsl(0, 0%, 75%);
-  --neutral-300: hsl(120, 1%, 64%);
-  --neutral-400: hsl(180, 0%, 53%);
-  --neutral-500: hsl(120, 0%, 43%);
-  --neutral-600: hsl(180, 1%, 32%);
-  --neutral-700: hsl(180, 1%, 23%);
-  --neutral-800: hsl(150, 3%, 14%);
-  --neutral-900: hsl(150, 8%, 5%);
-
-  /* TEXT */
-  --text-heading: hsl(0, 0%, 100%);
-  --text-body: hsl(0, 0%, 70%);
-  --text-muted: hsl(180, 0%, 53%);
-  --text-inverse: hsl(0, 0%, 100%);
-  --text-link: hsl(141, 73%, 42%);
-
-  /* BACKGROUND */
-  --bg-page: hsl(0, 0%, 7%);
-  --bg-surface: hsl(0, 0%, 9%);
-  --bg-elevated: hsl(0, 0%, 16%);
-  --bg-sunken: hsl(0, 0%, 3%);
-
-  /* BORDER */
-  --border-default: hsl(0, 0%, 20%);
-  --border-strong: hsl(0, 0%, 30%);
-  --border-subtle: hsl(0, 0%, 14%);
-  --border-focus: hsl(141, 73%, 42%);
-
-  /* STATUS */
-  --success-default: hsl(142, 65%, 36%);
-  --success-light: hsl(135, 66%, 67%);
-  --warning-default: hsl(38, 90%, 50%);
-  --warning-light: hsl(51, 100%, 70%);
-  --error-default: hsl(0, 84%, 60%);
-  --error-light: hsl(6, 100%, 76%);
-  --info-default: hsl(217, 90%, 60%);
-  --info-light: hsl(211, 100%, 80%);
-
-  /* GRADIENTS */
-  --gradient-brand: linear-gradient(135deg, #00a03d 0%, #191414 100%);
-  --gradient-accent: linear-gradient(135deg, #191414 0%, #3f3a3a 100%);
-  --gradient-hero: linear-gradient(
-    135deg,
-    #00a03d 0%,
-    #1db954 50%,
-    #191414 100%
-  );
-  --gradient-surface: linear-gradient(to bottom, #1a1a1a 0%, #121212 100%);
-  --gradient-card: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0) 100%
-  );
-
-  /* SHADOWS */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md:
-    0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg:
-    0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --shadow-xl:
-    0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  --shadow-brand: 0 0 20px rgb(29 185 84 / 0.2);
-
   /* RADIUS */
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -248,8 +171,7 @@
 
   /* TYPOGRAPHY */
   --font-family-sans: Inter, system-ui, -apple-system, sans-serif;
-  --font-family-mono:
-    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --font-size-xs: 12px;
   --font-size-sm: 14px;
   --font-size-base: 16px;
@@ -285,16 +207,28 @@
   --spacing-24: 96px;
   --spacing-32: 128px;
 
-  /* COMMON */
+  /* STATUS COLORS (mode-independent) */
+  --success-default: hsl(142, 65%, 36%);
+  --success-light: hsl(135, 66%, 67%);
+  --warning-default: hsl(38, 90%, 50%);
+  --warning-light: hsl(51, 100%, 70%);
+  --error-default: hsl(0, 84%, 60%);
+  --error-light: hsl(6, 100%, 76%);
+  --info-default: hsl(217, 90%, 60%);
+  --info-light: hsl(211, 100%, 80%);
+
+  /* BASE */
   --base-white: #ffffff;
   --base-black: #000000;
-  --selection-background: rgb(29 185 84 / 0.3);
-  --selection-foreground: inherit;
-  --overlay: rgba(0, 0, 0, 0.6);
-  --ring: rgb(29 185 84 / 0.4);
-  --skeleton: #1f1f1f;
 
-  /* BRAND SHADES */
+  /* ACCENT */
+  --accent-default: hsl(0, 11%, 9%);
+  --accent-dark: hsl(0, 0%, 0%);
+  --accent-light: hsl(0, 4%, 24%);
+  --accent-subtle: hsl(0, 11%, 9%);
+  --accent-foreground: hsl(0, 0%, 100%);
+
+  /* BRAND SHADES (emerald scale, used by antd) */
   --brand-50: hsl(129, 100%, 90%);
   --brand-100: hsl(128, 86%, 86%);
   --brand-200: hsl(130, 72%, 75%);
@@ -306,6 +240,390 @@
   --brand-800: hsl(120, 100%, 14%);
   --brand-900: hsl(120, 100%, 10%);
   --brand-950: hsl(120, 100%, 7%);
+}
+
+/* ============================================
+   DARK MODE  (default — also used on :root so
+   SSR renders correctly before JS runs)
+   ============================================ */
+:root,
+[data-mode="dark"] {
+  /* Brand defaults — overridden by [data-theme] */
+  --brand-default: hsl(141, 73%, 42%);
+  --brand-dark:    hsl(143, 100%, 31%);
+  --brand-light:   hsl(134, 78%, 65%);
+  --brand-subtle:  hsl(141, 73%, 52%);
+  --brand-foreground: hsl(0, 0%, 8%);
+  --brand-rgb: 29 185 84;
+
+  /* BACKGROUNDS */
+  --bg-page:     hsl(0, 0%, 7%);
+  --bg-surface:  hsl(0, 0%, 9%);
+  --bg-elevated: hsl(0, 0%, 16%);
+  --bg-sunken:   hsl(0, 0%, 3%);
+
+  /* TEXT */
+  --text-heading: hsl(0, 0%, 100%);
+  --text-body:    hsl(0, 0%, 70%);
+  --text-muted:   hsl(180, 0%, 53%);
+  --text-inverse: hsl(0, 0%, 8%);
+  --text-link:    var(--brand-default);
+
+  /* BORDERS */
+  --border-default: hsl(0, 0%, 20%);
+  --border-strong:  hsl(0, 0%, 30%);
+  --border-subtle:  hsl(0, 0%, 14%);
+  --border-focus:   var(--brand-default);
+
+  /* NEUTRALS */
+  --neutral-50:  hsl(0, 0%, 98%);
+  --neutral-100: hsl(0, 0%, 86%);
+  --neutral-200: hsl(0, 0%, 75%);
+  --neutral-300: hsl(0, 0%, 64%);
+  --neutral-400: hsl(0, 0%, 53%);
+  --neutral-500: hsl(0, 0%, 43%);
+  --neutral-600: hsl(0, 0%, 32%);
+  --neutral-700: hsl(0, 0%, 23%);
+  --neutral-800: hsl(0, 0%, 14%);
+  --neutral-900: hsl(0, 0%, 6%);
+
+  /* SHADOWS */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+  --shadow-brand: 0 0 20px rgb(var(--brand-rgb) / 0.25);
+
+  /* GRADIENTS */
+  --gradient-brand:   linear-gradient(135deg, var(--brand-dark) 0%, var(--bg-sunken) 100%);
+  --gradient-accent:  linear-gradient(135deg, hsl(0,0%,10%) 0%, hsl(0,0%,18%) 100%);
+  --gradient-hero:    linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-default) 50%, var(--bg-page) 100%);
+  --gradient-surface: linear-gradient(to bottom, var(--bg-elevated) 0%, var(--bg-page) 100%);
+  --gradient-card:    linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
+
+  /* MISC */
+  --selection-background: rgb(var(--brand-rgb) / 0.28);
+  --selection-foreground: inherit;
+  --overlay: rgba(0, 0, 0, 0.6);
+  --ring: rgb(var(--brand-rgb) / 0.42);
+  --skeleton: hsl(0, 0%, 14%);
+}
+
+/* ============================================
+   LIGHT MODE
+   ============================================ */
+[data-mode="light"] {
+  /* Brand defaults for light — overridden by [data-theme][data-mode="light"] */
+  --brand-default:    hsl(141, 73%, 36%);
+  --brand-dark:       hsl(143, 85%, 27%);
+  --brand-light:      hsl(134, 68%, 52%);
+  --brand-subtle:     hsl(141, 73%, 44%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-rgb: 20 148 55;
+
+  /* BACKGROUNDS */
+  --bg-page:     hsl(220, 18%, 96%);
+  --bg-surface:  hsl(0, 0%, 100%);
+  --bg-elevated: hsl(220, 14%, 92%);
+  --bg-sunken:   hsl(220, 16%, 93%);
+
+  /* TEXT */
+  --text-heading: hsl(220, 15%, 10%);
+  --text-body:    hsl(220, 8%, 30%);
+  --text-muted:   hsl(220, 5%, 54%);
+  --text-inverse: hsl(0, 0%, 100%);
+  --text-link:    var(--brand-default);
+
+  /* BORDERS */
+  --border-default: rgba(0, 0, 0, 0.10);
+  --border-strong:  rgba(0, 0, 0, 0.18);
+  --border-subtle:  rgba(0, 0, 0, 0.05);
+  --border-focus:   var(--brand-default);
+
+  /* NEUTRALS (light scale) */
+  --neutral-50:  hsl(220, 18%, 97%);
+  --neutral-100: hsl(220, 14%, 93%);
+  --neutral-200: hsl(220, 10%, 87%);
+  --neutral-300: hsl(220, 7%, 76%);
+  --neutral-400: hsl(220, 5%, 62%);
+  --neutral-500: hsl(220, 3%, 48%);
+  --neutral-600: hsl(220, 5%, 38%);
+  --neutral-700: hsl(220, 8%, 28%);
+  --neutral-800: hsl(220, 10%, 18%);
+  --neutral-900: hsl(220, 12%, 10%);
+
+  /* SHADOWS */
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.09), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
+  --shadow-brand: 0 0 20px rgb(var(--brand-rgb) / 0.22);
+
+  /* GRADIENTS */
+  --gradient-brand:   linear-gradient(135deg, var(--brand-default) 0%, var(--bg-elevated) 100%);
+  --gradient-accent:  linear-gradient(135deg, hsl(220,14%,90%) 0%, hsl(220,10%,96%) 100%);
+  --gradient-hero:    linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-default) 50%, var(--bg-page) 100%);
+  --gradient-surface: linear-gradient(to bottom, hsl(0,0%,100%) 0%, hsl(220,14%,95%) 100%);
+  --gradient-card:    linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0) 100%);
+
+  /* MISC */
+  --selection-background: rgb(var(--brand-rgb) / 0.18);
+  --selection-foreground: inherit;
+  --overlay: rgba(0, 0, 0, 0.35);
+  --ring: rgb(var(--brand-rgb) / 0.35);
+  --skeleton: hsl(220, 14%, 88%);
+}
+
+/* ============================================
+   COLOR SCHEMES — DARK MODE
+   (each block only overrides brand tokens)
+   ============================================ */
+
+/* Emerald — dark bg gets a subtle green tint */
+[data-theme="emerald"] {
+  --bg-page:     hsl(141, 6%, 7%);
+  --bg-surface:  hsl(141, 7%, 9%);
+  --bg-elevated: hsl(141, 5%, 16%);
+  --bg-sunken:   hsl(141, 8%, 3%);
+}
+
+[data-theme="amber"] {
+  --brand-default: hsl(45, 91%, 54%);
+  --brand-dark:    hsl(42, 95%, 43%);
+  --brand-light:   hsl(48, 95%, 72%);
+  --brand-subtle:  hsl(45, 91%, 64%);
+  --brand-foreground: hsl(30, 40%, 8%);
+  --brand-rgb: 245 190 42;
+  --shadow-brand: 0 0 20px rgb(245 190 42 / 0.28);
+  --bg-page:     hsl(45, 6%, 7%);
+  --bg-surface:  hsl(45, 7%, 9%);
+  --bg-elevated: hsl(45, 5%, 16%);
+  --bg-sunken:   hsl(45, 8%, 3%);
+}
+
+[data-theme="sunset"] {
+  --brand-default: hsl(22, 90%, 58%);
+  --brand-dark:    hsl(20, 88%, 46%);
+  --brand-light:   hsl(28, 90%, 72%);
+  --brand-subtle:  hsl(22, 90%, 68%);
+  --brand-foreground: hsl(20, 30%, 8%);
+  --brand-rgb: 240 113 57;
+  --shadow-brand: 0 0 20px rgb(240 113 57 / 0.28);
+  --bg-page:     hsl(22, 6%, 7%);
+  --bg-surface:  hsl(22, 7%, 9%);
+  --bg-elevated: hsl(22, 5%, 16%);
+  --bg-sunken:   hsl(22, 8%, 3%);
+}
+
+[data-theme="violet"] {
+  --brand-default: hsl(262, 80%, 68%);
+  --brand-dark:    hsl(260, 85%, 57%);
+  --brand-light:   hsl(265, 78%, 82%);
+  --brand-subtle:  hsl(262, 80%, 75%);
+  --brand-foreground: hsl(260, 20%, 8%);
+  --brand-rgb: 155 115 245;
+  --shadow-brand: 0 0 20px rgb(155 115 245 / 0.28);
+  --bg-page:     hsl(262, 8%, 7%);
+  --bg-surface:  hsl(262, 9%, 9%);
+  --bg-elevated: hsl(262, 6%, 16%);
+  --bg-sunken:   hsl(262, 10%, 3%);
+}
+
+[data-theme="sage"] {
+  --brand-default: hsl(158, 50%, 50%);
+  --brand-dark:    hsl(158, 55%, 40%);
+  --brand-light:   hsl(155, 48%, 66%);
+  --brand-subtle:  hsl(158, 50%, 58%);
+  --brand-foreground: hsl(158, 20%, 8%);
+  --brand-rgb: 65 168 130;
+  --shadow-brand: 0 0 20px rgb(65 168 130 / 0.25);
+  --bg-page:     hsl(158, 6%, 7%);
+  --bg-surface:  hsl(158, 7%, 9%);
+  --bg-elevated: hsl(158, 5%, 16%);
+  --bg-sunken:   hsl(158, 8%, 3%);
+}
+
+[data-theme="sky"] {
+  --brand-default: hsl(194, 80%, 54%);
+  --brand-dark:    hsl(192, 86%, 43%);
+  --brand-light:   hsl(197, 78%, 70%);
+  --brand-subtle:  hsl(194, 80%, 62%);
+  --brand-foreground: hsl(194, 20%, 8%);
+  --brand-rgb: 29 175 212;
+  --shadow-brand: 0 0 20px rgb(29 175 212 / 0.25);
+  --bg-page:     hsl(194, 7%, 7%);
+  --bg-surface:  hsl(194, 8%, 9%);
+  --bg-elevated: hsl(194, 6%, 16%);
+  --bg-sunken:   hsl(194, 9%, 3%);
+}
+
+[data-theme="ocean"] {
+  --brand-default: hsl(215, 85%, 60%);
+  --brand-dark:    hsl(214, 90%, 50%);
+  --brand-light:   hsl(215, 82%, 76%);
+  --brand-subtle:  hsl(215, 85%, 68%);
+  --brand-foreground: hsl(215, 20%, 8%);
+  --brand-rgb: 59 139 239;
+  --shadow-brand: 0 0 20px rgb(59 139 239 / 0.28);
+  --bg-page:     hsl(215, 8%, 7%);
+  --bg-surface:  hsl(215, 9%, 9%);
+  --bg-elevated: hsl(215, 7%, 16%);
+  --bg-sunken:   hsl(215, 10%, 3%);
+}
+
+[data-theme="teal"] {
+  --brand-default: hsl(174, 62%, 48%);
+  --brand-dark:    hsl(175, 68%, 38%);
+  --brand-light:   hsl(172, 58%, 65%);
+  --brand-subtle:  hsl(174, 62%, 56%);
+  --brand-foreground: hsl(174, 20%, 8%);
+  --brand-rgb: 29 181 158;
+  --shadow-brand: 0 0 20px rgb(29 181 158 / 0.25);
+  --bg-page:     hsl(174, 7%, 7%);
+  --bg-surface:  hsl(174, 8%, 9%);
+  --bg-elevated: hsl(174, 6%, 16%);
+  --bg-sunken:   hsl(174, 9%, 3%);
+}
+
+/* Classy — premium black + rich gold accent */
+[data-theme="classy"] {
+  --brand-default: hsl(38, 78%, 54%);
+  --brand-dark:    hsl(36, 90%, 42%);
+  --brand-light:   hsl(42, 82%, 72%);
+  --brand-subtle:  hsl(38, 78%, 64%);
+  --brand-foreground: hsl(38, 30%, 8%);
+  --brand-rgb: 220 168 50;
+  --shadow-brand: 0 0 24px rgb(220 168 50 / 0.30);
+  /* True deep black with minimal tint for premium look */
+  --bg-page:     hsl(38, 5%, 5%);
+  --bg-surface:  hsl(38, 4%, 8%);
+  --bg-elevated: hsl(38, 4%, 13%);
+  --bg-sunken:   hsl(38, 6%, 2%);
+}
+
+/* ============================================
+   COLOR SCHEMES — LIGHT MODE ADJUSTMENTS
+   (darker/richer brand for legibility on light bg)
+   ============================================ */
+
+[data-theme="emerald"][data-mode="light"] {
+  --brand-default: hsl(141, 73%, 36%);
+  --brand-dark:    hsl(143, 85%, 27%);
+  --brand-light:   hsl(134, 68%, 52%);
+  --brand-subtle:  hsl(141, 73%, 44%);
+  --brand-rgb: 20 148 55;
+  --shadow-brand: 0 0 20px rgb(20 148 55 / 0.22);
+  --bg-page:     hsl(141, 18%, 96%);
+  --bg-surface:  hsl(141, 12%, 100%);
+  --bg-elevated: hsl(141, 14%, 92%);
+  --bg-sunken:   hsl(141, 15%, 93%);
+}
+
+[data-theme="amber"][data-mode="light"] {
+  --brand-default: hsl(42, 92%, 44%);
+  --brand-dark:    hsl(40, 96%, 35%);
+  --brand-light:   hsl(46, 88%, 58%);
+  --brand-subtle:  hsl(43, 90%, 50%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-rgb: 196 136 8;
+  --shadow-brand: 0 0 20px rgb(196 136 8 / 0.22);
+  --bg-page:     hsl(45, 22%, 97%);
+  --bg-surface:  hsl(45, 14%, 100%);
+  --bg-elevated: hsl(45, 18%, 93%);
+  --bg-sunken:   hsl(45, 18%, 94%);
+}
+
+[data-theme="sunset"][data-mode="light"] {
+  --brand-default: hsl(20, 88%, 50%);
+  --brand-dark:    hsl(18, 90%, 40%);
+  --brand-light:   hsl(26, 85%, 62%);
+  --brand-subtle:  hsl(22, 88%, 56%);
+  --brand-rgb: 217 91 18;
+  --shadow-brand: 0 0 20px rgb(217 91 18 / 0.22);
+  --bg-page:     hsl(22, 20%, 97%);
+  --bg-surface:  hsl(22, 12%, 100%);
+  --bg-elevated: hsl(22, 16%, 93%);
+  --bg-sunken:   hsl(22, 16%, 94%);
+}
+
+[data-theme="violet"][data-mode="light"] {
+  --brand-default: hsl(262, 70%, 52%);
+  --brand-dark:    hsl(260, 78%, 42%);
+  --brand-light:   hsl(265, 65%, 66%);
+  --brand-subtle:  hsl(262, 68%, 58%);
+  --brand-rgb: 107 63 212;
+  --shadow-brand: 0 0 20px rgb(107 63 212 / 0.22);
+  --bg-page:     hsl(262, 20%, 97%);
+  --bg-surface:  hsl(262, 12%, 100%);
+  --bg-elevated: hsl(262, 16%, 93%);
+  --bg-sunken:   hsl(262, 16%, 94%);
+}
+
+[data-theme="sage"][data-mode="light"] {
+  --brand-default: hsl(158, 52%, 40%);
+  --brand-dark:    hsl(158, 58%, 32%);
+  --brand-light:   hsl(155, 46%, 55%);
+  --brand-subtle:  hsl(158, 50%, 46%);
+  --brand-rgb: 46 138 104;
+  --shadow-brand: 0 0 20px rgb(46 138 104 / 0.20);
+  --bg-page:     hsl(158, 18%, 96%);
+  --bg-surface:  hsl(158, 10%, 100%);
+  --bg-elevated: hsl(158, 14%, 92%);
+  --bg-sunken:   hsl(158, 15%, 93%);
+}
+
+[data-theme="sky"][data-mode="light"] {
+  --brand-default: hsl(194, 82%, 42%);
+  --brand-dark:    hsl(192, 88%, 34%);
+  --brand-light:   hsl(197, 76%, 56%);
+  --brand-subtle:  hsl(194, 80%, 48%);
+  --brand-rgb: 13 141 175;
+  --shadow-brand: 0 0 20px rgb(13 141 175 / 0.20);
+  --bg-page:     hsl(194, 20%, 96%);
+  --bg-surface:  hsl(194, 12%, 100%);
+  --bg-elevated: hsl(194, 16%, 92%);
+  --bg-sunken:   hsl(194, 17%, 93%);
+}
+
+[data-theme="ocean"][data-mode="light"] {
+  --brand-default: hsl(215, 82%, 50%);
+  --brand-dark:    hsl(214, 88%, 42%);
+  --brand-light:   hsl(215, 78%, 64%);
+  --brand-subtle:  hsl(215, 80%, 56%);
+  --brand-rgb: 26 110 216;
+  --shadow-brand: 0 0 20px rgb(26 110 216 / 0.22);
+  --bg-page:     hsl(215, 22%, 96%);
+  --bg-surface:  hsl(215, 14%, 100%);
+  --bg-elevated: hsl(215, 18%, 92%);
+  --bg-sunken:   hsl(215, 18%, 93%);
+}
+
+[data-theme="teal"][data-mode="light"] {
+  --brand-default: hsl(174, 64%, 38%);
+  --brand-dark:    hsl(175, 72%, 30%);
+  --brand-light:   hsl(172, 58%, 52%);
+  --brand-subtle:  hsl(174, 62%, 44%);
+  --brand-rgb: 14 148 132;
+  --shadow-brand: 0 0 20px rgb(14 148 132 / 0.20);
+  --bg-page:     hsl(174, 18%, 96%);
+  --bg-surface:  hsl(174, 10%, 100%);
+  --bg-elevated: hsl(174, 14%, 92%);
+  --bg-sunken:   hsl(174, 15%, 93%);
+}
+
+[data-theme="classy"][data-mode="light"] {
+  --brand-default: hsl(38, 75%, 42%);
+  --brand-dark:    hsl(36, 88%, 32%);
+  --brand-light:   hsl(42, 72%, 58%);
+  --brand-subtle:  hsl(38, 72%, 50%);
+  --brand-foreground: hsl(0, 0%, 98%);
+  --brand-rgb: 195 142 28;
+  --shadow-brand: 0 0 20px rgb(195 142 28 / 0.22);
+  /* Warm cream-white for premium light look */
+  --bg-page:     hsl(38, 16%, 97%);
+  --bg-surface:  hsl(38, 10%, 100%);
+  --bg-elevated: hsl(38, 12%, 93%);
+  --bg-sunken:   hsl(38, 14%, 94%);
 }
 
 @layer base {
@@ -431,7 +749,8 @@
   letter-spacing: 0.04em;
 }
 
-/* Day tiles */
+/* Day tiles — react-calendar v6 sizes tiles via inline flexBasis (14.28%),
+   so do NOT set max-width or override width here or the offset breaks */
 .react-calendar__tile {
   background: none;
   border: none;
@@ -440,16 +759,14 @@
   font-size: 13px;
   font-weight: 400;
   color: var(--color-text-body);
-  /* aspect-ratio alone drives the square — no fixed height */
   aspect-ratio: 1 / 1;
-  max-width: 44px;
-  width: 100%;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -457,19 +774,8 @@
   position: relative;
 }
 
-/* Constrain each month so tiles never exceed ~44px */
-.react-calendar__month-view__days {
-  justify-content: center;
-}
-
-.react-calendar__month-view__weekdays {
-  justify-content: center;
-}
-
 .react-calendar__month-view__weekdays__weekday {
-  max-width: 44px;
-  flex: 0 0 14.2857%;
-  /* text-align: center; */
+  text-align: center;
 }
 
 .react-calendar__tile abbr {
@@ -525,19 +831,48 @@
   color: var(--color-text-body);
 }
 
-/* --- CUSTOM INTENSITY TILES (heatmap) --- */
+/* --- CALENDAR DATE TEXT — brand colored on default tiles --- */
+.react-calendar__month-view__weekdays__weekday abbr {
+  color: var(--color-brand) !important;
+}
+.react-calendar__tile:not(.tile-success):not(.tile-missed) abbr,
+.react-calendar__tile:not(.tile-success):not(.tile-missed) time {
+  color: var(--color-brand);
+}
+
+/* --- 3-STATE TILES --- */
+.tile-success {
+  background: hsl(142, 62%, 42%) !important;
+  color: hsl(0, 0%, 98%) !important;
+  font-weight: 600;
+}
+.tile-success abbr,
+.tile-success time {
+  color: hsl(0, 0%, 98%) !important;
+}
+
+.tile-missed {
+  background: hsl(0, 70%, 55%) !important;
+  color: hsl(0, 0%, 98%) !important;
+}
+.tile-missed abbr,
+.tile-missed time {
+  color: hsl(0, 0%, 98%) !important;
+}
+
+/* --- LEGACY INTENSITY TILES (kept for compatibility) --- */
 .tile-low {
-  background: rgba(29, 185, 84, 0.25) !important;
+  background: rgb(var(--brand-rgb) / 0.25) !important;
   color: var(--color-text-body) !important;
 }
 
 .tile-mid {
-  background: rgba(29, 185, 84, 0.55) !important;
+  background: rgb(var(--brand-rgb) / 0.55) !important;
   color: var(--color-text-heading) !important;
 }
 
 .tile-high {
-  background: rgba(29, 185, 84, 0.9) !important;
+  background: rgb(var(--brand-rgb) / 0.90) !important;
   color: var(--color-bg-page) !important;
   font-weight: 700;
 }

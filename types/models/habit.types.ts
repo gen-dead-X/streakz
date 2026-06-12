@@ -5,11 +5,17 @@ export interface Frequency {
   days: number[]; // 0=Sun, 1=Mon, ..., 6=Sat — empty for 'daily'/'weekly'
 }
 
+export type CardStyle = 'wavy' | 'geometric' | 'blob';
+
 export interface Habit {
   _id: string;
   userId: string;
   name: string;
-  icon: string; // single emoji
+  icon: string; // Lucide icon name e.g. 'Flame'
+  description?: string;
+  tags: string[];
+  cardStyle: CardStyle;
+  notifications: boolean;
   frequency: Frequency;
   createdAt: string;
   archivedAt: string | null;

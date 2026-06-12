@@ -10,4 +10,5 @@ export interface InsightsResponse {
   avgConsistency: number; // 0-100, percentage over last 60 days
   weeklyData: WeeklyDataPoint[]; // 9 entries, oldest first
   checkInDates: string[]; // all 'YYYY-MM-DD' strings for heatmap
+  missedDates: string[];  // past dates since first habit, no check-ins
 }

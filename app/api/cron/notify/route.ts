@@ -25,7 +25,7 @@ export async function GET(request: Request) {
   const results = await Promise.allSettled(
     userIds.map(async (userId) => {
       const habits = await getHabitsForUser(userId, today);
-      const incomplete = habits.filter((h) => !h.isCompletedToday);
+      const incomplete = habits.filter((h) => !h.isCompletedToday && h.notifications !== false);
       if (!incomplete.length) return;
 
       const count = incomplete.length;

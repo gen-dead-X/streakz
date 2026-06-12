@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { BottomNav } from '@/components/ui/BottomNav';
 import { SideNav } from '@/components/ui/SideNav';
+import { SplashScreen } from '@/components/ui/SplashScreen';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -16,6 +17,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--color-bg-page)' }}>
+      <SplashScreen />
+
       {/* Desktop sidebar — hidden on mobile */}
       <SideNav user={user} />
 
@@ -35,7 +38,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="md:hidden" style={{ height: 72 }} />
           {children}
           {/* Spacing for mobile bottom nav */}
-          <div className="md:hidden" style={{ height: 80 }} />
+          <div className="md:hidden" style={{ height: 92 }} />
         </main>
       </div>
 

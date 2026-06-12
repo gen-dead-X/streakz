@@ -2,6 +2,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const { Text } = Typography;
 
@@ -19,7 +20,7 @@ export function BottomNav() {
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 flex items-center md:hidden"
       style={{
-        height: 64,
+        height: 72,
         background: 'var(--color-bg-sunken)',
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
@@ -34,23 +35,28 @@ export function BottomNav() {
         <Text style={{ fontSize: 11, ...(isToday ? active : inactive) }}>Today</Text>
       </button>
 
-      {/* Add */}
-      <div className="flex-1 flex justify-center">
-        <button
+      {/* Add — centered CTA, floats above nav */}
+      <div className="flex-1 flex items-center justify-center">
+        <motion.button
           onClick={() => router.push('/habits/new')}
           className="flex items-center justify-center"
           style={{
-            width: 52,
-            height: 52,
+            width: 62,
+            height: 62,
             borderRadius: '50%',
             background: 'var(--color-brand)',
             border: 'none',
             cursor: 'pointer',
-            boxShadow: 'var(--shadow-brand)',
+            boxShadow: '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
+            marginTop: -24,
           }}
+          initial={{ scale: 0.78 }}
+          animate={{ scale: 1 }}
+          whileTap={{ scale: 0.86 }}
+          transition={{ type: 'spring', stiffness: 440, damping: 18 }}
         >
-          <Plus size={26} style={{ color: 'var(--color-bg-page)' }} />
-        </button>
+          <Plus size={28} style={{ color: 'var(--color-bg-page)' }} />
+        </motion.button>
       </div>
 
       {/* Insights */}

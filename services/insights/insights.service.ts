@@ -7,7 +7,7 @@ import {
   calculateConsistency,
 } from '@/lib/streak/calculator';
 import type { InsightsResponse, WeeklyDataPoint } from '@/types/api/insights.types';
-import { format, subWeeks, startOfWeek, endOfWeek, isWithinInterval, parseISO } from 'date-fns';
+import { format, subWeeks, startOfWeek, endOfWeek, isWithinInterval, parseISO, eachDayOfInterval, subDays } from 'date-fns';
 
 export async function getInsights(
   userId: string,
@@ -66,6 +66,23 @@ export async function getInsights(
 
   const uniqueDates = [...new Set(allDates)].sort();
 
+  // Compute missed dates: past days since first habit created, with no check-ins
+  const checkInSet = new Set(uniqueDates);
+  let missedDates: string[] = [];
+  if (habits.length > 0) {
+    const firstHabitDate = (habits as any[]).reduce((earliest: Date, h: any) => {
+      const d = new Date(h.createdAt ?? h._id.getTimestamp?.() ?? Date.now());
+      return d < earliest ? d : earliest;
+    }, new Date());
+    const yesterday = subDays(parseISO(today), 1);
+    if (firstHabitDate <= yesterday) {
+      const allDaysInRange = eachDayOfInterval({ start: firstHabitDate, end: yesterday });
+      missedDates = allDaysInRange
+        .map((d) => format(d, 'yyyy-MM-dd'))
+        .filter((d) => !checkInSet.has(d));
+    }
+  }
+
   return {
     longestStreak,
     totalCheckIns,
@@ -73,5 +90,6 @@ export async function getInsights(
     avgConsistency,
     weeklyData,
     checkInDates: uniqueDates,
+    missedDates,
   };
 }
