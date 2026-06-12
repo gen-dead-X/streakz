@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Avatar } from 'antd';
 import { useRouter } from 'next/navigation';
 import { User, Settings2 } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface PageHeaderProps {
   user: { name: string; image: string | null };
@@ -48,13 +49,41 @@ export function PageHeader({ user }: PageHeaderProps) {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-end px-4 md:hidden"
+      className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:hidden"
       style={{
         height: 64,
         background: 'linear-gradient(to bottom, var(--color-bg-page) 0%, transparent 100%)',
         pointerEvents: 'none',
       }}
     >
+      {/* Left: streak label + date */}
+      <div style={{ pointerEvents: 'none' }}>
+        <p
+          style={{
+            fontSize: 11,
+            color: 'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            margin: 0,
+            lineHeight: 1,
+          }}
+        >
+          {format(new Date(), 'EEEE, MMM d')}
+        </p>
+        <h1
+          style={{
+            fontSize: 18,
+            fontWeight: 800,
+            color: 'var(--color-text-heading)',
+            margin: 0,
+            lineHeight: 1.2,
+          }}
+        >
+          Your Streaks
+        </h1>
+      </div>
+
+      {/* Right: avatar + dropdown */}
       <div ref={menuRef} style={{ position: 'relative', pointerEvents: 'auto' }}>
         <button
           onClick={() => setMenuOpen((v) => !v)}
