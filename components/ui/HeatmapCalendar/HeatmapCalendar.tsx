@@ -59,12 +59,26 @@ export function HeatmapCalendar({ checkInDates }: HeatmapCalendarProps) {
           padding: '20px 16px',
           border: '1px solid rgba(255,255,255,0.05)',
           display: 'flex',
-          flexDirection: 'column',
-          gap: 24,
+          flexDirection: isDesktop ? 'row' : 'column',
+          gap: isDesktop ? 16 : 24,
+          alignItems: 'flex-start',
         }}
       >
         {months.map((monthStart) => (
-          <div key={format(monthStart, 'yyyy-MM')}>
+          <div key={format(monthStart, 'yyyy-MM')} style={{ flex: 1, minWidth: 0 }}>
+            <span
+              style={{
+                display: 'block',
+                fontSize: 12,
+                fontWeight: 600,
+                color: 'var(--color-text-muted)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.06em',
+                marginBottom: 8,
+              }}
+            >
+              {format(monthStart, 'MMM yyyy')}
+            </span>
             <Calendar
               className="calendar-heatmap"
               activeStartDate={monthStart}

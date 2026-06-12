@@ -431,7 +431,8 @@
   letter-spacing: 0.04em;
 }
 
-/* Day tiles */
+/* Day tiles — react-calendar v6 sizes tiles via inline flexBasis (14.28%),
+   so do NOT set max-width or override width here or the offset breaks */
 .react-calendar__tile {
   background: none;
   border: none;
@@ -440,16 +441,14 @@
   font-size: 13px;
   font-weight: 400;
   color: var(--color-text-body);
-  /* aspect-ratio alone drives the square — no fixed height */
   aspect-ratio: 1 / 1;
-  max-width: 44px;
-  width: 100%;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -457,19 +456,8 @@
   position: relative;
 }
 
-/* Constrain each month so tiles never exceed ~44px */
-.react-calendar__month-view__days {
-  justify-content: center;
-}
-
-.react-calendar__month-view__weekdays {
-  justify-content: center;
-}
-
 .react-calendar__month-view__weekdays__weekday {
-  max-width: 44px;
-  flex: 0 0 14.2857%;
-  /* text-align: center; */
+  text-align: center;
 }
 
 .react-calendar__tile abbr {
