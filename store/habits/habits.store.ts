@@ -2,10 +2,13 @@ import { create } from 'zustand';
 import type { Habit, HabitWithStreak } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
 import type { CheckInWithAchievementsResponse } from '@/types/api/achievements.types';
+import type { CalendarDots, HabitsByDate } from '@/types/api/insights.types';
 import { notify } from '@/lib/snackbar';
 
 interface HabitsState {
   habits: HabitWithStreak[];
+  calendarDots: CalendarDots;
+  habitsByDate: HabitsByDate;
   loading: boolean;
   error: string | null;
   fetchHabits: () => Promise<void>;
@@ -18,6 +21,8 @@ interface HabitsState {
 
 export const useHabitsStore = create<HabitsState>((set, get) => ({
   habits: [],
+  calendarDots: {},
+  habitsByDate: {},
   loading: false,
   error: null,
 
@@ -26,15 +31,19 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     try {
       const res = await fetch('/api/habits');
       if (!res.ok) throw new Error('Failed to fetch habits');
-      const { habits } = await res.json();
-      set({ habits, loading: false });
+      const { habits, calendarDots, habitsByDate } = await res.json();
+      set({
+        habits,
+        calendarDots: calendarDots ?? {},
+        habitsByDate: habitsByDate ?? {},
+        loading: false,
+      });
     } catch (err) {
       set({ error: String(err), loading: false });
     }
   },
 
   async checkIn(habitId, date) {
-    // Optimistic update
     set((s) => ({
       habits: s.habits.map((h) =>
         h._id === habitId
@@ -53,7 +62,6 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
       body: JSON.stringify({ date }),
     });
     if (!res.ok) {
-      // Rollback on failure
       await get().fetchHabits();
       if (res.status !== 409) {
         notify('Check-in failed. Try again.', 'error');
@@ -65,7 +73,6 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
   },
 
   async uncheck(habitId, date) {
-    // Optimistic update
     set((s) => ({
       habits: s.habits.map((h) =>
         h._id === habitId
@@ -112,7 +119,6 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     });
     if (!res.ok) throw new Error('Failed to update habit');
     const { habit: updated } = (await res.json()) as { habit: Habit };
-    // Immediately reflect server response in store (preserves streak data)
     set((s) => ({
       habits: s.habits.map((h) =>
         h._id === id ? ({ ...h, ...updated } as HabitWithStreak) : h,
