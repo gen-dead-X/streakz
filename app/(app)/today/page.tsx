@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import { format } from 'date-fns';
 import { getHabitsForUser } from '@/services/habits/habits.service';
 import { HabitList } from '@/components/features/habits/HabitList';
-import { WeekStrip } from '@/components/ui/WeekStrip';
+import { WeekStrip } from '@/components/features/habits/WeekStrip';
 
 export default async function TodayPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -32,7 +32,7 @@ export default async function TodayPage() {
             <p
               style={{
                 fontSize: 11,
-                color: '#10b981',
+                color: 'var(--color-success)',
                 fontWeight: 600,
                 margin: '0 0 4px 4px',
                 letterSpacing: '0.05em',

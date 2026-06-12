@@ -21,8 +21,11 @@ export function WeekStrip() {
 
   useEffect(() => {
     fetch('/api/habits/week-summary')
-      .then((r) => r.json())
-      .then((data: DaySummary[]) => setSummaries(data))
+      .then((r) => {
+        if (!r.ok) return;
+        return r.json() as Promise<DaySummary[]>;
+      })
+      .then((data) => { if (data) setSummaries(data); })
       .catch(() => {});
   }, []);
 
@@ -38,7 +41,7 @@ export function WeekStrip() {
 
   function dotColor(s: DaySummary, date: string): string | null {
     if (s.total === 0 || date > today) return null;
-    return s.completed >= s.total ? '#10b981' : '#ef4444';
+    return s.completed >= s.total ? 'var(--color-success)' : 'var(--color-error)';
   }
 
   return (

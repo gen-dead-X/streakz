@@ -13,6 +13,11 @@ export async function GET() {
     format(addDays(weekStart, i), 'yyyy-MM-dd'),
   );
 
-  const summaries = await getWeekSummary(session.user.id, dates);
-  return Response.json(summaries);
+  try {
+    const summaries = await getWeekSummary(session.user.id, dates);
+    return Response.json(summaries);
+  } catch (err) {
+    console.error(err);
+    return Response.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
