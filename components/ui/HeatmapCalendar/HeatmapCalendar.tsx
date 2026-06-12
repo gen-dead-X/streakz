@@ -8,9 +8,10 @@ const { Text } = Typography;
 
 interface HeatmapCalendarProps {
   checkInDates: string[];
+  missedDates: string[];
 }
 
-export function HeatmapCalendar({ checkInDates }: HeatmapCalendarProps) {
+export function HeatmapCalendar({ checkInDates, missedDates }: HeatmapCalendarProps) {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -21,14 +22,10 @@ export function HeatmapCalendar({ checkInDates }: HeatmapCalendarProps) {
     return () => mq.removeEventListener('change', handler);
   }, []);
 
-  // Count check-ins per date
-  const countByDate = new Map<string, number>();
-  for (const d of checkInDates) {
-    countByDate.set(d, (countByDate.get(d) ?? 0) + 1);
-  }
+  const checkInSet = new Set(checkInDates);
+  const missedSet = new Set(missedDates);
 
   const today = new Date();
-  // On desktop show last 3 months stacked; on mobile show current month
   const monthsToShow = isDesktop ? 3 : 1;
   const months = Array.from({ length: monthsToShow }, (_, i) =>
     startOfMonth(subMonths(today, monthsToShow - 1 - i)),
@@ -37,10 +34,8 @@ export function HeatmapCalendar({ checkInDates }: HeatmapCalendarProps) {
   function getTileClassName({ date, view }: { date: Date; view: string }): string | null {
     if (view !== 'month') return null;
     const key = format(date, 'yyyy-MM-dd');
-    const count = countByDate.get(key) ?? 0;
-    if (count >= 4) return 'tile-high';
-    if (count >= 2) return 'tile-mid';
-    if (count >= 1) return 'tile-low';
+    if (checkInSet.has(key)) return 'tile-success';
+    if (missedSet.has(key)) return 'tile-missed';
     return null;
   }
 
@@ -54,10 +49,10 @@ export function HeatmapCalendar({ checkInDates }: HeatmapCalendarProps) {
       </Text>
       <div
         style={{
-          background: 'var(--color-bg-surface)',
+          background: 'rgb(var(--brand-rgb) / 0.07)',
           borderRadius: 20,
           padding: '20px 16px',
-          border: '1px solid rgba(255,255,255,0.05)',
+          border: '1px solid rgb(var(--brand-rgb) / 0.12)',
           display: 'flex',
           flexDirection: isDesktop ? 'row' : 'column',
           gap: isDesktop ? 16 : 24,
@@ -71,7 +66,7 @@ export function HeatmapCalendar({ checkInDates }: HeatmapCalendarProps) {
                 display: 'block',
                 fontSize: 12,
                 fontWeight: 600,
-                color: 'var(--color-text-muted)',
+                color: 'var(--color-brand)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.06em',
                 marginBottom: 8,

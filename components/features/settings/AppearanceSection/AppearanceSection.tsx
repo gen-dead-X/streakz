@@ -74,7 +74,7 @@ export function AppearanceSection() {
                     <Check
                       size={18}
                       style={{
-                        color: t.id === 'mono' ? '#fff' : '#000',
+                        color: t.id === 'classy' ? '#fff' : '#000',
                         strokeWidth: 2.5,
                       }}
                     />

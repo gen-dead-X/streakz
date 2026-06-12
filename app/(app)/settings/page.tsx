@@ -1,4 +1,5 @@
 import { AppearanceSection } from '@/components/features/settings/AppearanceSection';
+import { NotificationsSection } from '@/components/features/settings/NotificationsSection';
 
 export default function SettingsPage() {
   return (
@@ -37,6 +38,17 @@ export default function SettingsPage() {
         }}
       >
         <AppearanceSection />
+      </div>
+
+      <div
+        style={{
+          background: 'var(--color-bg-surface)',
+          borderRadius: 20,
+          padding: '24px 20px',
+          border: '1px solid var(--color-border-subtle)',
+        }}
+      >
+        <NotificationsSection />
       </div>
     </div>
   );
