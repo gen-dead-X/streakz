@@ -23,3 +23,9 @@ export interface UpdateHabitInput {
 export interface HabitsResponse {
   habits: HabitWithStreak[];
 }
+
+export interface DaySummary {
+  date: string;       // 'YYYY-MM-DD'
+  total: number;      // active habit count for that day
+  completed: number;  // habits checked in on that day
+}
