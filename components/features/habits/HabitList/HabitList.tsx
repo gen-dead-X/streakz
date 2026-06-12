@@ -29,6 +29,7 @@ function DesktopHabitRow({
   const router = useRouter();
 
   function handleToggle() {
+    navigator.vibrate?.(50);
     if (habit.isCompletedToday) onUncheck(habit._id, today);
     else onCheckIn(habit._id, today);
   }
@@ -64,6 +65,9 @@ function DesktopHabitRow({
           fontSize: 14, fontWeight: 600,
           color: 'var(--color-text-heading)',
           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          textDecoration: habit.isCompletedToday ? 'line-through' : 'none',
+          opacity: habit.isCompletedToday ? 0.55 : 1,
+          transition: 'opacity 0.2s',
         }}>
           {habit.name}
         </div>

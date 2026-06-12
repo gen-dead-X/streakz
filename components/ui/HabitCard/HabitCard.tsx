@@ -1,7 +1,10 @@
 'use client';
+import './HabitCard.css';
+import { useRef, useCallback } from 'react';
 import { Flame, MoreHorizontal } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import confetti from 'canvas-confetti';
 import { HabitIcon } from '@/components/ui/HabitIcon';
 import type { HabitCardProps } from './HabitCard.types';
 import type { CardStyle } from '@/types/models/habit.types';
@@ -39,16 +42,42 @@ function WaveTexture() {
   );
 }
 
+function randomInRange(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
 export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: HabitCardProps) {
   const router = useRouter();
   const style: CardStyle = habit.cardStyle ?? 'wavy';
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const fireConfetti = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const fire = confetti.create(canvas, { resize: true, useWorker: false });
+    fire({
+      particleCount: Math.floor(randomInRange(60, 100)),
+      angle: randomInRange(55, 125),
+      spread: randomInRange(60, 80),
+      origin: { x: 0.5, y: 1.05 },
+      startVelocity: randomInRange(28, 38),
+      gravity: 1.3,
+      decay: 0.92,
+      ticks: 200,
+      colors: ['#ffffff', '#a3f7b5', '#5eead4', '#6ee7b7', '#fbbf24'],
+      shapes: ['circle', 'square'],
+      scalar: 0.8,
+    });
+  }, []);
 
   function handleToggle(e: React.MouseEvent) {
     e.stopPropagation();
+    navigator.vibrate?.(50);
     if (habit.isCompletedToday) {
       onUncheck(habit._id, today);
     } else {
       onCheckIn(habit._id, today);
+      fireConfetti();
     }
   }
 
@@ -70,6 +99,7 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
       }}
     >
       <WaveTexture />
+      <canvas ref={canvasRef} className="habit-card-canvas" />
 
       {/* Icon — top-left floating */}
       <div style={{
@@ -102,7 +132,7 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
 
       {/* Content — bottom */}
       <div style={{ position: 'relative', zIndex: 2 }}>
-        {/* Name */}
+        {/* Name with strikethrough when completed */}
         <h2 style={{
           fontSize: 34,
           fontWeight: 900,
@@ -111,6 +141,9 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
           letterSpacing: '-0.5px',
           margin: '0 0 6px',
           wordBreak: 'break-word',
+          textDecoration: habit.isCompletedToday ? 'line-through' : 'none',
+          opacity: habit.isCompletedToday ? 0.65 : 1,
+          transition: 'opacity 0.25s ease',
         }}>
           {habit.name}
         </h2>
@@ -149,7 +182,10 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
         )}
 
         {/* Bottom row: streak + check-in */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: habit.tags?.length > 0 ? 0 : 12 }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginTop: habit.tags?.length > 0 ? 0 : 12,
+        }}>
           {/* Streak pill */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: 6,
@@ -166,7 +202,7 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
             </span>
           </div>
 
-          {/* Check-in button */}
+          {/* Check-in button — zIndex 4 so it sits above the confetti canvas */}
           <motion.button
             onClick={handleToggle}
             disabled={loading}
@@ -180,6 +216,8 @@ export function HabitCard({ habit, today, onCheckIn, onUncheck, loading }: Habit
               backdropFilter: 'blur(6px)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'background 0.2s',
+              position: 'relative',
+              zIndex: 4,
             }}
             aria-label={habit.isCompletedToday ? 'Uncheck' : 'Check in'}
           >
