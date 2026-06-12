@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { HabitIcon } from "@/components/ui/HabitIcon";
+import { RichTextPreview } from "@/components/ui/RichTextPreview";
 import type { HabitCardProps } from "./HabitCard.types";
 import type { CardStyle } from "@/types/models/habit.types";
 
@@ -190,20 +191,17 @@ export function HabitCard({
 
         {/* Description */}
         {habit.description && (
-          <p
+          <div
             style={{
               fontSize: 13,
               color: "rgba(255,255,255,0.72)",
               margin: "0 0 8px",
-              lineHeight: 1.4,
+              maxHeight: 38,
               overflow: "hidden",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
             }}
           >
-            {typeof habit.description === 'string' ? habit.description : ''}
-          </p>
+            <RichTextPreview content={habit.description} />
+          </div>
         )}
 
         {/* Tags */}
