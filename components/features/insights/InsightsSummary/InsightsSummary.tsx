@@ -69,7 +69,7 @@ export function InsightsSummary() {
       </div>
 
       {/* Heatmap */}
-      <HeatmapCalendar checkInDates={stats.checkInDates} missedDates={stats.missedDates} />
+      <HeatmapCalendar />
     </div>
   );
 }

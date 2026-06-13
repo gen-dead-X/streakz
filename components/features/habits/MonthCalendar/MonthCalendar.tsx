@@ -1,22 +1,53 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, addDays } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useHabitsStore } from '@/store/habits/habits.store';
 import type { DaySummary } from '@/types/api/habits.types';
 
-const DAY_HEADERS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_HEADERS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+
+type DayStatus = 'complete' | 'partial' | 'missed' | 'future' | 'empty';
+
+function getStatus(s: DaySummary, date: string, today: string): DayStatus {
+  if (date > today) return 'future';
+  if (s.total === 0) return 'empty';
+  if (s.completed === 0) return 'missed';
+  if (s.completed >= s.total) return 'complete';
+  return 'partial';
+}
+
+const CELL: Record<DayStatus, { bg: string; border: string; text: string; glow: string }> = {
+  complete: {
+    bg: 'rgba(34,197,94,0.16)',
+    border: '1px solid rgba(34,197,94,0.35)',
+    text: '#86efac',
+    glow: '0 0 10px rgba(34,197,94,0.25)',
+  },
+  partial: {
+    bg: 'rgba(234,179,8,0.14)',
+    border: '1px solid rgba(234,179,8,0.35)',
+    text: '#fde047',
+    glow: '0 0 10px rgba(234,179,8,0.2)',
+  },
+  missed: {
+    bg: 'rgba(239,68,68,0.12)',
+    border: '1px solid rgba(239,68,68,0.28)',
+    text: '#fca5a5',
+    glow: '0 0 10px rgba(239,68,68,0.18)',
+  },
+  future: { bg: 'transparent', border: '1px solid transparent', text: 'var(--color-text-muted)', glow: 'none' },
+  empty:  { bg: 'transparent', border: '1px solid transparent', text: 'var(--color-text-body)',  glow: 'none' },
+};
 
 function buildGrid(year: number, month: number): (string | null)[] {
   const ref = new Date(year, month - 1, 1);
   const days = eachDayOfInterval({ start: startOfMonth(ref), end: endOfMonth(ref) }).map(
     (d) => format(d, 'yyyy-MM-dd'),
   );
-  // getDay returns 0=Sun...6=Sat, convert to Mon-start (0=Mon...6=Sun)
   const firstDow = (getDay(startOfMonth(ref)) + 6) % 7;
   const grid: (string | null)[] = Array(firstDow).fill(null);
   grid.push(...days);
-  // Pad to full weeks
   while (grid.length % 7 !== 0) grid.push(null);
   return grid;
 }
@@ -37,28 +68,21 @@ export function MonthCalendar() {
 
   function getSummary(date: string): DaySummary {
     if (date === today) {
-      const total = habits.length;
-      const completed = habits.filter((h) => h.isCompletedToday).length;
-      return { date, total, completed };
+      return { date, total: habits.length, completed: habits.filter((h) => h.isCompletedToday).length };
     }
     return summaries.find((s) => s.date === date) ?? { date, total: 0, completed: 0 };
   }
 
-  function dotColor(s: DaySummary, date: string): string | null {
-    if (s.total === 0 || date > today) return null;
-    return s.completed >= s.total ? 'var(--color-success)' : 'var(--color-error)';
-  }
-
   function prev() {
+    setSummaries([]);
     if (month === 1) { setYear((y) => y - 1); setMonth(12); }
     else setMonth((m) => m - 1);
-    setSummaries([]);
   }
 
   function next() {
+    setSummaries([]);
     if (month === 12) { setYear((y) => y + 1); setMonth(1); }
     else setMonth((m) => m + 1);
-    setSummaries([]);
   }
 
   const grid = buildGrid(year, month);
@@ -66,56 +90,57 @@ export function MonthCalendar() {
 
   return (
     <div style={{ width: '100%' }}>
-      {/* Header: month label + navigation */}
+      {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-text-heading)' }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: 'var(--color-text-heading)', letterSpacing: '-0.2px' }}>
           {monthLabel}
         </span>
         <div style={{ display: 'flex', gap: 4 }}>
-          <button
-            onClick={prev}
-            style={{
-              width: 30, height: 30, borderRadius: 99,
-              background: 'var(--color-bg-elevated)', border: 'none',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-            aria-label="Previous month"
-          >
-            <ChevronLeft size={14} color="var(--color-text-muted)" />
-          </button>
-          <button
-            onClick={next}
-            style={{
-              width: 30, height: 30, borderRadius: 99,
-              background: 'var(--color-bg-elevated)', border: 'none',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-            aria-label="Next month"
-          >
-            <ChevronRight size={14} color="var(--color-text-muted)" />
-          </button>
+          {[{ fn: prev, icon: <ChevronLeft size={14} />, label: 'Previous month' },
+            { fn: next, icon: <ChevronRight size={14} />, label: 'Next month' }].map(({ fn, icon, label }) => (
+            <button
+              key={label}
+              onClick={fn}
+              aria-label={label}
+              style={{
+                width: 30, height: 30, borderRadius: 99,
+                background: 'rgba(255,255,255,0.06)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--color-text-muted)',
+                transition: 'background 0.15s ease',
+              }}
+            >
+              {icon}
+            </button>
+          ))}
         </div>
       </div>
 
       {/* Day-of-week headers */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 4 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', marginBottom: 6 }}>
         {DAY_HEADERS.map((d) => (
-          <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 600, color: 'var(--color-text-muted)', padding: '0 0 6px', letterSpacing: '0.04em' }}>
+          <div key={d} style={{
+            textAlign: 'center', fontSize: 10, fontWeight: 700,
+            color: 'var(--color-text-muted)', letterSpacing: '0.08em',
+            textTransform: 'uppercase', padding: '0 0 6px',
+          }}>
             {d}
           </div>
         ))}
       </div>
 
       {/* Calendar grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '2px 0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4 }}>
         {grid.map((date, i) => {
-          if (!date) {
-            return <div key={`empty-${i}`} />;
-          }
+          if (!date) return <div key={`e-${i}`} />;
+
           const isToday = date === today;
-          const isFuture = date > today;
           const summary = getSummary(date);
-          const color = dotColor(summary, date);
+          const status = getStatus(summary, date, today);
+          const c = CELL[status];
           const dayNum = parseInt(date.split('-')[2], 10);
 
           return (
@@ -125,46 +150,28 @@ export function MonthCalendar() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: 3,
-                padding: '4px 0',
+                justifyContent: 'center',
+                aspectRatio: '1',
+                borderRadius: 10,
+                background: isToday
+                  ? 'linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.82) 100%)'
+                  : c.bg,
+                border: isToday ? '1px solid rgba(255,255,255,0.3)' : c.border,
+                boxShadow: isToday
+                  ? '0 2px 16px rgba(255,255,255,0.12), inset 0 1px 0 rgba(255,255,255,0.5)'
+                  : c.glow !== 'none' ? c.glow : 'none',
+                backdropFilter: status !== 'future' && status !== 'empty' ? 'blur(4px)' : 'none',
+                transition: 'background 0.2s ease, box-shadow 0.2s ease',
               }}
             >
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 99,
-                  background: isToday ? 'var(--color-text-heading)' : 'transparent',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: 13,
-                    fontWeight: isToday ? 700 : 400,
-                    color: isToday
-                      ? 'var(--color-bg-page)'
-                      : isFuture
-                      ? 'var(--color-text-muted)'
-                      : 'var(--color-text-body)',
-                    lineHeight: 1,
-                  }}
-                >
-                  {dayNum}
-                </span>
-              </div>
-              <div
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: '50%',
-                  background: color ?? 'transparent',
-                  transition: 'background 0.3s',
-                  flexShrink: 0,
-                }}
-              />
+              <span style={{
+                fontSize: 12,
+                fontWeight: isToday ? 800 : status === 'future' ? 400 : 500,
+                color: isToday ? '#111' : c.text,
+                lineHeight: 1,
+              }}>
+                {dayNum}
+              </span>
             </div>
           );
         })}
