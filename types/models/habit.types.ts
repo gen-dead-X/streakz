@@ -7,7 +7,7 @@ export interface Frequency {
   days: number[]; // 0=Sun, 1=Mon, ..., 6=Sat — empty for 'daily'/'weekly'
 }
 
-export type CardStyle = 'wavy' | 'geometric' | 'blob';
+export type CardStyle = 'wavy' | 'geometric' | 'blob' | 'aurora' | 'ember' | 'midnight' | 'rose';
 
 export interface Habit {
   _id: string;
