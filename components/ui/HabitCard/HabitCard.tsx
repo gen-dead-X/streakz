@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 import { HabitIcon } from "@/components/ui/HabitIcon";
 import { RichTextPreview } from "@/components/ui/RichTextPreview";
+import { playSound } from "@/lib/audio/playSound";
 import type { HabitCardProps } from "./HabitCard.types";
 import type { CardStyle } from "@/types/models/habit.types";
 
@@ -103,6 +104,7 @@ export function HabitCard({
     } else {
       onCheckIn(habit._id, today);
       fireConfetti();
+      playSound('/music/streak-complete.wav');
     }
   }
 
