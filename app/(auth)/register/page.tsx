@@ -1,24 +1,26 @@
 'use client';
 import { useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Form, Input, Divider, Typography, Alert } from 'antd';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { FireOutlined } from '@ant-design/icons';
-import { signUp, signIn } from '@/lib/auth/auth-client';
+import { signUp } from '@/lib/auth/auth-client';
+import { registerSchema, type RegisterValues } from '@/lib/validation/auth.schema';
 
 const { Title, Text } = Typography;
 
 export default function RegisterPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onFinish(values: { name: string; email: string; password: string; confirm: string }) {
-    if (values.password !== values.confirm) {
-      setError('Passwords do not match');
-      return;
-    }
+  const { control, handleSubmit, formState: { errors } } = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+  });
+
+  async function onSubmit(values: RegisterValues) {
     setLoading(true);
     setError(null);
     const { error: err } = await signUp.email({
@@ -33,11 +35,6 @@ export default function RegisterPage() {
     } else {
       router.push('/today');
     }
-  }
-
-  async function onGoogle() {
-    setGoogleLoading(true);
-    await signIn.social({ provider: 'google', callbackURL: '/today' });
   }
 
   return (
@@ -63,55 +60,91 @@ export default function RegisterPage() {
 
         {error && <Alert title={error} type="error" showIcon style={{ marginBottom: 16 }} />}
 
-        <Form layout="vertical" onFinish={onFinish} requiredMark={false}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Form.Item
-            name="name"
             label={<Text style={{ color: 'var(--color-text-body)' }}>Name</Text>}
-            rules={[{ required: true, message: 'Enter your name' }]}
+            validateStatus={errors.name ? 'error' : ''}
+            help={errors.name?.message}
           >
-            <Input
-              size="large"
-              placeholder="Your name"
-              style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  size="large"
+                  placeholder="Your name"
+                  autoComplete="name"
+                  style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+                />
+              )}
             />
           </Form.Item>
+
           <Form.Item
-            name="email"
             label={<Text style={{ color: 'var(--color-text-body)' }}>Email</Text>}
-            rules={[{ required: true, type: 'email', message: 'Enter a valid email' }]}
+            validateStatus={errors.email ? 'error' : ''}
+            help={errors.email?.message}
           >
-            <Input
-              size="large"
-              placeholder="you@example.com"
-              style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  size="large"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+                />
+              )}
             />
           </Form.Item>
+
           <Form.Item
-            name="password"
             label={<Text style={{ color: 'var(--color-text-body)' }}>Password</Text>}
-            rules={[{ required: true, min: 8, message: 'At least 8 characters' }]}
+            validateStatus={errors.password ? 'error' : ''}
+            help={errors.password?.message}
           >
-            <Input.Password
-              size="large"
-              placeholder="••••••••"
-              style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <Input.Password
+                  {...field}
+                  size="large"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+                />
+              )}
             />
           </Form.Item>
+
           <Form.Item
-            name="confirm"
             label={<Text style={{ color: 'var(--color-text-body)' }}>Confirm Password</Text>}
-            rules={[{ required: true, message: 'Confirm your password' }]}
+            validateStatus={errors.confirm ? 'error' : ''}
+            help={errors.confirm?.message}
           >
-            <Input.Password
-              size="large"
-              placeholder="••••••••"
-              style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+            <Controller
+              name="confirm"
+              control={control}
+              render={({ field }) => (
+                <Input.Password
+                  {...field}
+                  size="large"
+                  placeholder="••••••••"
+                  autoComplete="new-password"
+                  style={{ background: 'var(--color-bg-elevated)', borderColor: 'var(--color-border-subtle)' }}
+                />
+              )}
             />
           </Form.Item>
+
           <Form.Item style={{ marginBottom: 12 }}>
             <Button
-              type="primary"
               htmlType="submit"
+              type="primary"
               size="large"
               block
               loading={loading}
@@ -120,9 +153,11 @@ export default function RegisterPage() {
               Create Account
             </Button>
           </Form.Item>
-        </Form>
+        </form>
 
-        <Divider style={{ borderColor: 'var(--color-border-subtle)', color: 'var(--color-text-muted)' }}>or</Divider>
+        <Divider style={{ borderColor: 'var(--color-border-subtle)', color: 'var(--color-text-muted)' }}>
+          or
+        </Divider>
 
         <Button
           size="large"
