@@ -9,13 +9,18 @@ self.addEventListener('push', (event) => {
   }
 
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Streak Counter', {
-      body: data.body || '',
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: 'streak-reminder',
-      data: { url: '/today' },
-    })
+    Promise.all([
+      self.registration.showNotification(data.title || 'Streak Counter', {
+        body: data.body || '',
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: 'streak-reminder',
+        data: { url: '/today' },
+      }),
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+        clientList.forEach((client) => client.postMessage({ type: 'PLAY_NOTIFICATION_TONE' }));
+      }),
+    ])
   );
 });
 

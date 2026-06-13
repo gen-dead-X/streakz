@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { SideNav } from "@/components/ui/SideNav";
 import { SplashScreen } from "@/components/ui/SplashScreen";
 import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
+import { NotificationTonePlayer } from "@/components/ui/NotificationTonePlayer";
 
 export default async function AppLayout({
   children,
@@ -46,6 +47,7 @@ export default async function AppLayout({
       {/* Mobile bottom nav — hidden on desktop */}
       <BottomNav />
       <PushPermissionBanner />
+      <NotificationTonePlayer />
     </div>
   );
 }
