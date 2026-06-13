@@ -4,7 +4,7 @@ import type { CardStyle, Frequency, HabitWithStreak } from '@/types/models/habit
 export interface CreateHabitInput {
   name: string;
   icon: string;
-  description?: JSONContent | string;
+  description?: JSONContent;
   tags?: string[];
   cardStyle?: CardStyle;
   notifications?: boolean;
@@ -14,7 +14,7 @@ export interface CreateHabitInput {
 export interface UpdateHabitInput {
   name?: string;
   icon?: string;
-  description?: JSONContent | string;
+  description?: JSONContent;
   tags?: string[];
   cardStyle?: CardStyle;
   notifications?: boolean;

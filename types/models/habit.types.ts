@@ -14,7 +14,7 @@ export interface Habit {
   userId: string;
   name: string;
   icon: string; // Lucide icon name e.g. 'Flame'
-  description?: JSONContent | string;
+  description?: JSONContent;
   tags: string[];
   cardStyle: CardStyle;
   notifications: boolean;

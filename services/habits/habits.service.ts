@@ -24,7 +24,7 @@ function toPlain(doc: any): Habit {
     userId: obj.userId,
     name: obj.name,
     icon: obj.icon,
-    description: obj.description ?? '',
+    description: obj.description ?? undefined,
     tags: obj.tags ?? [],
     cardStyle: obj.cardStyle ?? deterministicCardStyle(String(obj._id)),
     notifications: obj.notifications ?? true,

@@ -58,7 +58,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
   const [notifications, setNotifications] = useState(initial?.notifications ?? true);
   const [freqType, setFreqType] = useState<Frequency['type']>(initial?.frequency.type ?? 'daily');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
   const [descriptionJson, setDescriptionJson] = useState<JSONContent | undefined>(
     initial?.description && typeof initial.description === 'object'
       ? (initial.description as JSONContent)
@@ -80,9 +80,9 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
 
   async function onSubmit(values: HabitFormValues) {
     setLoading(true);
-    setError(null);
+    setHasError(false);
     if (freqType === 'specific' && (values.days ?? []).length === 0) {
-      setError('Select at least one day');
+      setHasError(true);
       setLoading(false);
       return;
     }
@@ -104,7 +104,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
         },
       });
     } catch {
-      setError('Failed to save. Please try again.');
+      setHasError(true);
     } finally {
       setLoading(false);
     }
@@ -398,25 +398,25 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
 
         <div style={{ flex: 1, minHeight: 12 }} />
 
-        {error && (
-          <p style={{ color: 'var(--color-error)', fontSize: 13, marginBottom: 12 }}>{error}</p>
-        )}
-
         <motion.button
           type="submit"
           disabled={loading}
           whileTap={{ scale: 0.97 }}
           style={{
             width: '100%', height: 58, borderRadius: 99,
-            background: loading ? 'var(--color-bg-elevated)' : 'var(--color-text-heading)',
-            color: 'var(--color-bg-page)',
+            background: loading
+              ? 'var(--color-bg-elevated)'
+              : hasError
+                ? 'var(--color-error)'
+                : 'var(--color-text-heading)',
+            color: loading ? 'var(--color-text-muted)' : 'var(--color-bg-page)',
             border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
             fontSize: 17, fontWeight: 800, letterSpacing: '-0.2px',
-            transition: 'background 0.2s',
+            transition: 'background 0.25s, color 0.25s',
             marginBottom: onDelete ? 12 : 0,
           }}
         >
-          {loading ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Streak'}
+          {loading ? 'Saving…' : hasError ? 'Retry' : isEdit ? 'Save Changes' : 'Create Streak'}
         </motion.button>
 
         {onDelete && (
