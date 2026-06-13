@@ -76,6 +76,11 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
   async function onSubmit(values: HabitFormValues) {
     setLoading(true);
     setError(null);
+    if (freqType === 'specific' && (values.days ?? []).length === 0) {
+      setError('Select at least one day');
+      setLoading(false);
+      return;
+    }
     try {
       const tags = (values.tags ?? '')
         .split(/[\s,]+/)
@@ -191,7 +196,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
           role="button"
           tabIndex={0}
           onClick={() => setEditorOpen(true)}
-          onKeyDown={(e) => e.key === 'Enter' && setEditorOpen(true)}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && setEditorOpen(true)}
           style={{
             background: 'var(--color-bg-elevated)',
             borderRadius: 14,
@@ -229,13 +234,11 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
           footer={null}
           destroyOnHidden
         >
-          {editorOpen && (
-            <RichTextEditor
-              value={descriptionJson}
-              onChange={setDescriptionJson}
-              placeholder="Add a rich description…"
-            />
-          )}
+          <RichTextEditor
+            value={descriptionJson}
+            onChange={setDescriptionJson}
+            placeholder="Add a rich description…"
+          />
           <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12 }}>
             <motion.button
               type="button"
