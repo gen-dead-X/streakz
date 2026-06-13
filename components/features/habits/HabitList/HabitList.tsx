@@ -1,15 +1,15 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { Skeleton } from 'antd';
-import { format } from 'date-fns';
-import { Flame, Settings, Check } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { StreakCardPager } from '@/components/features/habits/StreakCardPager';
-import { HabitIcon } from '@/components/ui/HabitIcon';
-import { useHabitsStore } from '@/store/habits/habits.store';
-import { useCheckIn } from '@/hooks/checkin/useCheckIn';
-import type { HabitWithStreak } from '@/types/models/habit.types';
+"use client";
+import { useEffect, useState } from "react";
+import { Skeleton } from "antd";
+import { format } from "date-fns";
+import { Flame, Settings, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { StreakCardPager } from "@/components/features/habits/StreakCardPager";
+import { HabitIcon } from "@/components/ui/HabitIcon";
+import { useHabitsStore } from "@/store/habits/habits.store";
+import { useCheckIn } from "@/hooks/checkin/useCheckIn";
+import type { HabitWithStreak } from "@/types/models/habit.types";
 
 // ── Compact row for desktop list ────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ function DesktopHabitRow({
   const router = useRouter();
 
   function handleToggle() {
-    navigator.vibrate?.(50);
+    navigator.vibrate?.(100);
     if (habit.isCompletedToday) onUncheck(habit._id, today);
     else onCheckIn(habit._id, today);
   }
@@ -40,44 +40,75 @@ function DesktopHabitRow({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       style={{
-        display: 'flex', alignItems: 'center', gap: 12,
-        padding: '10px 14px',
+        display: "flex",
+        alignItems: "center",
+        gap: 12,
+        padding: "10px 14px",
         borderRadius: 16,
-        background: 'var(--color-bg-surface)',
+        background: "var(--color-bg-surface)",
         border: habit.isCompletedToday
-          ? '1px solid rgba(16,185,129,0.25)'
-          : '1px solid rgba(255,255,255,0.04)',
-        transition: 'border-color 0.2s',
+          ? "1px solid rgba(16,185,129,0.25)"
+          : "1px solid rgba(255,255,255,0.04)",
+        transition: "border-color 0.2s",
       }}
     >
       {/* Icon */}
-      <div style={{
-        width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-        background: 'var(--color-bg-elevated)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}>
-        <HabitIcon name={habit.icon} size={18} color="var(--color-text-muted)" />
+      <div
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: 12,
+          flexShrink: 0,
+          background: "var(--color-bg-elevated)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <HabitIcon
+          name={habit.icon}
+          size={18}
+          color="var(--color-text-muted)"
+        />
       </div>
 
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontSize: 14, fontWeight: 600,
-          color: 'var(--color-text-heading)',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-          textDecoration: habit.isCompletedToday ? 'line-through' : 'none',
-          opacity: habit.isCompletedToday ? 0.55 : 1,
-          transition: 'opacity 0.2s',
-        }}>
+        <div
+          style={{
+            fontSize: 14,
+            fontWeight: 600,
+            color: "var(--color-text-heading)",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            textDecoration: habit.isCompletedToday ? "line-through" : "none",
+            opacity: habit.isCompletedToday ? 0.55 : 1,
+            transition: "opacity 0.2s",
+          }}
+        >
           {habit.name}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 2 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+            marginTop: 2,
+          }}
+        >
           <Flame size={11} color="var(--color-brand)" />
-          <span style={{ fontSize: 12, color: 'var(--color-brand)', fontWeight: 600 }}>
+          <span
+            style={{
+              fontSize: 12,
+              color: "var(--color-brand)",
+              fontWeight: 600,
+            }}
+          >
             {habit.currentStreak}
           </span>
-          <span style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-            {habit.currentStreak === 1 ? 'day' : 'days'}
+          <span style={{ fontSize: 11, color: "var(--color-text-muted)" }}>
+            {habit.currentStreak === 1 ? "day" : "days"}
           </span>
         </div>
       </div>
@@ -86,8 +117,12 @@ function DesktopHabitRow({
       <button
         onClick={() => router.push(`/habits/${habit._id}/edit`)}
         style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          padding: 6, borderRadius: 8, flexShrink: 0,
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          padding: 6,
+          borderRadius: 8,
+          flexShrink: 0,
         }}
         aria-label="Edit"
       >
@@ -100,16 +135,26 @@ function DesktopHabitRow({
         disabled={loading}
         whileTap={{ scale: 0.88 }}
         style={{
-          width: 36, height: 36, borderRadius: 99, border: 'none',
-          cursor: loading ? 'not-allowed' : 'pointer',
-          background: habit.isCompletedToday ? 'var(--color-brand)' : 'var(--color-bg-elevated)',
+          width: 36,
+          height: 36,
+          borderRadius: 99,
+          border: "none",
+          cursor: loading ? "not-allowed" : "pointer",
+          background: habit.isCompletedToday
+            ? "var(--color-brand)"
+            : "var(--color-bg-elevated)",
           flexShrink: 0,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'background 0.2s',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "background 0.2s",
         }}
-        aria-label={habit.isCompletedToday ? 'Uncheck' : 'Check in'}
+        aria-label={habit.isCompletedToday ? "Uncheck" : "Check in"}
       >
-        <Check size={16} color={habit.isCompletedToday ? '#fff' : 'var(--color-text-muted)'} />
+        <Check
+          size={16}
+          color={habit.isCompletedToday ? "#fff" : "var(--color-text-muted)"}
+        />
       </motion.button>
     </motion.div>
   );
@@ -121,7 +166,7 @@ export function HabitList() {
   const { habits, loading, fetchHabits, uncheck } = useHabitsStore();
   const { checkIn } = useCheckIn();
   const [pendingId, setPendingId] = useState<string | null>(null);
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const today = format(new Date(), "yyyy-MM-dd");
 
   useEffect(() => {
     fetchHabits();
@@ -141,10 +186,18 @@ export function HabitList() {
 
   if (loading && habits.length === 0) {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[1, 2].map((i) => (
-          <Skeleton key={i} active paragraph={{ rows: 2 }}
-            style={{ background: 'var(--color-bg-surface)', borderRadius: 24, padding: 20 }} />
+          <Skeleton
+            key={i}
+            active
+            paragraph={{ rows: 2 }}
+            style={{
+              background: "var(--color-bg-surface)",
+              borderRadius: 24,
+              padding: 20,
+            }}
+          />
         ))}
       </div>
     );
@@ -153,7 +206,7 @@ export function HabitList() {
   return (
     <>
       {/* ── Mobile: full-height card deck ──────────────────────────── */}
-      <div className="md:hidden" style={{ height: '100%' }}>
+      <div className="md:hidden" style={{ height: "100%" }}>
         <StreakCardPager
           habits={habits}
           today={today}
@@ -177,9 +230,17 @@ export function HabitList() {
         </div>
 
         {/* Compact list */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
+        <div
+          style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8 }}
+        >
           {habits.length === 0 ? (
-            <p style={{ color: 'var(--color-text-muted)', fontSize: 14, padding: '20px 0' }}>
+            <p
+              style={{
+                color: "var(--color-text-muted)",
+                fontSize: 14,
+                padding: "20px 0",
+              }}
+            >
               No streaks yet — tap + to add your first.
             </p>
           ) : (

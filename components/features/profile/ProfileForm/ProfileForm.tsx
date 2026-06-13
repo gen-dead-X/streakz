@@ -1,9 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Avatar, Button, Form, Input, Typography, Alert, Divider } from 'antd';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import { useSession, signOut, authClient } from '@/lib/auth/auth-client';
+import { profileSchema, type ProfileValues } from '@/lib/validation/profile.schema';
 
 const { Title, Text } = Typography;
 
@@ -14,7 +17,6 @@ export function ProfileForm() {
   const [loggingOut, setLoggingOut] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [form] = Form.useForm();
 
   const user = session?.user;
   const initials = (user?.name ?? 'U')
@@ -24,13 +26,16 @@ export function ProfileForm() {
     .toUpperCase()
     .slice(0, 2);
 
-  useEffect(() => {
-    if (user?.name) {
-      form.setFieldsValue({ name: user.name });
-    }
-  }, [user?.name, form]);
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<ProfileValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { name: '' },
+  });
 
-  async function onSave(values: { name: string }) {
+  useEffect(() => {
+    if (user?.name) reset({ name: user.name });
+  }, [user?.name, reset]);
+
+  async function onSubmit(values: ProfileValues) {
     setSaving(true);
     setSaveError(null);
     setSaveSuccess(false);
@@ -45,7 +50,6 @@ export function ProfileForm() {
 
   async function onLogout() {
     setLoggingOut(true);
-    // Clean up push subscription for this device before signing out
     try {
       const reg = await navigator.serviceWorker?.getRegistration('/sw.js');
       const sub = await reg?.pushManager?.getSubscription();
@@ -60,7 +64,11 @@ export function ProfileForm() {
     } catch {
       // Push cleanup failure must never block logout
     }
-    await signOut({ fetchOptions: { onSuccess: () => router.push('/login') } });
+    try {
+      await signOut({ fetchOptions: { onSuccess: () => router.push('/login') } });
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   if (isPending) return null;
@@ -96,8 +104,7 @@ export function ProfileForm() {
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
-          closable
-          onClose={() => setSaveError(null)}
+          closable={{ onClose: () => setSaveError(null) }}
         />
       )}
       {saveSuccess && (
@@ -106,33 +113,36 @@ export function ProfileForm() {
           type="success"
           showIcon
           style={{ marginBottom: 16 }}
-          closable
-          onClose={() => setSaveSuccess(false)}
+          closable={{ onClose: () => setSaveSuccess(false) }}
         />
       )}
 
-      <Form form={form} layout="vertical" onFinish={onSave} requiredMark={false}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Form.Item
-          name="name"
           label={<Text style={{ color: 'var(--color-text-body)' }}>Display Name</Text>}
-          rules={[
-            { required: true, message: 'Enter a display name' },
-            { whitespace: true, message: 'Name cannot be blank' },
-          ]}
+          validateStatus={errors.name ? 'error' : ''}
+          help={errors.name?.message}
         >
-          <Input
-            size="large"
-            placeholder="Your name"
-            style={{
-              background: 'var(--color-bg-elevated)',
-              borderColor: 'var(--color-border-subtle)',
-            }}
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                size="large"
+                placeholder="Your name"
+                style={{
+                  background: 'var(--color-bg-elevated)',
+                  borderColor: 'var(--color-border-subtle)',
+                }}
+              />
+            )}
           />
         </Form.Item>
         <Form.Item style={{ marginBottom: 0 }}>
           <Button
-            type="primary"
             htmlType="submit"
+            type="primary"
             size="large"
             loading={saving}
             style={{ background: 'var(--color-brand)', borderColor: 'var(--color-brand)' }}
@@ -140,7 +150,7 @@ export function ProfileForm() {
             Save Changes
           </Button>
         </Form.Item>
-      </Form>
+      </form>
 
       <Divider style={{ borderColor: 'var(--color-border-subtle)', marginTop: 32 }} />
 

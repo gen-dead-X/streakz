@@ -8,13 +8,13 @@ import {
   getRecentDots,
 } from '@/lib/streak/calculator';
 import type { CardStyle, Habit, HabitWithStreak } from '@/types/models/habit.types';
-import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
+import type { CreateHabitInput, UpdateHabitInput, DaySummary } from '@/types/api/habits.types';
 
-const CARD_STYLES: CardStyle[] = ['wavy', 'geometric', 'blob'];
+const CARD_STYLES: CardStyle[] = ['wavy', 'geometric', 'blob', 'aurora', 'ember', 'midnight', 'rose'];
 
 function deterministicCardStyle(id: string): CardStyle {
   const hash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return CARD_STYLES[hash % 3];
+  return CARD_STYLES[hash % CARD_STYLES.length];
 }
 
 function toPlain(doc: any): Habit {
@@ -24,7 +24,7 @@ function toPlain(doc: any): Habit {
     userId: obj.userId,
     name: obj.name,
     icon: obj.icon,
-    description: obj.description ?? '',
+    description: obj.description ?? undefined,
     tags: obj.tags ?? [],
     cardStyle: obj.cardStyle ?? deterministicCardStyle(String(obj._id)),
     notifications: obj.notifications ?? true,
@@ -168,4 +168,33 @@ export async function getCheckInDatesForMonth(
 
   const unique = [...new Set((checkIns as unknown[]).map((ci) => (ci as { date: string }).date))];
   return unique.sort();
+}
+
+export async function getWeekSummary(
+  userId: string,
+  dates: string[],
+): Promise<DaySummary[]> {
+  await connectDB();
+
+  // Count of currently active habits (non-archived)
+  const total = await HabitModel.countDocuments({ userId, archivedAt: null });
+
+  // All check-ins for this user on the requested dates
+  const checkIns = await CheckInModel.find({
+    userId,
+    date: { $in: dates },
+  }).lean() as { habitId: unknown; date: string }[];
+
+  // Count distinct habits checked in per date
+  const byDate = new Map<string, Set<string>>();
+  for (const ci of checkIns) {
+    if (!byDate.has(ci.date)) byDate.set(ci.date, new Set());
+    byDate.get(ci.date)!.add(String(ci.habitId));
+  }
+
+  return dates.map((date) => ({
+    date,
+    total,
+    completed: byDate.get(date)?.size ?? 0,
+  }));
 }
