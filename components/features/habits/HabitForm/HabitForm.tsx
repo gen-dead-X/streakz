@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { IconPicker } from '@/components/ui/IconPicker';
 import { HabitIcon } from '@/components/ui/HabitIcon';
 import { RichTextEditor } from '@/components/ui/RichTextEditor';
+import { playSound } from '@/lib/audio/playSound';
 import { FREQUENCY_OPTIONS, DAY_OPTIONS } from '@/constants/habits/frequency.constants';
 import { DEFAULT_ICON } from '@/constants/habits/icon.constants';
 import { habitSchema, type HabitFormValues } from '@/lib/validation/habit.schema';
@@ -103,6 +104,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
           days: freqType === 'specific' ? (values.days ?? []) : [],
         },
       });
+      playSound('/music/streak-added.wav');
     } catch {
       setHasError(true);
     } finally {
