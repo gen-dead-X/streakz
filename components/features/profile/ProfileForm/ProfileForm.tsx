@@ -64,7 +64,11 @@ export function ProfileForm() {
     } catch {
       // Push cleanup failure must never block logout
     }
-    await signOut({ fetchOptions: { onSuccess: () => router.push('/login') } });
+    try {
+      await signOut({ fetchOptions: { onSuccess: () => router.push('/login') } });
+    } finally {
+      setLoggingOut(false);
+    }
   }
 
   if (isPending) return null;
@@ -100,8 +104,7 @@ export function ProfileForm() {
           type="error"
           showIcon
           style={{ marginBottom: 16 }}
-          closable
-          onClose={() => setSaveError(null)}
+          closable={{ onClose: () => setSaveError(null) }}
         />
       )}
       {saveSuccess && (
@@ -110,8 +113,7 @@ export function ProfileForm() {
           type="success"
           showIcon
           style={{ marginBottom: 16 }}
-          closable
-          onClose={() => setSaveSuccess(false)}
+          closable={{ onClose: () => setSaveSuccess(false) }}
         />
       )}
 

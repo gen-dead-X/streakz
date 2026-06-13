@@ -31,10 +31,10 @@ export default function RegisterPage() {
     });
     if (err) {
       setError(err.message ?? 'Could not create account');
-      setLoading(false);
     } else {
       router.push('/today');
     }
+    setLoading(false);
   }
 
   return (

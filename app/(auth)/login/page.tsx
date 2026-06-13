@@ -30,10 +30,10 @@ export default function LoginPage() {
     });
     if (err) {
       setError(err.message ?? 'Invalid email or password');
-      setLoading(false);
     } else {
       router.push('/today');
     }
+    setLoading(false);
   }
 
   return (
