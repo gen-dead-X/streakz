@@ -4,9 +4,10 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, Input, Checkbox, Popconfirm, Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
-import { Bell, BellOff, X, Trash2, ChevronDown } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Bell, BellOff, ArrowLeft, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { IconPicker } from '@/components/ui/IconPicker';
+import { HabitIcon } from '@/components/ui/HabitIcon';
 import { RichTextEditor } from '@/components/ui/RichTextEditor';
 import { FREQUENCY_OPTIONS, DAY_OPTIONS } from '@/constants/habits/frequency.constants';
 import { DEFAULT_ICON } from '@/constants/habits/icon.constants';
@@ -16,13 +17,13 @@ import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.type
 import type { JSONContent } from '@tiptap/core';
 
 const CARD_STYLES: { value: CardStyle; gradient: string; label: string }[] = [
-  { value: 'wavy',     gradient: 'linear-gradient(135deg, #00c6ff 0%, #0061ff 55%, #0033dd 100%)',            label: 'Ocean'   },
+  { value: 'wavy',     gradient: 'linear-gradient(135deg, #00c6ff 0%, #0061ff 55%, #0033dd 100%)',             label: 'Ocean'   },
   { value: 'geometric',gradient: 'linear-gradient(135deg, #e8b950 0%, #f0516b 38%, #8b2ff8 78%, #5a20dd 100%)',label: 'Sunset'  },
-  { value: 'blob',     gradient: 'linear-gradient(125deg, #10b981 0%, #047857 50%, #065f46 100%)',             label: 'Forest'  },
-  { value: 'aurora',   gradient: 'linear-gradient(135deg, #00b09b 0%, #57d06e 60%, #96c93d 100%)',            label: 'Aurora'  },
-  { value: 'ember',    gradient: 'linear-gradient(135deg, #f12711 0%, #f5af19 100%)',                          label: 'Ember'   },
-  { value: 'midnight', gradient: 'linear-gradient(135deg, #0f0c29 0%, #302b63 55%, #24243e 100%)',            label: 'Midnight'},
-  { value: 'rose',     gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 60%, #fd746c 100%)',            label: 'Rose'    },
+  { value: 'blob',     gradient: 'linear-gradient(125deg, #10b981 0%, #047857 50%, #065f46 100%)',              label: 'Forest'  },
+  { value: 'aurora',   gradient: 'linear-gradient(135deg, #00b09b 0%, #57d06e 60%, #96c93d 100%)',             label: 'Aurora'  },
+  { value: 'ember',    gradient: 'linear-gradient(135deg, #f12711 0%, #f5af19 100%)',                           label: 'Ember'   },
+  { value: 'midnight', gradient: 'linear-gradient(135deg, #0f0c29 0%, #302b63 55%, #24243e 100%)',             label: 'Midnight'},
+  { value: 'rose',     gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 60%, #fd746c 100%)',             label: 'Rose'    },
 ];
 
 interface HabitFormProps {
@@ -49,6 +50,8 @@ const ROW_DIVIDER: React.CSSProperties = {
   margin: '0 16px',
 };
 
+const COLLAPSE_TRANSITION = { duration: 0.2, ease: 'easeInOut' } as const;
+
 export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false }: HabitFormProps) {
   const [icon, setIcon] = useState(initial?.icon ?? DEFAULT_ICON);
   const [cardStyle, setCardStyle] = useState<CardStyle>(initial?.cardStyle ?? 'wavy');
@@ -60,6 +63,10 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
     initial?.description && typeof initial.description === 'object'
       ? (initial.description as JSONContent)
       : undefined,
+  );
+  const [iconPickerOpen, setIconPickerOpen] = useState(false);
+  const [descOpen, setDescOpen] = useState(
+    !!(initial?.description && typeof initial.description === 'object'),
   );
 
   const { control, handleSubmit, formState: { errors } } = useForm<HabitFormValues>({
@@ -117,8 +124,8 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
-      {/* ── Header ─────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
+      {/* ── Header: back arrow · title input · bell ── */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
         <motion.button
           type="button"
           onClick={onCancel}
@@ -127,16 +134,38 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
             width: 44, height: 44, borderRadius: 99,
             background: 'var(--color-bg-elevated)',
             border: 'none', cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}
-          aria-label="Close"
+          aria-label="Back"
         >
-          <X size={18} color="var(--color-text-body)" />
+          <ArrowLeft size={18} color="var(--color-text-body)" />
         </motion.button>
 
-        <h1 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: 'var(--color-text-heading)', letterSpacing: '-0.5px' }}>
-          {isEdit ? 'Edit Streak' : 'New Streak'}
-        </h1>
+        <Form.Item
+          validateStatus={errors.name ? 'error' : ''}
+          help={errors.name?.message}
+          style={{ margin: 0, flex: 1 }}
+        >
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder={isEdit ? 'Edit Streak' : 'New Streak'}
+                maxLength={50}
+                variant="borderless"
+                style={{
+                  background: 'transparent',
+                  color: 'var(--color-text-heading)',
+                  fontSize: 22, fontWeight: 900,
+                  letterSpacing: '-0.5px',
+                  height: 'auto', padding: '4px 0',
+                }}
+              />
+            )}
+          />
+        </Form.Item>
 
         <motion.button
           type="button"
@@ -149,6 +178,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
             cursor: 'pointer',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             transition: 'border 0.2s, background 0.2s',
+            flexShrink: 0,
           }}
           aria-label={notifications ? 'Disable notifications' : 'Enable notifications'}
           aria-pressed={notifications}
@@ -161,37 +191,54 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
 
       {/* ── Form ───────────────────────────────────── */}
       <form onSubmit={handleSubmit(onSubmit)} style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Icon + Title */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
-          <IconPicker value={icon} onChange={setIcon} />
-          <Form.Item
-            validateStatus={errors.name ? 'error' : ''}
-            help={errors.name?.message}
-            style={{ margin: 0, flex: 1 }}
+
+        {/* Icon — collapsible */}
+        <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 16, overflow: 'hidden' }}>
+          <button
+            type="button"
+            onClick={() => setIconPickerOpen((v) => !v)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 12,
+              padding: '12px 16px', background: 'transparent', border: 'none', cursor: 'pointer',
+            }}
           >
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Habit name"
-                  maxLength={50}
-                  variant="borderless"
-                  style={{
-                    background: 'transparent',
-                    color: 'var(--color-text-heading)',
-                    fontSize: 26, fontWeight: 900,
-                    letterSpacing: '-0.5px',
-                    height: 'auto', padding: '4px 0',
-                  }}
-                />
-              )}
-            />
-          </Form.Item>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10,
+              background: 'var(--color-bg-surface)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              <HabitIcon name={icon} size={18} color="var(--color-brand)" />
+            </div>
+            <span style={{ flex: 1, textAlign: 'left', fontSize: 14, color: 'var(--color-text-body)' }}>
+              {icon}
+            </span>
+            {iconPickerOpen
+              ? <ChevronUp size={16} color="var(--color-text-muted)" />
+              : <ChevronDown size={16} color="var(--color-text-muted)" />}
+          </button>
+
+          <AnimatePresence initial={false}>
+            {iconPickerOpen && (
+              <motion.div
+                key="icon-picker"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={COLLAPSE_TRANSITION}
+                style={{ overflow: 'hidden' }}
+              >
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '12px 16px 16px' }}>
+                  <IconPicker
+                    value={icon}
+                    onChange={(name) => { setIcon(name); setIconPickerOpen(false); }}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        {/* Metadata surface */}
+        {/* Metadata surface — Tags, Theme, Frequency, Days */}
         <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 16, overflow: 'hidden' }}>
           {/* Tags */}
           <div style={{ display: 'flex', alignItems: 'center', padding: '14px 16px' }}>
@@ -305,16 +352,48 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
           )}
         </div>
 
-        {/* Inline rich text editor */}
+        {/* Description — collapsible, no header label */}
         <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 20, overflow: 'hidden' }}>
-          <div style={{ padding: '12px 16px 0' }}>
-            <span style={{ ...ROW_LABEL, display: 'block' }}>Description</span>
-          </div>
-          <RichTextEditor
-            value={descriptionJson}
-            onChange={setDescriptionJson}
-            placeholder="Add a description…"
-          />
+          <button
+            type="button"
+            onClick={() => setDescOpen((v) => !v)}
+            style={{
+              width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+              padding: '14px 16px', background: 'transparent', border: 'none', cursor: 'pointer',
+            }}
+          >
+            <span style={{
+              flex: 1, textAlign: 'left', fontSize: 14,
+              color: descriptionJson ? 'var(--color-text-body)' : 'var(--color-text-muted)',
+              fontStyle: descriptionJson ? 'normal' : 'italic',
+            }}>
+              {descriptionJson ? 'Description' : 'Add a description…'}
+            </span>
+            {descOpen
+              ? <ChevronUp size={16} color="var(--color-text-muted)" />
+              : <ChevronDown size={16} color="var(--color-text-muted)" />}
+          </button>
+
+          <AnimatePresence initial={false}>
+            {descOpen && (
+              <motion.div
+                key="desc-editor"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={COLLAPSE_TRANSITION}
+                style={{ overflow: 'hidden' }}
+              >
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <RichTextEditor
+                    value={descriptionJson}
+                    onChange={setDescriptionJson}
+                    placeholder="Add a description…"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         <div style={{ flex: 1, minHeight: 12 }} />
