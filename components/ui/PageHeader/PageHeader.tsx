@@ -52,14 +52,14 @@ export function PageHeader({ user }: PageHeaderProps) {
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:hidden"
       style={{
         height: 64,
-        background:
-          "linear-gradient(to bottom, var(--color-bg-page) 0%, transparent 100%)",
-        pointerEvents: "none",
+        background: "rgba(18,18,18,0.82)",
+        backdropFilter: "blur(20px)",
+        WebkitBackdropFilter: "blur(20px)",
+        borderBottom: "1px solid rgba(255,255,255,0.05)",
       }}
     >
       {/* Left: streak label + date */}
       <div
-        style={{ pointerEvents: "none" }}
         className="flex flex-col gap-2 py-1"
       >
         <p

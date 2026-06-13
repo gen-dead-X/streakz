@@ -1,9 +1,10 @@
 "use client";
 import "./HabitCard.css";
-import { useRef, useCallback } from "react";
-import { Flame, MoreHorizontal } from "lucide-react";
+import { useRef, useCallback, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { Flame, MoreHorizontal, Eye, X } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { HabitIcon } from "@/components/ui/HabitIcon";
 import { RichTextPreview } from "@/components/ui/RichTextPreview";
@@ -22,7 +23,6 @@ const GRADIENTS: Record<CardStyle, string> = {
   rose: "linear-gradient(135deg, #f093fb 0%, #f5576c 60%, #fd746c 100%)",
 };
 
-// Pre-computed wavy polyline paths (30 lines × 50 points) — built once at module load
 const WAVE_LINES: string[] = Array.from({ length: 32 }, (_, i) => {
   const baseX = (i / 31) * 400;
   const phase = i * 0.55;
@@ -75,7 +75,16 @@ export function HabitCard({
 }: HabitCardProps) {
   const router = useRouter();
   const style: CardStyle = habit.cardStyle ?? "wavy";
+  const gradient = GRADIENTS[style];
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [isPressing, setIsPressing] = useState(false);
+  const [peekOpen, setPeekOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fireConfetti = useCallback(() => {
     const canvas = canvasRef.current;
@@ -104,217 +113,540 @@ export function HabitCard({
     } else {
       onCheckIn(habit._id, today);
       fireConfetti();
-      playSound('/music/streak-complete.wav');
+      playSound("/music/streak-complete.wav");
     }
   }
 
-  return (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        borderRadius: 28,
-        background: GRADIENTS[style],
-        position: "relative",
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "flex-end",
-        padding: "20px 20px 22px",
-        userSelect: "none",
-        WebkitUserSelect: "none",
-      }}
-    >
-      <WaveTexture />
-      <canvas ref={canvasRef} className="habit-card-canvas" />
+  function startPress() {
+    setIsPressing(true);
+    pressTimer.current = setTimeout(() => {
+      setIsPressing(false);
+      setPeekOpen(true);
+      navigator.vibrate?.([20, 50, 20]);
+    }, 500);
+  }
 
-      {/* Icon — top-left floating */}
-      <div
-        style={{
-          position: "absolute",
-          top: 20,
-          left: 20,
-          width: 44,
-          height: 44,
-          borderRadius: 14,
-          background: "rgba(255,255,255,0.2)",
-          backdropFilter: "blur(4px)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 2,
-        }}
-      >
-        <HabitIcon name={habit.icon} size={22} color="rgba(255,255,255,0.95)" />
-      </div>
+  function cancelPress() {
+    clearTimeout(pressTimer.current);
+    setIsPressing(false);
+  }
 
-      {/* Edit button — top-right */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          router.push(`/habits/${habit._id}/edit`);
-        }}
-        style={{
-          position: "absolute",
-          top: 20,
-          right: 20,
-          width: 36,
-          height: 36,
-          borderRadius: 99,
-          background: "rgba(0,0,0,0.25)",
-          backdropFilter: "blur(4px)",
-          border: "none",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          zIndex: 2,
-        }}
-        aria-label="Edit streak"
-      >
-        <MoreHorizontal size={16} color="rgba(255,255,255,0.9)" />
-      </button>
-
-      {/* Content — bottom */}
-      <div style={{ position: "relative", zIndex: 2 }}>
-        {/* Name with strikethrough when completed */}
-        <h2
+  const peekModal = (
+    <AnimatePresence>
+      {peekOpen && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.18 }}
           style={{
-            fontSize: 34,
-            fontWeight: 900,
-            color: "#fff",
-            lineHeight: 1.1,
-            letterSpacing: "-0.5px",
-            margin: "0 0 6px",
-            wordBreak: "break-word",
-            textDecoration: habit.isCompletedToday ? "line-through" : "none",
-            opacity: habit.isCompletedToday ? 0.65 : 1,
-            transition: "opacity 0.25s ease",
-          }}
-        >
-          {habit.name}
-        </h2>
-
-        {/* Description */}
-        {habit.description && (
-          <div
-            style={{
-              fontSize: 13,
-              color: "rgba(255,255,255,0.72)",
-              margin: "0 0 8px",
-              maxHeight: 38,
-              overflow: "hidden",
-            }}
-          >
-            <RichTextPreview content={habit.description} />
-          </div>
-        )}
-
-        {/* Tags */}
-        {habit.tags?.length > 0 && (
-          <div
-            style={{
-              display: "flex",
-              gap: 5,
-              flexWrap: "wrap",
-              marginBottom: 12,
-            }}
-          >
-            {habit.tags.map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: "rgba(255,255,255,0.8)",
-                  background: "rgba(255,255,255,0.18)",
-                  borderRadius: 99,
-                  padding: "3px 9px",
-                }}
-              >
-                #{tag}
-              </span>
-            ))}
-          </div>
-        )}
-
-        {/* Bottom row: streak + check-in */}
-        <div
-          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 9999,
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
-            marginTop: habit.tags?.length > 0 ? 0 : 12,
+            justifyContent: "center",
+            padding: 24,
+            backdropFilter: "blur(10px)",
+            WebkitBackdropFilter: "blur(10px)",
+            background: "rgba(0,0,0,0.72)",
+          }}
+          onClick={() => setPeekOpen(false)}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.88, y: 44 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.88, y: 44 }}
+            transition={{ type: "spring", stiffness: 380, damping: 28 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              width: "100%",
+              maxWidth: 420,
+              maxHeight: "80vh",
+              borderRadius: 28,
+              background: gradient,
+              overflow: "hidden",
+              display: "flex",
+              flexDirection: "column",
+              position: "relative",
+              boxShadow: "0 32px 80px rgba(0,0,0,0.65)",
+            }}
+          >
+            <WaveTexture />
+
+            {/* Close button */}
+            <button
+              onClick={() => setPeekOpen(false)}
+              style={{
+                position: "absolute",
+                top: 16,
+                right: 16,
+                width: 36,
+                height: 36,
+                borderRadius: 99,
+                background: "rgba(0,0,0,0.38)",
+                backdropFilter: "blur(6px)",
+                border: "none",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10,
+              }}
+              aria-label="Close preview"
+            >
+              <X size={16} color="rgba(255,255,255,0.9)" />
+            </button>
+
+            {/* Scrollable content */}
+            <div
+              style={{
+                overflow: "auto",
+                flex: 1,
+                padding: "28px 24px 32px",
+                position: "relative",
+                zIndex: 2,
+              }}
+            >
+              {/* Icon + name */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 14,
+                  marginBottom: 20,
+                }}
+              >
+                <div
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: 16,
+                    background: "rgba(255,255,255,0.2)",
+                    backdropFilter: "blur(4px)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <HabitIcon
+                    name={habit.icon}
+                    size={26}
+                    color="rgba(255,255,255,0.95)"
+                  />
+                </div>
+                <h2
+                  style={{
+                    fontSize: 28,
+                    fontWeight: 900,
+                    color: "#fff",
+                    margin: 0,
+                    lineHeight: 1.1,
+                    letterSpacing: "-0.5px",
+                  }}
+                >
+                  {habit.name}
+                </h2>
+              </div>
+
+              {/* Full description — no height limit */}
+              {habit.description && (
+                <div
+                  style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: 14,
+                    lineHeight: 1.65,
+                    marginBottom: 20,
+                  }}
+                >
+                  <RichTextPreview content={habit.description} />
+                </div>
+              )}
+
+              {/* Tags */}
+              {habit.tags?.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 6,
+                    flexWrap: "wrap",
+                    marginBottom: 22,
+                  }}
+                >
+                  {habit.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: "rgba(255,255,255,0.8)",
+                        background: "rgba(255,255,255,0.18)",
+                        borderRadius: 99,
+                        padding: "4px 10px",
+                      }}
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              {/* Stats row */}
+              <div style={{ display: "flex", gap: 12 }}>
+                <div
+                  style={{
+                    background: "rgba(0,0,0,0.28)",
+                    borderRadius: 16,
+                    padding: "12px 18px",
+                    flex: 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "rgba(255,255,255,0.5)",
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.07em",
+                      marginBottom: 4,
+                    }}
+                  >
+                    Streak
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 900,
+                      color: "#fff",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {habit.currentStreak}
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 400,
+                        color: "rgba(255,255,255,0.55)",
+                        marginLeft: 5,
+                      }}
+                    >
+                      days
+                    </span>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    background: "rgba(0,0,0,0.28)",
+                    borderRadius: 16,
+                    padding: "12px 18px",
+                    flex: 1,
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "rgba(255,255,255,0.5)",
+                      fontWeight: 600,
+                      textTransform: "uppercase",
+                      letterSpacing: "0.07em",
+                      marginBottom: 4,
+                    }}
+                  >
+                    Best
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 26,
+                      fontWeight: 900,
+                      color: "#fff",
+                      lineHeight: 1,
+                    }}
+                  >
+                    {habit.longestStreak}
+                    <span
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 400,
+                        color: "rgba(255,255,255,0.55)",
+                        marginLeft: 5,
+                      }}
+                    >
+                      days
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  return (
+    <>
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: 28,
+          background: gradient,
+          position: "relative",
+          overflow: "hidden",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          padding: "20px 20px 22px",
+          userSelect: "none",
+          WebkitUserSelect: "none",
+          cursor: "default",
+          transform: isPressing ? "scale(0.97)" : "scale(1)",
+          transition: isPressing
+            ? "none"
+            : "transform 0.35s cubic-bezier(0.34,1.56,0.64,1)",
+        }}
+        onMouseDown={startPress}
+        onMouseUp={cancelPress}
+        onMouseLeave={cancelPress}
+        onTouchStart={startPress}
+        onTouchEnd={cancelPress}
+        onTouchMove={cancelPress}
+        onContextMenu={(e) => e.preventDefault()}
+      >
+        <WaveTexture />
+        <canvas ref={canvasRef} className="habit-card-canvas" />
+
+        {/* Icon — top-left floating */}
+        <div
+          style={{
+            position: "absolute",
+            top: 20,
+            left: 20,
+            width: 44,
+            height: 44,
+            borderRadius: 14,
+            background: "rgba(255,255,255,0.2)",
+            backdropFilter: "blur(4px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2,
           }}
         >
-          {/* Streak pill */}
+          <HabitIcon name={habit.icon} size={22} color="rgba(255,255,255,0.95)" />
+        </div>
+
+        {/* Edit button — top-right */}
+        <button
+          onMouseDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            router.push(`/habits/${habit._id}/edit`);
+          }}
+          style={{
+            position: "absolute",
+            top: 20,
+            right: 20,
+            width: 36,
+            height: 36,
+            borderRadius: 99,
+            background: "rgba(0,0,0,0.25)",
+            backdropFilter: "blur(4px)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2,
+          }}
+          aria-label="Edit streak"
+        >
+          <MoreHorizontal size={16} color="rgba(255,255,255,0.9)" />
+        </button>
+
+        {/* Content — bottom */}
+        <div style={{ position: "relative", zIndex: 2 }}>
+          {/* Name with strikethrough when completed */}
+          <h2
+            style={{
+              fontSize: 34,
+              fontWeight: 900,
+              color: "#fff",
+              lineHeight: 1.1,
+              letterSpacing: "-0.5px",
+              margin: "0 0 6px",
+              wordBreak: "break-word",
+              textDecoration: habit.isCompletedToday ? "line-through" : "none",
+              opacity: habit.isCompletedToday ? 0.65 : 1,
+              transition: "opacity 0.25s ease",
+            }}
+          >
+            {habit.name}
+          </h2>
+
+          {/* Description: fade-masked with eye button */}
+          {habit.description && (
+            <div style={{ position: "relative", marginBottom: 8 }}>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.72)",
+                  maxHeight: "5em",
+                  overflow: "hidden",
+                  lineHeight: 1.5,
+                  WebkitMaskImage:
+                    "linear-gradient(to bottom, black 40%, transparent 100%)",
+                  maskImage:
+                    "linear-gradient(to bottom, black 40%, transparent 100%)",
+                  paddingRight: 36,
+                }}
+              >
+                <RichTextPreview content={habit.description} />
+              </div>
+              {/* Eye button — peek trigger */}
+              <button
+                onMouseDown={(e) => e.stopPropagation()}
+                onTouchStart={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPeekOpen(true);
+                }}
+                style={{
+                  position: "absolute",
+                  right: 0,
+                  bottom: 0,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 99,
+                  background: "rgba(0,0,0,0.4)",
+                  backdropFilter: "blur(6px)",
+                  border: "none",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 3,
+                }}
+                aria-label="Peek description"
+              >
+                <Eye size={13} color="rgba(255,255,255,0.85)" />
+              </button>
+            </div>
+          )}
+
+          {/* Tags */}
+          {habit.tags?.length > 0 && (
+            <div
+              style={{
+                display: "flex",
+                gap: 5,
+                flexWrap: "wrap",
+                marginBottom: 12,
+              }}
+            >
+              {habit.tags.map((tag) => (
+                <span
+                  key={tag}
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: "rgba(255,255,255,0.8)",
+                    background: "rgba(255,255,255,0.18)",
+                    borderRadius: 99,
+                    padding: "3px 9px",
+                  }}
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Bottom row: streak + check-in */}
           <div
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 6,
-              background: "rgba(0,0,0,0.28)",
-              backdropFilter: "blur(6px)",
-              borderRadius: 99,
-              padding: "6px 14px",
+              justifyContent: "space-between",
+              marginTop: habit.tags?.length > 0 ? 0 : 12,
             }}
           >
-            <Flame size={14} color="#fbbf24" />
-            <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
-              {habit.currentStreak}
-            </span>
-            <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
-              {habit.currentStreak === 1 ? "day" : "days"}
-            </span>
-          </div>
+            {/* Streak pill */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                background: "rgba(0,0,0,0.28)",
+                backdropFilter: "blur(6px)",
+                borderRadius: 99,
+                padding: "6px 14px",
+              }}
+            >
+              <Flame size={14} color="#fbbf24" />
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#fff" }}>
+                {habit.currentStreak}
+              </span>
+              <span style={{ fontSize: 12, color: "rgba(255,255,255,0.65)" }}>
+                {habit.currentStreak === 1 ? "day" : "days"}
+              </span>
+            </div>
 
-          {/* Check-in button — zIndex 4 so it sits above the confetti canvas */}
-          <motion.button
-            onClick={handleToggle}
-            disabled={loading}
-            whileTap={{ scale: 0.88 }}
-            style={{
-              width: 52,
-              height: 52,
-              borderRadius: 99,
-              border: "none",
-              cursor: loading ? "not-allowed" : "pointer",
-              background: habit.isCompletedToday
-                ? "rgba(255,255,255,0.95)"
-                : "rgba(255,255,255,0.25)",
-              backdropFilter: "blur(6px)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              transition: "background 0.2s",
-              position: "relative",
-              zIndex: 4,
-            }}
-            aria-label={habit.isCompletedToday ? "Uncheck" : "Check in"}
-          >
-            {habit.isCompletedToday ? (
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path
-                  d="M5 11.5L9 15.5L17 7"
-                  stroke="#111"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : (
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path
-                  d="M11 5V17M5 11H17"
-                  stroke="white"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            )}
-          </motion.button>
+            {/* Check-in button */}
+            <motion.button
+              onMouseDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              onClick={handleToggle}
+              disabled={loading}
+              whileTap={{ scale: 0.88 }}
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 99,
+                border: "none",
+                cursor: loading ? "not-allowed" : "pointer",
+                background: habit.isCompletedToday
+                  ? "rgba(255,255,255,0.95)"
+                  : "rgba(255,255,255,0.25)",
+                backdropFilter: "blur(6px)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "background 0.2s",
+                position: "relative",
+                zIndex: 4,
+              }}
+              aria-label={habit.isCompletedToday ? "Uncheck" : "Check in"}
+            >
+              {habit.isCompletedToday ? (
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path
+                    d="M5 11.5L9 15.5L17 7"
+                    stroke="#111"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                  <path
+                    d="M11 5V17M5 11H17"
+                    stroke="white"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              )}
+            </motion.button>
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Peek modal — portalled to document.body */}
+      {mounted && createPortal(peekModal, document.body)}
+    </>
   );
 }
