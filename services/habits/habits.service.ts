@@ -10,11 +10,11 @@ import {
 import type { CardStyle, Habit, HabitWithStreak } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput, DaySummary } from '@/types/api/habits.types';
 
-const CARD_STYLES: CardStyle[] = ['wavy', 'geometric', 'blob'];
+const CARD_STYLES: CardStyle[] = ['wavy', 'geometric', 'blob', 'aurora', 'ember', 'midnight', 'rose'];
 
 function deterministicCardStyle(id: string): CardStyle {
   const hash = id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
-  return CARD_STYLES[hash % 3];
+  return CARD_STYLES[hash % CARD_STYLES.length];
 }
 
 function toPlain(doc: any): Habit {

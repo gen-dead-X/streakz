@@ -15,6 +15,10 @@ const GRADIENTS: Record<CardStyle, string> = {
   geometric:
     "linear-gradient(135deg, #e8b950 0%, #f0516b 38%, #8b2ff8 78%, #5a20dd 100%)",
   blob: "linear-gradient(125deg, #10b981 0%, #047857 50%, #065f46 100%)",
+  aurora: "linear-gradient(135deg, #00b09b 0%, #57d06e 60%, #96c93d 100%)",
+  ember: "linear-gradient(135deg, #f12711 0%, #f5af19 100%)",
+  midnight: "linear-gradient(135deg, #0f0c29 0%, #302b63 55%, #24243e 100%)",
+  rose: "linear-gradient(135deg, #f093fb 0%, #f5576c 60%, #fd746c 100%)",
 };
 
 // Pre-computed wavy polyline paths (30 lines × 50 points) — built once at module load

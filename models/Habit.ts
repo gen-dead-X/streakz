@@ -15,7 +15,7 @@ const HabitSchema = new Schema(
     icon: { type: String, required: true },
     description: { type: Schema.Types.Mixed, default: null },
     tags: { type: [String], default: [] },
-    cardStyle: { type: String, enum: ['wavy', 'geometric', 'blob'], default: 'wavy' },
+    cardStyle: { type: String, enum: ['wavy', 'geometric', 'blob', 'aurora', 'ember', 'midnight', 'rose'], default: 'wavy' },
     notifications: { type: Boolean, default: true },
     frequency: { type: FrequencySchema, required: true },
     archivedAt: { type: Date, default: null },
