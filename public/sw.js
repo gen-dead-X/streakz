@@ -1,6 +1,13 @@
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-  const data = event.data.json();
+
+  let data;
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: 'Streak Counter', body: event.data.text() };
+  }
+
   event.waitUntil(
     self.registration.showNotification(data.title || 'Streak Counter', {
       body: data.body || '',
