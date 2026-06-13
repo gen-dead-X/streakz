@@ -4,6 +4,7 @@ import { format } from "date-fns";
 import { getHabitsForUser } from "@/services/habits/habits.service";
 import { HabitList } from "@/components/features/habits/HabitList";
 import { WeekStrip } from "@/components/features/habits/WeekStrip";
+import { TwoWeekStrip } from "@/components/features/habits/TwoWeekStrip";
 
 export default async function TodayPage() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -20,9 +21,10 @@ export default async function TodayPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Week strip calendar */}
-      {total && (
+      {/* Mobile: week strip */}
+      {total ? (
         <div
+          className="md:hidden"
           style={{
             background: "var(--color-bg-surface)",
             borderRadius: 20,
@@ -46,7 +48,38 @@ export default async function TodayPage() {
           )}
           <WeekStrip />
         </div>
-      )}
+      ) : null}
+
+      {/* Desktop: 14-day two-week strip */}
+      {total ? (
+        <div
+          className="hidden md:block"
+          style={{
+            background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+            backdropFilter: "blur(12px)",
+            WebkitBackdropFilter: "blur(12px)",
+            borderRadius: 20,
+            padding: "18px 22px 16px",
+            border: "1px solid rgba(255,255,255,0.07)",
+          }}
+        >
+          {allDone && (
+            <p
+              style={{
+                fontSize: 11,
+                color: "var(--color-success)",
+                fontWeight: 600,
+                margin: "0 0 10px 2px",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+              }}
+            >
+              All done today 🎉
+            </p>
+          )}
+          <TwoWeekStrip />
+        </div>
+      ) : null}
 
       {/*
         Mobile: give the deck enough height.

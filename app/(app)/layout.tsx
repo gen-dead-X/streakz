@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/ui/BottomNav";
 import { SideNav } from "@/components/ui/SideNav";
 import { SplashScreen } from "@/components/ui/SplashScreen";
 import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
+import { NotificationTonePlayer } from "@/components/ui/NotificationTonePlayer";
 
 export default async function AppLayout({
   children,
@@ -36,20 +37,17 @@ export default async function AppLayout({
       {/* Main content */}
       <div className="md:ml-[240px]" style={{ minHeight: "100dvh" }}>
         <main
-          className="mx-auto px-4 py-6 md:px-8 md:py-8"
+          className="mx-auto px-4 md:px-8 pt-20 pb-24 md:py-8"
           style={{ maxWidth: 900 }}
         >
-          {/* Spacing for mobile fixed header */}
-          <div className="md:hidden" style={{ height: 48 }} />
           {children}
-          {/* Spacing for mobile bottom nav */}
-          <div className="md:hidden" style={{ height: 92 }} />
         </main>
       </div>
 
       {/* Mobile bottom nav — hidden on desktop */}
       <BottomNav />
       <PushPermissionBanner />
+      <NotificationTonePlayer />
     </div>
   );
 }

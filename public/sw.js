@@ -1,14 +1,26 @@
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-  const data = event.data.json();
+
+  let data;
+  try {
+    data = event.data.json();
+  } catch {
+    data = { title: 'Streak Counter', body: event.data.text() };
+  }
+
   event.waitUntil(
-    self.registration.showNotification(data.title || 'Streak Counter', {
-      body: data.body || '',
-      icon: '/favicon.ico',
-      badge: '/favicon.ico',
-      tag: 'streak-reminder',
-      data: { url: '/today' },
-    })
+    Promise.all([
+      self.registration.showNotification(data.title || 'Streak Counter', {
+        body: data.body || '',
+        icon: '/favicon.ico',
+        badge: '/favicon.ico',
+        tag: 'streak-reminder',
+        data: { url: '/today' },
+      }),
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+        clientList.forEach((client) => client.postMessage({ type: 'PLAY_NOTIFICATION_TONE' }));
+      }),
+    ])
   );
 });
 
