@@ -1,0 +1,1 @@
+export { TwoWeekStrip } from './TwoWeekStrip';

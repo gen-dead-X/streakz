@@ -6,11 +6,13 @@ import { Flame, MoreHorizontal, Eye, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
+import { BorderBeam } from "antd";
 import { HabitIcon } from "@/components/ui/HabitIcon";
 import { RichTextPreview } from "@/components/ui/RichTextPreview";
 import { playSound } from "@/lib/audio/playSound";
 import type { HabitCardProps } from "./HabitCard.types";
 import type { CardStyle } from "@/types/models/habit.types";
+import type { BorderBeamColor } from "antd";
 
 const GRADIENTS: Record<CardStyle, string> = {
   wavy: "linear-gradient(135deg, #00c6ff 0%, #0061ff 55%, #0033dd 100%)",
@@ -22,6 +24,18 @@ const GRADIENTS: Record<CardStyle, string> = {
   midnight: "linear-gradient(135deg, #0f0c29 0%, #302b63 55%, #24243e 100%)",
   rose: "linear-gradient(135deg, #f093fb 0%, #f5576c 60%, #fd746c 100%)",
 };
+
+const SUCCESS_WORDS = ['Done!', 'Yess!', 'At it!', "Let's go!", 'Boom!', 'Keep it!', 'On fire!', 'Perfect!', 'Crushed it!', 'Amazing!'];
+
+type BtnPhase = 'idle' | 'loading' | 'word' | 'done';
+
+function getBeamColor(streak: number, completed: boolean): BorderBeamColor {
+  if (completed) return [{ color: '#22c55e', percent: 0 }, { color: '#86efac', percent: 60 }];
+  if (streak >= 7) return [{ color: '#f97316', percent: 0 }, { color: '#fbbf24', percent: 35 }, { color: '#22c55e', percent: 60 }];
+  if (streak >= 4) return [{ color: '#eab308', percent: 0 }, { color: '#fde047', percent: 60 }];
+  if (streak >= 1) return [{ color: '#f97316', percent: 0 }, { color: '#fb923c', percent: 60 }];
+  return [{ color: 'rgba(255,255,255,0.55)', percent: 0 }, { color: 'rgba(255,255,255,0.15)', percent: 60 }];
+}
 
 const WAVE_LINES: string[] = Array.from({ length: 32 }, (_, i) => {
   const baseX = (i / 31) * 400;
@@ -78,13 +92,41 @@ export function HabitCard({
   const gradient = GRADIENTS[style];
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const pressTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const waitingForComplete = useRef(false);
   const [isPressing, setIsPressing] = useState(false);
   const [peekOpen, setPeekOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [phase, setPhase] = useState<BtnPhase>(() => habit.isCompletedToday ? 'done' : 'idle');
+  const [currentWord, setCurrentWord] = useState('');
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!loading && waitingForComplete.current && habit.isCompletedToday) {
+      waitingForComplete.current = false;
+      const word = SUCCESS_WORDS[Math.floor(Math.random() * SUCCESS_WORDS.length)];
+      setCurrentWord(word);
+      setPhase('word');
+      const t = setTimeout(() => setPhase('done'), 1400);
+      return () => clearTimeout(t);
+    }
+    if (!loading && waitingForComplete.current && !habit.isCompletedToday) {
+      waitingForComplete.current = false;
+      setPhase('idle');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
+  useEffect(() => {
+    if (!habit.isCompletedToday && phase === 'done') {
+      setPhase('idle');
+    }
+    if (habit.isCompletedToday && phase === 'idle') {
+      setPhase('done');
+    }
+  }, [habit.isCompletedToday]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fireConfetti = useCallback(() => {
     const canvas = canvasRef.current;
@@ -111,6 +153,8 @@ export function HabitCard({
     if (habit.isCompletedToday) {
       onUncheck(habit._id, today);
     } else {
+      waitingForComplete.current = true;
+      setPhase('loading');
       onCheckIn(habit._id, today);
       fireConfetti();
       playSound("/music/streak-complete.wav");
@@ -594,53 +638,105 @@ export function HabitCard({
               </span>
             </div>
 
-            {/* Check-in button */}
-            <motion.button
-              onMouseDown={(e) => e.stopPropagation()}
-              onTouchStart={(e) => e.stopPropagation()}
-              onClick={handleToggle}
-              disabled={loading}
-              whileTap={{ scale: 0.88 }}
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 99,
-                border: "none",
-                cursor: loading ? "not-allowed" : "pointer",
-                background: habit.isCompletedToday
-                  ? "rgba(255,255,255,0.95)"
-                  : "rgba(255,255,255,0.25)",
-                backdropFilter: "blur(6px)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "background 0.2s",
-                position: "relative",
-                zIndex: 4,
-              }}
-              aria-label={habit.isCompletedToday ? "Uncheck" : "Check in"}
-            >
-              {habit.isCompletedToday ? (
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <path
-                    d="M5 11.5L9 15.5L17 7"
-                    stroke="#111"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              ) : (
-                <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                  <path
-                    d="M11 5V17M5 11H17"
-                    stroke="white"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              )}
-            </motion.button>
+            {/* Check-in button with BorderBeam */}
+            <div style={{ position: 'relative', display: 'inline-flex', zIndex: 4 }}>
+              <BorderBeam color={getBeamColor(habit.currentStreak, phase === 'done' || habit.isCompletedToday)}>
+                <motion.button
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onClick={handleToggle}
+                  disabled={phase === 'loading'}
+                  whileTap={{ scale: 0.88 }}
+                  style={{
+                    width: 104,
+                    height: 46,
+                    borderRadius: 23,
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    cursor: phase === 'loading' ? 'not-allowed' : 'pointer',
+                    background: (phase === 'done' || habit.isCompletedToday)
+                      ? 'rgba(34,197,94,0.28)'
+                      : 'rgba(255,255,255,0.12)',
+                    backdropFilter: 'blur(8px)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    transition: 'background 0.35s ease',
+                  }}
+                  aria-label={habit.isCompletedToday ? 'Uncheck' : 'Check in'}
+                >
+                  <AnimatePresence mode="popLayout" initial={false}>
+                    {phase === 'loading' && (
+                      <motion.span
+                        key="loading"
+                        initial={{ opacity: 0, y: -12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 12 }}
+                        transition={{ duration: 0.18 }}
+                        style={{ display: 'flex', gap: 4, alignItems: 'center' }}
+                      >
+                        {[0, 1, 2].map((i) => (
+                          <span
+                            key={i}
+                            style={{
+                              width: 5, height: 5, borderRadius: '50%',
+                              background: 'rgba(255,255,255,0.8)',
+                              animation: `pulse-dot 0.9s ${i * 0.18}s ease-in-out infinite`,
+                            }}
+                          />
+                        ))}
+                      </motion.span>
+                    )}
+                    {phase === 'word' && (
+                      <motion.span
+                        key={currentWord}
+                        initial={{ opacity: 0, y: -18 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 18 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+                        style={{
+                          fontSize: 14, fontWeight: 800,
+                          color: '#fff',
+                          letterSpacing: '-0.2px',
+                          userSelect: 'none',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {currentWord}
+                      </motion.span>
+                    )}
+                    {phase === 'done' && (
+                      <motion.span
+                        key="done"
+                        initial={{ opacity: 0, scale: 0.6 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.6 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 26 }}
+                      >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                          <path d="M4 10.5L8 14.5L16 6" stroke="#86efac" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </motion.span>
+                    )}
+                    {phase === 'idle' && (
+                      <motion.span
+                        key="idle"
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -12 }}
+                        transition={{ duration: 0.18 }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      >
+                        <div style={{
+                          width: 8, height: 8, borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.55)',
+                        }} />
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+              </BorderBeam>
+            </div>
           </div>
         </div>
       </div>
