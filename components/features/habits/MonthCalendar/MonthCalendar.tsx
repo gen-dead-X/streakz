@@ -68,9 +68,9 @@ export function MonthCalendar() {
 
   function getSummary(date: string): DaySummary {
     if (date === today) {
-      return { date, total: habits.length, completed: habits.filter((h) => h.isCompletedToday).length };
+      return { date: date, total: habits.length, completed: habits.filter((h) => h.isCompletedToday).length };
     }
-    return summaries.find((s) => s.date === date) ?? { date, total: 0, completed: 0 };
+    return summaries.find((s) => s.date === date) ?? { date: date, total: 0, completed: 0 };
   }
 
   function prev() {

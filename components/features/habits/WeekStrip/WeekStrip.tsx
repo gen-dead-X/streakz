@@ -80,9 +80,9 @@ export function WeekStrip() {
     if (date === today) {
       const total = habits.length;
       const completed = habits.filter((h) => h.isCompletedToday).length;
-      return { date, total, completed };
+      return { date: date, total, completed };
     }
-    return summaries.find((s) => s.date === date) ?? { date, total: 0, completed: 0 };
+    return summaries.find((s) => s.date === date) ?? { date: date, total: 0, completed: 0 };
   }
 
   return (
