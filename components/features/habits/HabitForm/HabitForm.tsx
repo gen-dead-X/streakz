@@ -308,9 +308,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
         {/* Inline rich text editor */}
         <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 20, overflow: 'hidden' }}>
           <div style={{ padding: '12px 16px 0' }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.09em' }}>
-              Description
-            </span>
+            <span style={{ ...ROW_LABEL, display: 'block' }}>Description</span>
           </div>
           <RichTextEditor
             value={descriptionJson}
