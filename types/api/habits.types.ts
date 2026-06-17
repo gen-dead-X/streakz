@@ -1,5 +1,5 @@
 import type { JSONContent } from '@tiptap/core';
-import type { CardStyle, Frequency, HabitWithStreak } from '@/types/models/habit.types';
+import type { CardStyle, Frequency, HabitScope, HabitWithStreak } from '@/types/models/habit.types';
 
 export interface CreateHabitInput {
   name: string;
@@ -9,6 +9,8 @@ export interface CreateHabitInput {
   cardStyle?: CardStyle;
   notifications?: boolean;
   frequency: Frequency;
+  projectId?: string | null;
+  scope?: HabitScope;
 }
 
 export interface UpdateHabitInput {
