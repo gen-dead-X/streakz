@@ -10,7 +10,8 @@ export async function GET() {
   try {
     const projects = await getProjectsForUser(session.user.id);
     return Response.json({ projects });
-  } catch {
+  } catch (err) {
+    console.error(err);
     return Response.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -27,7 +28,8 @@ export async function POST(request: Request) {
   try {
     const project = await createProject(session.user.id, body);
     return Response.json({ project }, { status: 201 });
-  } catch {
+  } catch (err) {
+    console.error(err);
     return Response.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
