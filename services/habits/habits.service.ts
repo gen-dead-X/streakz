@@ -29,6 +29,8 @@ function toPlain(doc: any): Habit {
     cardStyle: obj.cardStyle ?? deterministicCardStyle(String(obj._id)),
     notifications: obj.notifications ?? true,
     frequency: obj.frequency,
+    projectId: obj.projectId ?? null,
+    scope: obj.scope ?? 'personal',
     createdAt: obj.createdAt?.toISOString() ?? '',
     archivedAt: obj.archivedAt ? obj.archivedAt.toISOString() : null,
   };

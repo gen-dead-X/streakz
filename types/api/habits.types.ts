@@ -10,6 +10,7 @@ export interface CreateHabitInput {
   notifications?: boolean;
   frequency: Frequency;
   projectId?: string | null;
+  /** Only meaningful when projectId is set. Defaults to 'personal'. */
   scope?: HabitScope;
 }
 

@@ -20,6 +20,7 @@ export interface ProjectStatusMember {
   image: string | null;
   personalDone: number;
   personalTotal: number;
+  /** habitIds of team habits this member has checked in on today */
   teamHabitsDone: string[];
 }
 
