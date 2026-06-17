@@ -10,15 +10,21 @@ const FrequencySchema = new Schema(
 
 const HabitSchema = new Schema(
   {
-    userId: { type: String, required: true, index: true },
-    name: { type: String, required: true, maxlength: 50, trim: true },
-    icon: { type: String, required: true },
+    userId:      { type: String, required: true, index: true },
+    name:        { type: String, required: true, maxlength: 50, trim: true },
+    icon:        { type: String, required: true },
     description: { type: Schema.Types.Mixed, default: null },
-    tags: { type: [String], default: [] },
-    cardStyle: { type: String, enum: ['wavy', 'geometric', 'blob', 'aurora', 'ember', 'midnight', 'rose'], default: 'wavy' },
+    tags:        { type: [String], default: [] },
+    cardStyle:   {
+      type:    String,
+      enum:    ['wavy', 'geometric', 'blob', 'aurora', 'ember', 'midnight', 'rose'],
+      default: 'wavy',
+    },
     notifications: { type: Boolean, default: true },
-    frequency: { type: FrequencySchema, required: true },
-    archivedAt: { type: Date, default: null },
+    frequency:     { type: FrequencySchema, required: true },
+    projectId:     { type: String, default: null, index: true },
+    scope:         { type: String, enum: ['team', 'personal'], default: 'personal' },
+    archivedAt:    { type: Date, default: null },
   },
   { timestamps: true },
 );
