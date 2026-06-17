@@ -28,5 +28,6 @@ const ProjectSchema = new Schema(
 );
 
 ProjectSchema.index({ 'members.userId': 1 });
+ProjectSchema.index({ ownerId: 1 });
 
 export const ProjectModel = models.Project ?? model('Project', ProjectSchema);
