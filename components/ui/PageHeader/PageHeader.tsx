@@ -4,6 +4,7 @@ import { Avatar } from "antd";
 import { useRouter } from "next/navigation";
 import { User, Settings2 } from "lucide-react";
 import { format } from "date-fns";
+import { ProjectSwitcher } from "@/components/ui/ProjectSwitcher";
 
 interface PageHeaderProps {
   user: { name: string; image: string | null };
@@ -58,33 +59,21 @@ export function PageHeader({ user }: PageHeaderProps) {
         borderBottom: "1px solid rgba(255,255,255,0.05)",
       }}
     >
-      {/* Left: streak label + date */}
-      <div
-        className="flex flex-col gap-2 py-1"
-      >
+      {/* Left: project switcher */}
+      <div className="flex flex-col justify-center py-1 min-w-0">
         <p
           style={{
-            fontSize: 11,
-            color: "var(--color-text-muted)",
+            fontSize:      11,
+            color:         "var(--color-text-muted)",
             textTransform: "uppercase",
             letterSpacing: "0.08em",
-            margin: 0,
-            lineHeight: 1,
+            margin:        "0 0 2px",
+            lineHeight:    1,
           }}
         >
-          {format(new Date(), "EEEE, MMM d")}
+          {format(new Date(), "EEE, MMM d")}
         </p>
-        <h1
-          style={{
-            fontSize: 18,
-            fontWeight: 800,
-            color: "var(--color-text-heading)",
-            margin: 0,
-            lineHeight: 1.2,
-          }}
-        >
-          Your Streaks
-        </h1>
+        <ProjectSwitcher />
       </div>
 
       {/* Right: avatar + dropdown */}

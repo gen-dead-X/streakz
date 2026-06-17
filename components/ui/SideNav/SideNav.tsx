@@ -2,7 +2,7 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus, Flame, Settings2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { ProjectSwitcher } from '@/components/ui/ProjectSwitcher';
 
 const { Text } = Typography;
 
@@ -87,34 +87,21 @@ export function SideNav({ user }: SideNavProps) {
         </Text>
       </div>
 
-      {/* Date context — shown only when viewing Today */}
-      {isToday && (
-        <div className="px-2 mb-6">
-          <p
-            style={{
-              fontSize: 11,
-              color: 'var(--color-text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              margin: '0 0 2px',
-              lineHeight: 1,
-            }}
-          >
-            {format(new Date(), 'EEEE, MMM d')}
-          </p>
-          <p
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              color: 'var(--color-text-heading)',
-              margin: 0,
-              lineHeight: 1.2,
-            }}
-          >
-            Your Streaks
-          </p>
-        </div>
-      )}
+      {/* Project switcher */}
+      <div className="px-2 mb-4">
+        <p
+          style={{
+            fontSize:      10,
+            color:         'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            margin:        '0 0 4px',
+          }}
+        >
+          Viewing
+        </p>
+        <ProjectSwitcher />
+      </div>
 
       {/* Nav items */}
       <nav className="flex flex-col gap-1 flex-1">
