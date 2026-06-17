@@ -70,11 +70,12 @@ export function ProjectPage({ project, currentUserId }: ProjectPageProps) {
     });
     if (res.ok) {
       await refreshHabits();
+    } else {
+      notify('Failed to check in', 'error');
     }
   }
 
   async function handleUncheck(habitId: string, date: string) {
-    // Store uses DELETE on /api/habits/${habitId}/checkins with body { date }
     const res = await fetch(`/api/habits/${habitId}/checkins`, {
       method:  'DELETE',
       headers: { 'Content-Type': 'application/json' },
@@ -82,6 +83,8 @@ export function ProjectPage({ project, currentUserId }: ProjectPageProps) {
     });
     if (res.ok) {
       await refreshHabits();
+    } else {
+      notify('Failed to uncheck', 'error');
     }
   }
 

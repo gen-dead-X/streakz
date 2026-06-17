@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Input } from 'antd';
 import { useProjectsStore } from '@/store/projects/projects.store';
+import { notify } from '@/lib/snackbar';
 
 const ICONS = ['🚀', '💪', '📚', '🎯', '🏃', '🧘', '🎨', '💡', '🌱', '⚡', '🔥', '🎵'];
 
@@ -36,6 +37,8 @@ export function ProjectForm({
         const id = await createProject({ name: name.trim(), icon });
         if (id) {
           onSuccess ? onSuccess(id) : router.push(`/projects/${id}`);
+        } else {
+          notify('Failed to create project. Please try again.', 'error');
         }
       } else if (mode === 'edit' && projectId) {
         const res = await fetch(`/api/projects/${projectId}`, {
