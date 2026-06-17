@@ -103,10 +103,11 @@ export async function joinProjectByToken(
 ): Promise<string | null> {
   await connectDB();
 
-  // Idempotent: return existing project id if already a member
+  // Idempotent: return existing project id if already a member (only for live projects)
   const existing = await ProjectModel.findOne({
     inviteToken:      token,
     'members.userId': userId,
+    archivedAt:       null,
   }).lean() as { _id: unknown } | null;
   if (existing) return String(existing._id);
 
@@ -148,6 +149,7 @@ export async function removeMember(
   targetUserId: string,
 ): Promise<boolean> {
   await connectDB();
+  if (ownerId === targetUserId) return false;
   const result = await ProjectModel.updateOne(
     { _id: projectId, ownerId },
     { $pull: { members: { userId: targetUserId } } },
@@ -216,6 +218,16 @@ export async function getProjectStatus(
 ): Promise<ProjectStatusResponse> {
   await connectDB();
 
+  // Load project to get the authoritative member list
+  const project = await ProjectModel.findOne({
+    _id:        projectId,
+    archivedAt: null,
+  }).lean() as { members: { userId: string }[] } | null;
+
+  if (!project) return { members: [], totalMembers: 0, allDone: true };
+
+  const memberUserIds = project.members.map((m) => m.userId);
+
   // All active habits in this project
   const habits = await HabitModel.find({
     projectId,
@@ -237,9 +249,6 @@ export async function getProjectStatus(
     if (!checkedInByUser.has(key)) checkedInByUser.set(key, new Set());
     checkedInByUser.get(key)!.add(String(ci.habitId));
   }
-
-  // Collect all unique member userIds from the project habits
-  const memberUserIds = [...new Set(habits.map((h) => h.userId))];
 
   // Team habits (shared across all members)
   const teamHabits = habits.filter((h) => h.scope === 'team');
