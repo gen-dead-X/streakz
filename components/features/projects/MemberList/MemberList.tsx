@@ -40,7 +40,6 @@ export function MemberList({ project, currentUserId }: MemberListProps) {
       router.push('/today');
     } catch {
       notify('Failed to leave project', 'error');
-    } finally {
       setBusy(null);
     }
   }
