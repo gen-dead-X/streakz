@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, Input, Checkbox, Popconfirm, Dropdown } from 'antd';
@@ -13,7 +14,7 @@ import { playSound } from '@/lib/audio/playSound';
 import { FREQUENCY_OPTIONS, DAY_OPTIONS } from '@/constants/habits/frequency.constants';
 import { DEFAULT_ICON } from '@/constants/habits/icon.constants';
 import { habitSchema, type HabitFormValues } from '@/lib/validation/habit.schema';
-import type { CardStyle, Habit, Frequency } from '@/types/models/habit.types';
+import type { CardStyle, Habit, Frequency, HabitScope } from '@/types/models/habit.types';
 import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.types';
 import type { JSONContent } from '@tiptap/core';
 
@@ -70,6 +71,11 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
     !!(initial?.description && typeof initial.description === 'object'),
   );
 
+  const searchParams  = useSearchParams();
+  const urlProjectId  = searchParams.get('projectId');
+  const urlScope      = (searchParams.get('scope') as HabitScope) ?? 'personal';
+  const [scope, setScope] = useState<HabitScope>(urlScope);
+
   const { control, handleSubmit, formState: { errors } } = useForm<HabitFormValues>({
     resolver: zodResolver(habitSchema),
     defaultValues: {
@@ -103,6 +109,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
           type: freqType,
           days: freqType === 'specific' ? (values.days ?? []) : [],
         },
+        ...(urlProjectId ? { projectId: urlProjectId, scope } : {}),
       });
       playSound('/music/streak-added.wav');
     } catch {
@@ -239,6 +246,45 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
             )}
           </AnimatePresence>
         </div>
+
+        {/* Scope picker — only shown when creating a habit inside a project */}
+        {urlProjectId && !isEdit && (
+          <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 16, padding: '12px 16px' }}>
+            <div style={{ padding: '0 0 8px', ...ROW_LABEL }}>Habit Type</div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {(['personal', 'team'] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => setScope(s)}
+                  style={{
+                    flex:         1,
+                    padding:      '10px 0',
+                    borderRadius: 10,
+                    border:       scope === s
+                      ? '2px solid var(--color-brand)'
+                      : '2px solid rgba(255,255,255,0.08)',
+                    background:   scope === s
+                      ? 'rgba(var(--brand-rgb) / 0.1)'
+                      : 'var(--color-bg-elevated)',
+                    color:        scope === s ? 'var(--color-brand)' : 'var(--color-text-muted)',
+                    fontWeight:   scope === s ? 600 : 400,
+                    fontSize:     13,
+                    cursor:       'pointer',
+                    transition:   'all 0.12s ease',
+                  }}
+                >
+                  {s === 'personal' ? '👤 Personal' : '👥 Team'}
+                </button>
+              ))}
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--color-text-muted)', margin: '6px 0 0' }}>
+              {scope === 'team'
+                ? "All members must check in — missing a day resets everyone's streak"
+                : 'Your own habit inside the project — your streak is yours alone'}
+            </p>
+          </div>
+        )}
 
         {/* Metadata surface — Tags, Theme, Frequency, Days */}
         <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 16, overflow: 'hidden' }}>
