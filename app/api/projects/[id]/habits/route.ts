@@ -36,6 +36,9 @@ export async function POST(
   if (!body.name?.trim() || !body.icon || !body.frequency?.type) {
     return Response.json({ error: 'Missing required fields' }, { status: 400 });
   }
+  if (body.scope !== undefined && body.scope !== 'personal' && body.scope !== 'team') {
+    return Response.json({ error: 'scope must be "personal" or "team"' }, { status: 400 });
+  }
 
   try {
     const habit = await createHabit(session.user.id, { ...body, projectId: id, scope: body.scope ?? 'personal' });

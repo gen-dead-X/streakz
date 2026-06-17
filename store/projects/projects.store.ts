@@ -68,6 +68,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
       if (!res.ok) throw new Error('Invalid invite');
       const { projectId } = (await res.json()) as { projectId: string };
       await get().fetchProjects();
+      notify('Joined project!', 'success');
       return projectId;
     } catch {
       notify('Could not join project. The invite link may be invalid.', 'error');
