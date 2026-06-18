@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SideNav } from "@/components/ui/SideNav";
-import { SplashScreen } from "@/components/ui/SplashScreen";
+import { SplashScreenLoader } from "@/components/ui/SplashScreen/SplashScreenLoader";
 import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
 import { NotificationTonePlayer } from "@/components/ui/NotificationTonePlayer";
 
@@ -26,7 +26,7 @@ export default async function AppLayout({
       className="min-h-screen"
       style={{ background: "var(--color-bg-page)" }}
     >
-      <SplashScreen />
+      <SplashScreenLoader />
 
       {/* Desktop sidebar — hidden on mobile */}
       <SideNav user={user} />

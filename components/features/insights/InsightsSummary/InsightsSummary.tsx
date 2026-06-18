@@ -1,10 +1,18 @@
 'use client';
 import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { Skeleton } from 'antd';
 import { StatCard } from '@/components/ui/StatCard';
 import { WeeklyBars } from '@/components/ui/WeeklyBars';
-import { HeatmapCalendar } from '@/components/ui/HeatmapCalendar';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { useInsightsStore } from '@/store/insights/insights.store';
+
+// HeatmapCalendar makes 3 separate month-summary API calls and uses window.matchMedia.
+// Lazy-load it so it doesn't block the stat cards and weekly bars from rendering first.
+const HeatmapCalendar = dynamic(
+  () => import('@/components/ui/HeatmapCalendar').then((m) => ({ default: m.HeatmapCalendar })),
+  { ssr: false, loading: () => <PageLoader variant="section" size={80} /> },
+);
 
 export function InsightsSummary() {
   const { stats, loading, fetchInsights } = useInsightsStore();
@@ -68,7 +76,7 @@ export function InsightsSummary() {
         <WeeklyBars data={stats.weeklyData} />
       </div>
 
-      {/* Heatmap */}
+      {/* Heatmap — loaded independently so stat cards render first */}
       <HeatmapCalendar />
     </div>
   );

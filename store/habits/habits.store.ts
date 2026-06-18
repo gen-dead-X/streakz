@@ -4,10 +4,13 @@ import type { CreateHabitInput, UpdateHabitInput } from '@/types/api/habits.type
 import type { CheckInWithAchievementsResponse } from '@/types/api/achievements.types';
 import { notify } from '@/lib/snackbar';
 
+const STALE_MS = 60_000;
+
 interface HabitsState {
   habits: HabitWithStreak[];
   loading: boolean;
   error: string | null;
+  _fetchedAt: number;
   fetchHabits: () => Promise<void>;
   checkIn: (habitId: string, date: string) => Promise<CheckInWithAchievementsResponse | null>;
   uncheck: (habitId: string, date: string) => Promise<void>;
@@ -20,14 +23,18 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
   habits: [],
   loading: false,
   error: null,
+  _fetchedAt: 0,
 
   async fetchHabits() {
+    const { _fetchedAt, habits } = get();
+    if (habits.length > 0 && Date.now() - _fetchedAt < STALE_MS) return;
+
     set({ loading: true, error: null });
     try {
       const res = await fetch('/api/habits');
       if (!res.ok) throw new Error('Failed to fetch habits');
       const { habits } = await res.json();
-      set({ habits, loading: false });
+      set({ habits, loading: false, _fetchedAt: Date.now() });
     } catch (err) {
       set({ error: String(err), loading: false });
     }
@@ -54,6 +61,7 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     });
     if (!res.ok) {
       // Rollback on failure
+      set({ _fetchedAt: 0 });
       await get().fetchHabits();
       if (res.status !== 409) {
         notify('Check-in failed. Try again.', 'error');
@@ -84,6 +92,7 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
       body: JSON.stringify({ date }),
     });
     if (!res.ok) {
+      set({ _fetchedAt: 0 });
       await get().fetchHabits();
     }
   },
@@ -96,6 +105,7 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to create habit');
+      set({ _fetchedAt: 0 });
       await get().fetchHabits();
       notify('Habit created!', 'success');
     } catch {
@@ -112,11 +122,11 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     });
     if (!res.ok) throw new Error('Failed to update habit');
     const { habit: updated } = (await res.json()) as { habit: Habit };
-    // Immediately reflect server response in store (preserves streak data)
     set((s) => ({
       habits: s.habits.map((h) =>
         h._id === id ? ({ ...h, ...updated } as HabitWithStreak) : h,
       ),
+      _fetchedAt: 0,
     }));
     await get().fetchHabits();
   },
@@ -125,6 +135,9 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
     set((s) => ({ habits: s.habits.filter((h) => h._id !== id) }));
     notify('Habit removed', 'info');
     const res = await fetch(`/api/habits/${id}`, { method: 'DELETE' });
-    if (!res.ok) await get().fetchHabits();
+    if (!res.ok) {
+      set({ _fetchedAt: 0 });
+      await get().fetchHabits();
+    }
   },
 }));

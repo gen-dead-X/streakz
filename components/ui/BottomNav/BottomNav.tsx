@@ -1,5 +1,6 @@
 'use client';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -8,7 +9,6 @@ const { Text } = Typography;
 
 export function BottomNav() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -27,49 +27,46 @@ export function BottomNav() {
         borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
     >
-      {/* Today */}
-      <button
-        onClick={() => router.push('/today')}
+      <Link
+        href="/today"
         className="flex-1 flex flex-col items-center justify-center gap-1 py-2"
-        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        style={{ textDecoration: 'none' }}
       >
         <CalendarDays size={22} style={isToday ? active : inactive} />
         <Text style={{ fontSize: 11, ...(isToday ? active : inactive) }}>Today</Text>
-      </button>
+      </Link>
 
       {/* Add — centered CTA, floats above nav */}
       <div className="flex-1 flex items-center justify-center">
-        <motion.button
-          onClick={() => router.push('/habits/new')}
-          className="flex items-center justify-center"
-          style={{
-            width: 62,
-            height: 62,
-            borderRadius: '50%',
-            background: 'var(--color-brand)',
-            border: 'none',
-            cursor: 'pointer',
-            boxShadow: '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
-            marginTop: -24,
-          }}
-          initial={{ scale: 0.78 }}
-          animate={{ scale: 1 }}
-          whileTap={{ scale: 0.86 }}
-          transition={{ type: 'spring', stiffness: 440, damping: 18 }}
-        >
-          <Plus size={28} style={{ color: 'var(--color-bg-page)' }} />
-        </motion.button>
+        <Link href="/habits/new" style={{ display: 'block' }}>
+          <motion.div
+            className="flex items-center justify-center"
+            style={{
+              width: 62,
+              height: 62,
+              borderRadius: '50%',
+              background: 'var(--color-brand)',
+              boxShadow: '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
+              marginTop: -24,
+            }}
+            initial={{ scale: 0.78 }}
+            animate={{ scale: 1 }}
+            whileTap={{ scale: 0.86 }}
+            transition={{ type: 'spring', stiffness: 440, damping: 18 }}
+          >
+            <Plus size={28} style={{ color: 'var(--color-bg-page)' }} />
+          </motion.div>
+        </Link>
       </div>
 
-      {/* Insights */}
-      <button
-        onClick={() => router.push('/insights')}
+      <Link
+        href="/insights"
         className="flex-1 flex flex-col items-center justify-center gap-1 py-2"
-        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+        style={{ textDecoration: 'none' }}
       >
         <BarChart3 size={22} style={isInsights ? active : inactive} />
         <Text style={{ fontSize: 11, ...(isInsights ? active : inactive) }}>Insights</Text>
-      </button>
+      </Link>
     </nav>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Avatar, Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus, Flame, Settings2 } from 'lucide-react';
 import { ProjectSwitcher } from '@/components/ui/ProjectSwitcher';
@@ -12,7 +13,6 @@ interface SideNavProps {
 
 export function SideNav({ user }: SideNavProps) {
   const pathname = usePathname();
-  const router = useRouter();
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -25,14 +25,9 @@ export function SideNav({ user }: SideNavProps) {
     .toUpperCase()
     .slice(0, 2);
 
-  const navItem = (
-    icon: React.ReactNode,
-    label: string,
-    active: boolean,
-    onClick: () => void,
-  ) => (
-    <button
-      onClick={onClick}
+  const navItem = (icon: React.ReactNode, label: string, active: boolean, href: string) => (
+    <Link
+      href={href}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -40,19 +35,18 @@ export function SideNav({ user }: SideNavProps) {
         width: '100%',
         padding: '10px 16px',
         borderRadius: 12,
-        border: 'none',
         cursor: 'pointer',
         background: active ? 'rgb(var(--brand-rgb) / 0.12)' : 'transparent',
         color: active ? 'var(--color-brand)' : 'var(--color-text-muted)',
         transition: 'all 0.15s ease',
-        textAlign: 'left',
+        textDecoration: 'none',
       }}
     >
       {icon}
       <Text style={{ fontSize: 15, fontWeight: active ? 600 : 400, color: 'inherit' }}>
         {label}
       </Text>
-    </button>
+    </Link>
   );
 
   return (
@@ -105,29 +99,14 @@ export function SideNav({ user }: SideNavProps) {
 
       {/* Nav items */}
       <nav className="flex flex-col gap-1 flex-1">
-        {navItem(
-          <CalendarDays size={20} />,
-          'Today',
-          isToday,
-          () => router.push('/today'),
-        )}
-        {navItem(
-          <BarChart3 size={20} />,
-          'Insights',
-          isInsights,
-          () => router.push('/insights'),
-        )}
-        {navItem(
-          <Settings2 size={20} />,
-          'Settings',
-          isSettings,
-          () => router.push('/settings'),
-        )}
+        {navItem(<CalendarDays size={20} />, 'Today',    isToday,    '/today')}
+        {navItem(<BarChart3   size={20} />, 'Insights', isInsights, '/insights')}
+        {navItem(<Settings2   size={20} />, 'Settings', isSettings, '/settings')}
       </nav>
 
       {/* Add Habit button */}
-      <button
-        onClick={() => router.push('/habits/new')}
+      <Link
+        href="/habits/new"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -135,22 +114,21 @@ export function SideNav({ user }: SideNavProps) {
           width: '100%',
           padding: '12px 16px',
           borderRadius: 12,
-          border: 'none',
-          cursor: 'pointer',
           background: 'var(--color-brand)',
           color: 'var(--color-bg-page)',
           marginBottom: 16,
           fontWeight: 600,
           fontSize: 15,
+          textDecoration: 'none',
         }}
       >
         <Plus size={20} />
         Add Habit
-      </button>
+      </Link>
 
       {/* User */}
-      <button
-        onClick={() => router.push('/profile')}
+      <Link
+        href="/profile"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -158,11 +136,10 @@ export function SideNav({ user }: SideNavProps) {
           padding: '12px 8px',
           borderRadius: 12,
           background: 'var(--color-bg-elevated)',
-          border: 'none',
-          cursor: 'pointer',
           width: '100%',
           textAlign: 'left',
           transition: 'background 0.15s ease',
+          textDecoration: 'none',
         }}
       >
         <Avatar
@@ -192,7 +169,7 @@ export function SideNav({ user }: SideNavProps) {
             {user.name}
           </Text>
         </div>
-      </button>
+      </Link>
     </aside>
   );
 }
