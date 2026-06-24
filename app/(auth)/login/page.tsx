@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Form, Input, Divider, Typography, Alert } from 'antd';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FireOutlined } from '@ant-design/icons';
 import { signIn } from '@/lib/auth/auth-client';
 import { loginSchema, type LoginValues } from '@/lib/validation/auth.schema';
@@ -12,9 +12,11 @@ import { loginSchema, type LoginValues } from '@/lib/validation/auth.schema';
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
-  const router = useRouter();
+  const router       = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl      = searchParams.get('next') ?? '/today';
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]     = useState<string | null>(null);
 
   const { control, handleSubmit, formState: { errors } } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -24,14 +26,14 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     const { error: err } = await signIn.email({
-      email: values.email,
-      password: values.password,
-      callbackURL: '/today',
+      email:       values.email,
+      password:    values.password,
+      callbackURL: nextUrl,
     });
     if (err) {
       setError(err.message ?? 'Invalid email or password');
     } else {
-      router.push('/today');
+      router.push(nextUrl);
     }
     setLoading(false);
   }

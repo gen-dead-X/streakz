@@ -3,7 +3,6 @@ import { headers } from "next/headers";
 import { format } from "date-fns";
 import { getHabitsForUser } from "@/services/habits/habits.service";
 import { HabitList } from "@/components/features/habits/HabitList";
-import { WeekStrip } from "@/components/features/habits/WeekStrip";
 import { TwoWeekStrip } from "@/components/features/habits/TwoWeekStrip";
 
 export default async function TodayPage() {
@@ -13,41 +12,29 @@ export default async function TodayPage() {
   }
 
   const todayStr = format(new Date(), "yyyy-MM-dd");
-  const habits = await getHabitsForUser(session.user.id, todayStr);
+  const habits   = await getHabitsForUser(session.user.id, todayStr);
 
-  const total = habits.length;
+  const total   = habits.length;
   const completed = habits.filter((h) => h.isCompletedToday).length;
   const allDone = total && completed === total;
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Mobile: week strip */}
-      {total ? (
-        <div
+      {/* Mobile: header now contains the date strip — show completion badge only */}
+      {allDone ? (
+        <p
           className="md:hidden"
           style={{
-            background: "var(--color-bg-surface)",
-            borderRadius: 20,
-            padding: "12px 16px 8px",
-            border: "1px solid rgba(255,255,255,0.04)",
+            fontSize:      11,
+            color:         "var(--color-success)",
+            fontWeight:    600,
+            margin:        0,
+            letterSpacing: "0.05em",
+            textTransform: "uppercase",
           }}
         >
-          {allDone && (
-            <p
-              style={{
-                fontSize: 11,
-                color: "var(--color-success)",
-                fontWeight: 600,
-                margin: "0 0 4px 4px",
-                letterSpacing: "0.05em",
-                textTransform: "uppercase",
-              }}
-            >
-              All done today 🎉
-            </p>
-          )}
-          <WeekStrip />
-        </div>
+          All done today 🎉
+        </p>
       ) : null}
 
       {/* Desktop: 14-day two-week strip */}
@@ -55,21 +42,21 @@ export default async function TodayPage() {
         <div
           className="hidden md:block"
           style={{
-            background: "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
-            backdropFilter: "blur(12px)",
+            background:          "linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)",
+            backdropFilter:      "blur(12px)",
             WebkitBackdropFilter: "blur(12px)",
-            borderRadius: 20,
-            padding: "18px 22px 16px",
-            border: "1px solid rgba(255,255,255,0.07)",
+            borderRadius:        20,
+            padding:             "18px 22px 16px",
+            border:              "1px solid rgba(255,255,255,0.07)",
           }}
         >
           {allDone && (
             <p
               style={{
-                fontSize: 11,
-                color: "var(--color-success)",
-                fontWeight: 600,
-                margin: "0 0 10px 2px",
+                fontSize:      11,
+                color:         "var(--color-success)",
+                fontWeight:    600,
+                margin:        "0 0 10px 2px",
                 letterSpacing: "0.05em",
                 textTransform: "uppercase",
               }}
@@ -85,7 +72,7 @@ export default async function TodayPage() {
         Mobile: give the deck enough height.
         Desktop (md+): HabitList renders deck + list side by side, height is auto.
       */}
-      <div className="h-[calc(100dvh-280px)] min-h-95 md:h-auto md:min-h-0">
+      <div className="h-[calc(100dvh-240px)] min-h-95 md:h-auto md:min-h-0">
         <HabitList />
       </div>
     </div>

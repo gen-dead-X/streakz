@@ -6,6 +6,11 @@ export interface ProjectMember {
   joinedAt: string;
 }
 
+export interface EnrichedProjectMember extends ProjectMember {
+  name: string;
+  image: string | null;
+}
+
 export interface Project {
   _id: string;
   name: string;

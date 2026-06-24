@@ -24,7 +24,7 @@ export default async function InvitePage({
   const session = await auth.api.getSession({ headers: await headers() });
 
   if (session) {
-    // Check if user is already a member — if so, redirect immediately
+    // Already a member → go straight to project
     const project = await getProjectById(preview.projectId, session.user.id);
     if (project) redirect(`/projects/${preview.projectId}`);
   }

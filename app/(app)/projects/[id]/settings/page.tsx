@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth/auth';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getProjectById } from '@/services/projects/projects.service';
+import { getProjectById, getEnrichedMembers } from '@/services/projects/projects.service';
 import { MemberList }  from '@/components/features/projects/MemberList';
 import { ProjectForm } from '@/components/features/projects/ProjectForm';
 import { CopyInviteButton, RegenerateTokenButton } from './SettingsClientActions';
@@ -27,8 +27,9 @@ export default async function ProjectSettingsPage({
   const project = await getProjectById(id, session.user.id);
   if (!project) redirect('/today');
 
-  const isOwner  = project.ownerId === session.user.id;
-  const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${project.inviteToken}`;
+  const isOwner       = project.ownerId === session.user.id;
+  const inviteUrl     = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${project.inviteToken}`;
+  const enrichedMembers = await getEnrichedMembers(project.members);
 
   return (
     <div style={{ maxWidth: 520, display: 'flex', flexDirection: 'column', gap: 36 }}>
@@ -76,7 +77,7 @@ export default async function ProjectSettingsPage({
 
       <section>
         <p style={sectionLabel}>Members</p>
-        <MemberList project={project} currentUserId={session.user.id} />
+        <MemberList project={project} members={enrichedMembers} currentUserId={session.user.id} />
       </section>
     </div>
   );

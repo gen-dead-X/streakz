@@ -37,7 +37,7 @@ export default async function AppLayout({
       {/* Main content */}
       <div className="md:ml-[240px]" style={{ minHeight: "100dvh" }}>
         <main
-          className="mx-auto px-4 md:px-8 pt-20 pb-24 md:py-8"
+          className="mx-auto px-4 md:px-8 pt-[152px] md:pt-8 pb-24 md:pb-8"
           style={{ maxWidth: 900 }}
         >
           {children}

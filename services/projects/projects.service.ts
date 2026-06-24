@@ -3,6 +3,7 @@ import { connectDB } from '@/lib/mongoose/connection';
 import { ProjectModel } from '@/models/Project';
 import { HabitModel } from '@/models/Habit';
 import { CheckInModel } from '@/models/CheckIn';
+import type { EnrichedProjectMember } from '@/types/models/project.types';
 import type { Project } from '@/types/models/project.types';
 import type {
   CreateProjectInput,
@@ -210,6 +211,33 @@ export async function regenerateInviteToken(
 
   if (!doc) return null;
   return doc.inviteToken;
+}
+
+export async function getEnrichedMembers(
+  members: { userId: string; role: 'owner' | 'member'; joinedAt: string }[],
+): Promise<EnrichedProjectMember[]> {
+  const conn = await connectDB();
+  const db   = conn.connection.db!;
+  const ids  = members.map((m) => m.userId);
+
+  const docs = await db
+    .collection('user')
+    .find({ id: { $in: ids } }, { projection: { id: 1, name: 1, image: 1 } })
+    .toArray();
+
+  const byId = new Map<string, { name: string; image: string | null }>();
+  for (const doc of docs) {
+    byId.set(doc.id as string, {
+      name:  (doc.name as string | null) ?? 'Member',
+      image: (doc.image as string | null) ?? null,
+    });
+  }
+
+  return members.map((m) => ({
+    ...m,
+    name:  byId.get(m.userId)?.name  ?? 'Member',
+    image: byId.get(m.userId)?.image ?? null,
+  }));
 }
 
 export async function getProjectStatus(
