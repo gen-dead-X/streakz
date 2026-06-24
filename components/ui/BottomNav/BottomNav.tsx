@@ -4,11 +4,13 @@ import { usePathname } from 'next/navigation';
 import { Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useDarkMode } from '@/hooks/theme/useDarkMode';
 
 const { Text } = Typography;
 
 export function BottomNav() {
   const pathname = usePathname();
+  const dark = useDarkMode();
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -21,10 +23,10 @@ export function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-40 flex items-center md:hidden"
       style={{
         height: 72,
-        background: 'rgba(8,8,8,0.85)',
+        background: dark ? 'rgba(8,8,8,0.85)' : 'rgba(255,255,255,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        borderTop: dark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)',
       }}
     >
       <Link

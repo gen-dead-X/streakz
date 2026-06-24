@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { User, Settings2 } from "lucide-react";
 import { format } from "date-fns";
 import { ProjectSwitcher } from "@/components/ui/ProjectSwitcher";
+import { useDarkMode } from "@/hooks/theme/useDarkMode";
 
 interface PageHeaderProps {
   user: { name: string; image: string | null };
@@ -27,6 +28,7 @@ const MENU_ITEM: React.CSSProperties = {
 
 export function PageHeader({ user }: PageHeaderProps) {
   const router = useRouter();
+  const dark = useDarkMode();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -53,10 +55,10 @@ export function PageHeader({ user }: PageHeaderProps) {
       className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 md:hidden"
       style={{
         height: 64,
-        background: "rgba(18,18,18,0.82)",
+        background: dark ? "rgba(18,18,18,0.82)" : "rgba(255,255,255,0.92)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid rgba(255,255,255,0.05)",
+        borderBottom: dark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.08)",
       }}
     >
       {/* Left: project switcher */}
@@ -116,7 +118,7 @@ export function PageHeader({ user }: PageHeaderProps) {
               overflow: "hidden",
               minWidth: 164,
               boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              border: dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.10)",
               zIndex: 100,
             }}
           >
@@ -133,7 +135,7 @@ export function PageHeader({ user }: PageHeaderProps) {
               />
               Profile
             </button>
-            <div style={{ height: 1, background: "rgba(255,255,255,0.06)" }} />
+            <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" }} />
             <button
               onClick={() => {
                 router.push("/settings");

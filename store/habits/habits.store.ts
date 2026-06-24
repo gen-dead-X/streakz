@@ -68,7 +68,7 @@ export const useHabitsStore = create<HabitsState>((set, get) => ({
       }
       return null;
     }
-    notify('✓ Checked in!', 'success');
+    notify('Checked in', 'success');
     return res.json() as Promise<CheckInWithAchievementsResponse>;
   },
 
