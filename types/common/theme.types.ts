@@ -7,7 +7,8 @@ export type ColorScheme =
   | 'sky'
   | 'ocean'
   | 'teal'
-  | 'classy';
+  | 'classy'
+  | 'glassy';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 

@@ -10,6 +10,7 @@ export const THEMES: ThemeMeta[] = [
   { id: 'ocean',   name: 'Ocean',    swatch: '#3B8BEF' },
   { id: 'teal',    name: 'Teal',     swatch: '#1DB59E' },
   { id: 'classy',  name: 'Classy',   swatch: '#DEAD32' },
+  { id: 'glassy',  name: 'Glassy',   swatch: '#9DDFBB' },
 ];
 
 /** Hex primary color per scheme per mode — fed into antd colorPrimary */
@@ -23,4 +24,5 @@ export const SCHEME_PRIMARY: Record<ColorScheme, { dark: string; light: string }
   ocean:   { dark: '#3B8BEF', light: '#1A6ED8' },
   teal:    { dark: '#1DB59E', light: '#0D9484' },
   classy:  { dark: '#DEAD32', light: '#C4921C' },
+  glassy:  { dark: '#1DB954', light: '#18943F' },
 };

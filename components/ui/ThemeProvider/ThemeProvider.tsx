@@ -6,7 +6,7 @@ import { getAntdTheme } from '@/lib/antd-theme';
 import type { ResolvedMode } from '@/types/common/theme.types';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const { colorScheme, mode } = useThemeStore();
+  const { colorScheme, mode, glassOpacity } = useThemeStore();
   const [resolvedMode, setResolvedMode] = useState<ResolvedMode>('dark');
 
   useEffect(() => {
@@ -32,6 +32,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, [colorScheme, mode]);
+
+  useEffect(() => {
+    if (colorScheme === 'glassy') {
+      document.documentElement.style.setProperty('--glass-opacity', String(glassOpacity));
+    } else {
+      document.documentElement.style.removeProperty('--glass-opacity');
+    }
+  }, [colorScheme, glassOpacity]);
 
   return (
     <ConfigProvider theme={getAntdTheme(colorScheme, resolvedMode)}>
