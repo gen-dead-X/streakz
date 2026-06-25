@@ -30,6 +30,7 @@ export function SideNav({ user }: SideNavProps) {
   const navItem = (icon: React.ReactNode, label: string, active: boolean, href: string) => (
     <Link
       href={href}
+      prefetch={active ? false : undefined}
       style={{
         display: 'flex',
         alignItems: 'center',

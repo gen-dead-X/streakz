@@ -19,6 +19,27 @@ interface PageHeaderProps {
 const DOW_LABEL = ["M", "T", "W", "T", "F", "S", "S"];
 const CELL_W    = 44;
 
+// Stable object references — framer-motion uses reference equality to decide
+// whether to restart an animation. Inline objects recreated on every render
+// caused it to cancel-and-restart the repeat:Infinity breathing ring on each
+// render cycle, creating a tight render loop.
+// Stable object references — framer-motion uses reference equality to decide
+// whether to restart an animation. Inline objects recreated on every render
+// caused it to cancel-and-restart the repeat:Infinity breathing ring on each
+// render cycle, creating a tight render loop.
+const BREATHE_ANIMATE = { scale: [1, 1.48, 1.48] as [number, number, number], opacity: [0.6, 0, 0] as [number, number, number] };
+const BREATHE_ANIMATE_OFF = { scale: 1, opacity: 0 };
+const BREATHE_TRANSITION = { duration: 2.4, repeat: Infinity, repeatDelay: 0.7, ease: "easeOut" as const };
+const BREATHE_TRANSITION_OFF = { duration: 0.15 };
+const CIRCLE_ANIMATE_VISIBLE = { opacity: 1 };
+const CIRCLE_ANIMATE_HIDDEN  = { opacity: 0 };
+const CIRCLE_TRANSITION = { duration: 0.08 };
+const LIVE_DOT_ANIMATE = { scale: [1, 1.35, 1] as [number, number, number], opacity: [1, 0.55, 1] as [number, number, number] };
+const LIVE_DOT_TRANSITION = { duration: 1.9, repeat: Infinity, ease: "easeInOut" as const };
+const ISLAND_FADE_TRANSITION = { delay: 0.14, duration: 0.22 };
+const ISLAND_BODY_TRANSITION = { delay: 0.2, duration: 0.22 };
+const ISLAND_SPRING = { type: "spring" as const, stiffness: 360, damping: 34 };
+
 const MENU_ITEM: React.CSSProperties = {
   display:    "flex",
   alignItems: "center",
@@ -214,7 +235,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       onClick={handleTodayTap}
                       style={{ position: "relative", width: 30, height: 30, cursor: "pointer" }}
                     >
-                      {/* Breathing ripple ring — cleared extra space with inset so ring clips inside the padding area */}
+                      {/* Breathing ripple ring */}
                       <motion.div
                         style={{
                           position: "absolute", inset: -5,
@@ -222,16 +243,12 @@ export function PageHeader({ user }: PageHeaderProps) {
                           border: "1.5px solid var(--color-brand)",
                           pointerEvents: "none",
                         }}
-                        animate={!islandExpanded
-                          ? { scale: [1, 1.48, 1.48], opacity: [0.6, 0, 0] }
-                          : { scale: 1, opacity: 0 }}
-                        transition={!islandExpanded
-                          ? { duration: 2.4, repeat: Infinity, repeatDelay: 0.7, ease: "easeOut" }
-                          : { duration: 0.15 }}
+                        animate={islandExpanded ? BREATHE_ANIMATE_OFF : BREATHE_ANIMATE}
+                        transition={islandExpanded ? BREATHE_TRANSITION_OFF : BREATHE_TRANSITION}
                       />
                       <motion.div
-                        animate={{ opacity: islandExpanded ? 0 : 1 }}
-                        transition={{ duration: 0.08 }}
+                        animate={islandExpanded ? CIRCLE_ANIMATE_HIDDEN : CIRCLE_ANIMATE_VISIBLE}
+                        transition={CIRCLE_TRANSITION}
                         style={{
                           width: 30, height: 30, borderRadius: "50%",
                           background: "var(--color-brand)",
@@ -302,7 +319,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 borderRadius: islandRect.height / 2,
                 opacity:      0,
               }}
-              transition={{ type: "spring", stiffness: 360, damping: 34 }}
+              transition={ISLAND_SPRING}
               style={{
                 position:             "fixed",
                 top:                   0,
@@ -324,7 +341,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ delay: 0.14, duration: 0.22 }}
+                transition={ISLAND_FADE_TRANSITION}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "13px 16px 10px",
@@ -335,8 +352,8 @@ export function PageHeader({ user }: PageHeaderProps) {
                 <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
                   {/* Live pulse dot */}
                   <motion.div
-                    animate={{ scale: [1, 1.35, 1], opacity: [1, 0.55, 1] }}
-                    transition={{ duration: 1.9, repeat: Infinity, ease: "easeInOut" }}
+                    animate={LIVE_DOT_ANIMATE}
+                    transition={LIVE_DOT_TRANSITION}
                     style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e" }}
                   />
                   <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.9)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
@@ -364,7 +381,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ delay: 0.2, duration: 0.22 }}
+                transition={ISLAND_BODY_TRANSITION}
                 style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" as never }}
               >
                 {/* Progress summary row */}
