@@ -881,3 +881,16 @@
 .calendar-heatmap .react-calendar__navigation__label {
   font-size: 13px;
 }
+
+/* ============================================
+   DESKTOP TYPOGRAPHY SCALE
+   ============================================ */
+@media (min-width: 768px) {
+  html {
+    font-size: 14px;
+  }
+
+  body {
+    font-size: 14px;
+  }
+}

@@ -45,7 +45,7 @@ export function SideNav({ user }: SideNavProps) {
       }}
     >
       {icon}
-      <Text style={{ fontSize: 15, fontWeight: active ? 600 : 400, color: 'inherit' }}>
+      <Text style={{ fontSize: 16, fontWeight: active ? 600 : 400, color: 'inherit' }}>
         {label}
       </Text>
     </Link>
@@ -78,7 +78,7 @@ export function SideNav({ user }: SideNavProps) {
         >
           <Flame size={20} style={{ color: 'var(--color-bg-page)' }} />
         </div>
-        <Text strong style={{ fontSize: 18, color: 'var(--color-text-heading)' }}>
+        <Text strong style={{ fontSize: 20, color: 'var(--color-text-heading)' }}>
           Streak Counter
         </Text>
       </div>
@@ -87,7 +87,7 @@ export function SideNav({ user }: SideNavProps) {
       <div className="px-2 mb-4">
         <p
           style={{
-            fontSize:      10,
+            fontSize:      11,
             color:         'var(--color-text-muted)',
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
@@ -120,7 +120,7 @@ export function SideNav({ user }: SideNavProps) {
           color: 'var(--color-bg-page)',
           marginBottom: 16,
           fontWeight: 600,
-          fontSize: 15,
+          fontSize: 16,
           border: 'none',
           cursor: 'pointer',
         }}
