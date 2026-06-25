@@ -4,6 +4,7 @@ import { App } from 'antd';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { ThemeProvider } from '@/components/ui/ThemeProvider';
 import { NotificationRegistrar } from '@/components/ui/NotificationRegistrar';
+import { BottomSheetProvider } from '@/components/ui/BottomSheet';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -11,7 +12,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider>
         <App>
           <NotificationRegistrar />
-          {children}
+          <BottomSheetProvider>
+            {children}
+          </BottomSheetProvider>
         </App>
       </ThemeProvider>
     </AntdRegistry>

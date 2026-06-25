@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Flame, MoreHorizontal, Eye, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import confetti from "canvas-confetti";
 import { BorderBeam } from "antd";
 import { HabitIcon } from "@/components/ui/HabitIcon";
@@ -87,7 +88,8 @@ export function HabitCard({
   onUncheck,
   loading,
 }: HabitCardProps) {
-  const router = useRouter();
+  const router   = useRouter();
+  const openEdit = useHabitSheetStore((s) => s.openEdit);
   const style: CardStyle = habit.cardStyle ?? "wavy";
   const gradient = GRADIENTS[style];
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -487,7 +489,7 @@ export function HabitCard({
           onTouchStart={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
-            router.push(`/habits/${habit._id}/edit`);
+            openEdit(habit._id);
           }}
           style={{
             position: "absolute",

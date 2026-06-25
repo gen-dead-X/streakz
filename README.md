@@ -221,6 +221,27 @@ Consistency is measured over the last 60 days as `completed scheduled days / tot
 
 ---
 
+## Moments That Felt Right ✦
+
+A log of design work that hit the mark — what was built and what made it work.
+
+---
+
+### iOS-Style Bottom Sheet (June 2026)
+
+Replaced the full-page add/edit habit flow with a Framer Motion bottom sheet that feels native to the device.
+
+**What made it work:**
+- Two snap points (full at 8% from top, half at 50%) with velocity-aware snapping — a quick flick advances; a slow drag position-snaps
+- The background content scales to `0.93` and grows `14px` corner radius as the sheet opens, using a shared `MotionValue` so the scale interpolates live during drag with zero lag
+- Drag is locked to the handle pill only — the content area scrolls independently without fighting the gesture
+- `BottomSheetProvider` + `BottomSheetBackground` + `BottomSheet` are fully decoupled from the habit domain — drop them in any project, swap the CSS variables, and it works
+- A single Zustand store (`useHabitSheetStore`) lets any component anywhere trigger the sheet without routing
+
+The iOS zoom-out during open/close is the detail that makes it feel right.
+
+---
+
 <div align="center">
 
 Built with focus, friction, and a healthy obsession with not breaking the chain.

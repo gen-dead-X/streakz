@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { Settings2, Plus, Copy } from 'lucide-react';
+import { useHabitSheetStore } from '@/store/habitSheet/habitSheet.store';
 import { ProjectHeader }   from '@/components/features/projects/ProjectHeader';
 import { TeamHabitRow }    from '@/components/features/projects/TeamHabitRow';
 import { TeamStatusPanel } from '@/components/features/projects/TeamStatusPanel';
@@ -18,8 +19,9 @@ interface ProjectPageProps {
 }
 
 export function ProjectPage({ project, currentUserId }: ProjectPageProps) {
-  const router = useRouter();
-  const today  = format(new Date(), 'yyyy-MM-dd');
+  const router   = useRouter();
+  const openAdd  = useHabitSheetStore((s) => s.openAdd);
+  const today    = format(new Date(), 'yyyy-MM-dd');
 
   const [habits,  setHabits]  = useState<HabitWithStreak[]>([]);
   const [status,  setStatus]  = useState<ProjectStatusResponse>({
@@ -136,7 +138,7 @@ export function ProjectPage({ project, currentUserId }: ProjectPageProps) {
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <p style={{ ...sectionLabel, margin: 0 }}>Your Habits</p>
           <button
-            onClick={() => router.push(`/habits/new?projectId=${project._id}&scope=personal`)}
+            onClick={() => openAdd({ projectId: project._id, scope: 'personal' })}
             style={{
               display:      'flex',
               alignItems:   'center',

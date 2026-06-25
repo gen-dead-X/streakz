@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
 import { useRouter } from "next/navigation";
 import { User, Settings2, ChevronDown, Plus } from "lucide-react";
+import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { format, startOfWeek, addDays } from "date-fns";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
@@ -37,10 +38,11 @@ function buildWeekDates(): string[] {
 }
 
 export function PageHeader({ user }: PageHeaderProps) {
-  const router  = useRouter();
-  const dark    = useDarkMode();
+  const router   = useRouter();
+  const dark     = useDarkMode();
+  const openAdd  = useHabitSheetStore((s) => s.openAdd);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef  = useRef<HTMLDivElement>(null);
 
   /* Date strip state */
   const today     = format(new Date(), "yyyy-MM-dd");
@@ -134,7 +136,7 @@ export function PageHeader({ user }: PageHeaderProps) {
           ref={menuRef}
         >
           <button
-            onClick={() => router.push("/habits/new")}
+            onClick={() => openAdd()}
             style={{
               width:          36,
               height:         36,

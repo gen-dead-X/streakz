@@ -34,6 +34,8 @@ interface HabitFormProps {
   onCancel: () => void;
   onDelete?: () => Promise<void>;
   isEdit?: boolean;
+  projectId?: string;
+  defaultScope?: HabitScope;
 }
 
 const ROW_LABEL: React.CSSProperties = {
@@ -54,7 +56,7 @@ const ROW_DIVIDER: React.CSSProperties = {
 
 const COLLAPSE_TRANSITION = { duration: 0.2, ease: 'easeInOut' } as const;
 
-export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false }: HabitFormProps) {
+export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false, projectId: propProjectId, defaultScope }: HabitFormProps) {
   const [icon, setIcon] = useState(initial?.icon ?? DEFAULT_ICON);
   const [cardStyle, setCardStyle] = useState<CardStyle>(initial?.cardStyle ?? 'wavy');
   const [notifications, setNotifications] = useState(initial?.notifications ?? true);
@@ -71,10 +73,11 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
     !!(initial?.description && typeof initial.description === 'object'),
   );
 
-  const searchParams  = useSearchParams();
-  const urlProjectId  = searchParams.get('projectId');
-  const urlScope      = (searchParams.get('scope') as HabitScope) ?? 'personal';
-  const [scope, setScope] = useState<HabitScope>(urlScope);
+  const searchParams   = useSearchParams();
+  const urlProjectId   = searchParams.get('projectId');
+  const urlScope       = (searchParams.get('scope') as HabitScope) ?? 'personal';
+  const effectiveProjectId = propProjectId ?? urlProjectId;
+  const [scope, setScope]  = useState<HabitScope>(defaultScope ?? urlScope);
 
   const { control, handleSubmit, formState: { errors } } = useForm<HabitFormValues>({
     resolver: zodResolver(habitSchema),
@@ -109,7 +112,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
           type: freqType,
           days: freqType === 'specific' ? (values.days ?? []) : [],
         },
-        ...(urlProjectId ? { projectId: urlProjectId, scope } : {}),
+        ...(effectiveProjectId ? { projectId: effectiveProjectId, scope } : {}),
       });
       playSound('/music/streak-added.wav');
     } catch {
@@ -248,7 +251,7 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false 
         </div>
 
         {/* Scope picker — only shown when creating a habit inside a project */}
-        {urlProjectId && !isEdit && (
+        {effectiveProjectId && !isEdit && (
           <div style={{ background: 'var(--color-bg-elevated)', borderRadius: 18, marginBottom: 16, padding: '12px 16px' }}>
             <div style={{ padding: '0 0 8px', ...ROW_LABEL }}>Habit Type</div>
             <div style={{ display: 'flex', gap: 8 }}>

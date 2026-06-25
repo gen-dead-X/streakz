@@ -6,6 +6,7 @@ import { Flame, Settings, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { StreakCardPager } from "@/components/features/habits/StreakCardPager";
+import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { HabitIcon } from "@/components/ui/HabitIcon";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useCheckIn } from "@/hooks/checkin/useCheckIn";
@@ -26,7 +27,8 @@ function DesktopHabitRow({
   onCheckIn: (id: string, date: string) => void;
   onUncheck: (id: string, date: string) => void;
 }) {
-  const router = useRouter();
+  const router   = useRouter();
+  const openEdit = useHabitSheetStore((s) => s.openEdit);
 
   function handleToggle() {
     navigator.vibrate?.(100);
@@ -115,7 +117,7 @@ function DesktopHabitRow({
 
       {/* Edit */}
       <button
-        onClick={() => router.push(`/habits/${habit._id}/edit`)}
+        onClick={() => openEdit(habit._id)}
         style={{
           background: "none",
           border: "none",

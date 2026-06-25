@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Avatar, Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus, Flame, Settings2 } from 'lucide-react';
 import { ProjectSwitcher } from '@/components/ui/ProjectSwitcher';
+import { useHabitSheetStore } from '@/store/habitSheet/habitSheet.store';
 
 const { Text } = Typography;
 
@@ -13,6 +14,7 @@ interface SideNavProps {
 
 export function SideNav({ user }: SideNavProps) {
   const pathname = usePathname();
+  const openAdd  = useHabitSheetStore((s) => s.openAdd);
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -105,8 +107,8 @@ export function SideNav({ user }: SideNavProps) {
       </nav>
 
       {/* Add Habit button */}
-      <Link
-        href="/habits/new"
+      <button
+        onClick={() => openAdd()}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -119,12 +121,13 @@ export function SideNav({ user }: SideNavProps) {
           marginBottom: 16,
           fontWeight: 600,
           fontSize: 15,
-          textDecoration: 'none',
+          border: 'none',
+          cursor: 'pointer',
         }}
       >
         <Plus size={20} />
         Add Habit
-      </Link>
+      </button>
 
       {/* User */}
       <Link

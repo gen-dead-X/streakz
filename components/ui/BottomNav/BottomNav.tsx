@@ -5,12 +5,14 @@ import { Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDarkMode } from '@/hooks/theme/useDarkMode';
+import { useHabitSheetStore } from '@/store/habitSheet/habitSheet.store';
 
 const { Text } = Typography;
 
 export function BottomNav() {
   const pathname = usePathname();
   const dark = useDarkMode();
+  const openAdd = useHabitSheetStore((s) => s.openAdd);
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -40,25 +42,27 @@ export function BottomNav() {
 
       {/* Add — centered CTA, floats above nav */}
       <div className="flex-1 flex items-center justify-center">
-        <Link href="/habits/new" style={{ display: 'block' }}>
-          <motion.div
-            className="flex items-center justify-center"
-            style={{
-              width: 62,
-              height: 62,
-              borderRadius: '50%',
-              background: 'var(--color-brand)',
-              boxShadow: '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
-              marginTop: -24,
-            }}
-            initial={{ scale: 0.78 }}
-            animate={{ scale: 1 }}
-            whileTap={{ scale: 0.86 }}
-            transition={{ type: 'spring', stiffness: 440, damping: 18 }}
-          >
-            <Plus size={28} style={{ color: 'var(--color-bg-page)' }} />
-          </motion.div>
-        </Link>
+        <motion.button
+          onClick={() => openAdd()}
+          className="flex items-center justify-center"
+          style={{
+            width: 62,
+            height: 62,
+            borderRadius: '50%',
+            background: 'var(--color-brand)',
+            boxShadow: '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
+            marginTop: -24,
+            border: 'none',
+            cursor: 'pointer',
+          }}
+          initial={{ scale: 0.78 }}
+          animate={{ scale: 1 }}
+          whileTap={{ scale: 0.86 }}
+          transition={{ type: 'spring', stiffness: 440, damping: 18 }}
+          aria-label="Add habit"
+        >
+          <Plus size={28} style={{ color: 'var(--color-bg-page)' }} />
+        </motion.button>
       </div>
 
       <Link
