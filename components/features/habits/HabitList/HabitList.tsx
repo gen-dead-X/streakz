@@ -171,8 +171,9 @@ export function HabitList() {
   const today = format(new Date(), "yyyy-MM-dd");
 
   useEffect(() => {
-    fetchHabits();
-  }, [fetchHabits]);
+    void fetchHabits();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleCheckIn(habitId: string, date: string) {
     setPendingId(habitId);

@@ -41,6 +41,7 @@ export function BottomNav() {
     >
       <Link
         href="/today"
+        prefetch={isToday ? false : undefined}
         className="flex-1 flex flex-col items-center justify-center gap-1 py-2"
         style={{ textDecoration: 'none' }}
       >
