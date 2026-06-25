@@ -485,21 +485,6 @@
   --bg-sunken:   hsl(174, 9%, 3%);
 }
 
-/* Classy — premium black + rich gold accent */
-[data-theme="classy"] {
-  --brand-default: hsl(38, 78%, 54%);
-  --brand-dark:    hsl(36, 90%, 42%);
-  --brand-light:   hsl(42, 82%, 72%);
-  --brand-subtle:  hsl(38, 78%, 64%);
-  --brand-foreground: hsl(38, 30%, 8%);
-  --brand-rgb: 220 168 50;
-  --shadow-brand: 0 0 24px rgb(220 168 50 / 0.30);
-  /* True deep black with minimal tint for premium look */
-  --bg-page:     hsl(38, 5%, 5%);
-  --bg-surface:  hsl(38, 4%, 8%);
-  --bg-elevated: hsl(38, 4%, 13%);
-  --bg-sunken:   hsl(38, 6%, 2%);
-}
 
 /* ============================================
    COLOR SCHEMES — LIGHT MODE ADJUSTMENTS
@@ -613,33 +598,33 @@
 
 /* ============================================
    GLASSY — iOS / macOS liquid glass morphism
-   (dark mode default)
+   Applies on top of any [data-theme="X"] color.
+
+   Core principle (Apple Liquid Glass 2025-2026):
+   - Glass material is a NEUTRAL DARK BASE, not white
+   - Brand color glows through from the body gradient behind it
+   - Slider increases blur intensity + base opacity (more "frosted")
+   - This keeps surfaces dark and branded at all slider values
    ============================================ */
-[data-theme="glassy"] {
-  /* Brand: emerald (unchanged) */
-  --brand-default: hsl(141, 73%, 42%);
-  --brand-dark:    hsl(143, 100%, 31%);
-  --brand-light:   hsl(134, 78%, 65%);
-  --brand-subtle:  hsl(141, 73%, 52%);
-  --brand-foreground: hsl(0, 0%, 8%);
-  --brand-rgb: 29 185 84;
-  --shadow-brand: 0 0 28px rgb(29 185 84 / 0.42);
+[data-style="glassy"] {
+  /* Blur scales with opacity: 30% → 11px, 80% → 29px, 95% → 34px */
+  --glass-blur: calc(var(--glass-opacity) * 36px);
+  --glass-saturation: 185%;
+  --glass-opacity: 0.65;  /* overwritten live by ThemeProvider */
 
-  /* Glass meta — --glass-opacity overwritten by ThemeProvider via JS */
-  --glass-blur: 22px;
-  --glass-saturation: 180%;
-  --glass-opacity: 0.10;
+  /* ── NEUTRAL DARK GLASS SURFACES ──
+     Opacity maps 1-to-1: glassOpacity=0.80 → surfaces at ~80-85% dark.
+     Slider range 0.30–0.95; never turns white — brand gradient shines through.
+  */
+  --bg-page:     hsl(0, 0%, 5%);
+  --bg-surface:  rgba(12, 14, 12, var(--glass-opacity));
+  --bg-elevated: rgba(18, 20, 18, min(calc(var(--glass-opacity) + 0.05), 1));
+  --bg-sunken:   rgba(5, 6, 5,   min(calc(var(--glass-opacity) + 0.08), 1));
 
-  /* Backgrounds — frosted glass surfaces */
-  --bg-page:     hsl(141, 10%, 5%);
-  --bg-surface:  rgba(255, 255, 255, var(--glass-opacity));
-  --bg-elevated: rgba(255, 255, 255, calc(var(--glass-opacity) * 1.9));
-  --bg-sunken:   rgba(0, 0, 0, 0.24);
-
-  /* Borders — luminous glass edges */
-  --border-default: rgba(255, 255, 255, 0.14);
-  --border-strong:  rgba(255, 255, 255, 0.22);
-  --border-subtle:  rgba(255, 255, 255, 0.06);
+  /* Borders — thin luminous specular highlight on glass edge */
+  --border-default: rgba(255, 255, 255, 0.13);
+  --border-strong:  rgba(255, 255, 255, 0.20);
+  --border-subtle:  rgba(255, 255, 255, 0.05);
   --border-focus:   var(--brand-default);
 
   /* Text */
@@ -661,69 +646,66 @@
   --neutral-800: hsl(0, 0%, 14%);
   --neutral-900: hsl(0, 0%, 7%);
 
-  /* Shadows — glass depth + specular top edge highlight */
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.14);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.16);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.52), inset 0 1px 0 rgba(255,255,255,0.18);
-  --shadow-xl: 0 16px 48px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,255,255,0.20);
+  /* Shadows: deep drop + specular inner edge (top highlight) */
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.12);
+  --shadow-md: 0 4px 18px rgba(0,0,0,0.44), inset 0 1px 0 rgba(255,255,255,0.14);
+  --shadow-lg: 0 8px 34px rgba(0,0,0,0.54), inset 0 1px 0 rgba(255,255,255,0.16);
+  --shadow-xl: 0 16px 52px rgba(0,0,0,0.64), inset 0 1px 0 rgba(255,255,255,0.18);
+  --shadow-brand: 0 0 28px rgb(var(--brand-rgb) / 0.44);
 
-  /* Gradients */
-  --gradient-brand:   linear-gradient(135deg, rgba(29,185,84,0.34) 0%, rgba(0,0,0,0.58) 100%);
-  --gradient-accent:  linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.09) 100%);
-  --gradient-hero:    linear-gradient(135deg, rgba(29,185,84,0.44) 0%, rgba(29,185,84,0.18) 50%, rgba(0,0,0,0.70) 100%);
-  --gradient-surface: linear-gradient(to bottom, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.04) 100%);
-  --gradient-card:    linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.00) 100%);
+  /* Gradients — brand-aware (adapts to any color theme) */
+  --gradient-brand:   linear-gradient(135deg, rgb(var(--brand-rgb) / 0.36) 0%, rgba(0,0,0,0.60) 100%);
+  --gradient-accent:  linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 100%);
+  --gradient-hero:    linear-gradient(135deg, rgb(var(--brand-rgb) / 0.46) 0%, rgb(var(--brand-rgb) / 0.18) 50%, rgba(0,0,0,0.72) 100%);
+  --gradient-surface: linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%);
+  --gradient-card:    linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.00) 100%);
 
   /* Misc */
-  --selection-background: rgb(29 185 84 / 0.32);
+  --selection-background: rgb(var(--brand-rgb) / 0.32);
   --selection-foreground: inherit;
-  --overlay: rgba(0, 0, 0, 0.58);
-  --ring: rgb(29 185 84 / 0.46);
-  --skeleton: rgba(255, 255, 255, 0.08);
+  --overlay: rgba(0, 0, 0, 0.60);
+  --ring: rgb(var(--brand-rgb) / 0.46);
+  --skeleton: rgba(255, 255, 255, 0.07);
 }
 
-/* Body: the vivid gradient "scene" behind all glass surfaces */
-[data-theme="glassy"] body {
+/* Body: vivid brand ambient scene that shows through the glass */
+[data-style="glassy"] body {
   background:
-    radial-gradient(ellipse 140% 90% at 12% 2%, rgba(29,185,84,0.24) 0%, transparent 48%),
-    radial-gradient(ellipse 90% 140% at 88% 98%, rgba(29,185,84,0.16) 0%, transparent 48%),
-    radial-gradient(ellipse 60% 60% at 52% 52%, rgba(18,78,42,0.08) 0%, transparent 58%),
-    hsl(141, 10%, 5%);
+    radial-gradient(ellipse 150% 90%  at  8%  0%, rgb(var(--brand-rgb) / 0.28) 0%, transparent 45%),
+    radial-gradient(ellipse  90% 150% at 92% 100%, rgb(var(--brand-rgb) / 0.18) 0%, transparent 45%),
+    radial-gradient(ellipse  70%  70% at 50%  55%, rgb(var(--brand-rgb) / 0.08) 0%, transparent 55%),
+    hsl(0, 0%, 5%);
   background-attachment: fixed;
 }
 
-/* Backdrop filter on antd containers */
-[data-theme="glassy"] .ant-card,
-[data-theme="glassy"] .ant-modal-content,
-[data-theme="glassy"] .ant-drawer-content,
-[data-theme="glassy"] .ant-popover-inner,
-[data-theme="glassy"] .ant-select-dropdown,
-[data-theme="glassy"] .ant-dropdown-menu,
-[data-theme="glassy"] .ant-tooltip-inner {
+/* Antd container glass */
+[data-style="glassy"] .ant-card,
+[data-style="glassy"] .ant-modal-content,
+[data-style="glassy"] .ant-drawer-content,
+[data-style="glassy"] .ant-popover-inner,
+[data-style="glassy"] .ant-select-dropdown,
+[data-style="glassy"] .ant-dropdown-menu,
+[data-style="glassy"] .ant-tooltip-inner {
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  background: rgba(12, 20, 14, calc(var(--glass-opacity) * 3.2 + 0.38)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.11) !important;
+  background: rgba(12, 14, 12, var(--glass-opacity)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
-/* Glassy — light mode */
-[data-theme="glassy"][data-mode="light"] {
-  --brand-default: hsl(141, 73%, 36%);
-  --brand-dark:    hsl(143, 85%, 27%);
-  --brand-light:   hsl(134, 68%, 52%);
-  --brand-subtle:  hsl(141, 73%, 44%);
-  --brand-foreground: hsl(0, 0%, 98%);
-  --brand-rgb: 20 148 55;
-  --shadow-brand: 0 0 22px rgb(20 148 55 / 0.22);
-
+/* ── GLASSY LIGHT MODE ──
+   Frosted white glass on light ambient backdrop.
+   At 0.80 (default): ~80% white → crisp glass look with color showing through.
+*/
+[data-style="glassy"][data-mode="light"] {
   --bg-page:     hsl(220, 22%, 95%);
-  --bg-surface:  rgba(255, 255, 255, calc(var(--glass-opacity) * 5.5 + 0.44));
-  --bg-elevated: rgba(255, 255, 255, calc(var(--glass-opacity) * 6.5 + 0.58));
-  --bg-sunken:   rgba(0, 0, 0, 0.04);
+  --bg-surface:  rgba(255, 255, 255, var(--glass-opacity));
+  --bg-elevated: rgba(248, 248, 248, min(calc(var(--glass-opacity) + 0.05), 1));
+  --bg-sunken:   rgba(0, 0, 0, 0.03);
 
-  --border-default: rgba(0, 0, 0, 0.09);
-  --border-strong:  rgba(0, 0, 0, 0.16);
-  --border-subtle:  rgba(255, 255, 255, 0.68);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong:  rgba(0, 0, 0, 0.14);
+  --border-subtle:  rgba(255, 255, 255, 0.72);
   --border-focus:   var(--brand-default);
 
   --text-heading: hsl(220, 15%, 10%);
@@ -732,48 +714,34 @@
   --text-inverse: hsl(0, 0%, 100%);
   --text-link:    var(--brand-default);
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), inset 0 1px 0 rgba(255,255,255,0.94);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.09), inset 0 1px 0 rgba(255,255,255,0.86);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.11), inset 0 1px 0 rgba(255,255,255,0.76);
-  --shadow-xl: 0 16px 40px rgba(0,0,0,0.13), inset 0 1px 0 rgba(255,255,255,0.66);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.96);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.88);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.78);
+  --shadow-xl: 0 16px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.68);
 
-  --skeleton: rgba(0, 0, 0, 0.05);
-  --overlay: rgba(0, 0, 0, 0.38);
+  --skeleton: rgba(0, 0, 0, 0.04);
+  --overlay: rgba(0, 0, 0, 0.35);
 }
 
-[data-theme="glassy"][data-mode="light"] body {
+[data-style="glassy"][data-mode="light"] body {
   background:
-    radial-gradient(ellipse 140% 90% at 10% 2%, rgba(20,148,55,0.16) 0%, transparent 48%),
-    radial-gradient(ellipse 90% 130% at 90% 98%, rgba(20,148,55,0.10) 0%, transparent 48%),
+    radial-gradient(ellipse 150% 90%  at  8%  0%, rgb(var(--brand-rgb) / 0.14) 0%, transparent 45%),
+    radial-gradient(ellipse  90% 140% at 92%  100%, rgb(var(--brand-rgb) / 0.09) 0%, transparent 45%),
     hsl(220, 22%, 95%);
   background-attachment: fixed;
 }
 
-[data-theme="glassy"][data-mode="light"] .ant-card,
-[data-theme="glassy"][data-mode="light"] .ant-modal-content,
-[data-theme="glassy"][data-mode="light"] .ant-drawer-content,
-[data-theme="glassy"][data-mode="light"] .ant-popover-inner,
-[data-theme="glassy"][data-mode="light"] .ant-select-dropdown,
-[data-theme="glassy"][data-mode="light"] .ant-dropdown-menu {
+[data-style="glassy"][data-mode="light"] .ant-card,
+[data-style="glassy"][data-mode="light"] .ant-modal-content,
+[data-style="glassy"][data-mode="light"] .ant-drawer-content,
+[data-style="glassy"][data-mode="light"] .ant-popover-inner,
+[data-style="glassy"][data-mode="light"] .ant-select-dropdown,
+[data-style="glassy"][data-mode="light"] .ant-dropdown-menu {
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  background: rgba(255, 255, 255, calc(var(--glass-opacity) * 4.5 + 0.52)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.78) !important;
-}
-
-[data-theme="classy"][data-mode="light"] {
-  --brand-default: hsl(38, 75%, 42%);
-  --brand-dark:    hsl(36, 88%, 32%);
-  --brand-light:   hsl(42, 72%, 58%);
-  --brand-subtle:  hsl(38, 72%, 50%);
-  --brand-foreground: hsl(0, 0%, 98%);
-  --brand-rgb: 195 142 28;
-  --shadow-brand: 0 0 20px rgb(195 142 28 / 0.22);
-  /* Warm cream-white for premium light look */
-  --bg-page:     hsl(38, 16%, 97%);
-  --bg-surface:  hsl(38, 10%, 100%);
-  --bg-elevated: hsl(38, 12%, 93%);
-  --bg-sunken:   hsl(38, 14%, 94%);
+  background: rgba(255, 255, 255, var(--glass-opacity)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.80) !important;
+  box-shadow: var(--shadow-md) !important;
 }
 
 @layer base {

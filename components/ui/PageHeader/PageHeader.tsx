@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { Avatar } from "antd";
 import { useRouter } from "next/navigation";
 import { User, Settings2, ChevronDown, Plus } from "lucide-react";
@@ -7,6 +8,7 @@ import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { format, startOfWeek, addDays, getDay } from "date-fns";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
+import { useThemeStore } from "@/store/theme/theme.store";
 import type { DaySummary } from "@/types/api/habits.types";
 
 interface PageHeaderProps {
@@ -52,11 +54,18 @@ function dowIndex(dateStr: string): number {
 
 export function PageHeader({ user }: PageHeaderProps) {
   const router   = useRouter();
-  const dark     = useDarkMode();
+  const dark         = useDarkMode();
+  const appStyle     = useThemeStore((s) => s.appStyle);
+  const glassOpacity = useThemeStore((s) => s.glassOpacity);
+  const isGlassy     = appStyle === 'glassy';
   const openAdd  = useHabitSheetStore((s) => s.openAdd);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef  = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const menuRef    = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const scrollRef  = useRef<HTMLDivElement>(null);
+
+  useEffect(() => { setMounted(true); }, []);
 
   const today  = format(new Date(), "yyyy-MM-dd");
   const month  = format(new Date(), "MMM");
@@ -102,9 +111,10 @@ export function PageHeader({ user }: PageHeaderProps) {
   useEffect(() => {
     if (!menuOpen) return;
     function handleOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
+      const target = e.target as Node;
+      const inTrigger  = menuRef.current?.contains(target);
+      const inDropdown = dropdownRef.current?.contains(target);
+      if (!inTrigger && !inDropdown) setMenuOpen(false);
     }
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
@@ -117,20 +127,29 @@ export function PageHeader({ user }: PageHeaderProps) {
     .toUpperCase()
     .slice(0, 2);
 
-  // Gradient color to match header backdrop
-  const fadeColor = dark ? "rgb(14,16,15)" : "rgb(252,252,252)";
+  // Gradient color to mask scroll edges — matches bg-elevated at current opacity
+  const elevatedOpacity = Math.min(glassOpacity + 0.05, 1);
+  const fadeColor = isGlassy
+    ? (dark
+        ? `rgba(18, 20, 18, ${elevatedOpacity})`
+        : `rgba(248, 248, 248, ${elevatedOpacity})`)
+    : (dark ? "rgb(14,16,15)" : "rgb(252,252,252)");
 
   return (
+    <>
     <header
       className="fixed top-0 left-0 right-0 z-40 md:hidden"
       style={{
-        background:           dark ? "rgba(14,16,15,0.92)" : "rgba(252,252,252,0.94)",
-        backdropFilter:       "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom:         dark
-          ? "1px solid rgba(255,255,255,0.06)"
-          : "1px solid rgba(0,0,0,0.07)",
-        borderRadius:         "0 0 20px 20px",
+        background: isGlassy
+          ? 'var(--color-bg-elevated)'
+          : (dark ? "rgba(14,16,15,0.92)" : "rgba(252,252,252,0.94)"),
+        backdropFilter:       'blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))',
+        WebkitBackdropFilter: 'blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))',
+        borderBottom: isGlassy
+          ? (dark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(255,255,255,0.55)")
+          : (dark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.07)"),
+        borderRadius: "0 0 20px 20px",
+        boxShadow: isGlassy ? 'var(--shadow-md)' : undefined,
       }}
     >
       {/* ── Top row: month · add + avatar ── */}
@@ -206,40 +225,6 @@ export function PageHeader({ user }: PageHeaderProps) {
             </Avatar>
           </button>
 
-          {menuOpen && (
-            <div
-              style={{
-                position:     "absolute",
-                right:        12,
-                top:          52,
-                background:   "var(--color-bg-elevated)",
-                borderRadius: 16,
-                overflow:     "hidden",
-                minWidth:     164,
-                boxShadow:    "0 8px 28px rgba(0,0,0,0.45)",
-                border:       dark
-                  ? "1px solid rgba(255,255,255,0.08)"
-                  : "1px solid rgba(0,0,0,0.10)",
-                zIndex: 100,
-              }}
-            >
-              <button
-                onClick={() => { router.push("/profile"); setMenuOpen(false); }}
-                style={MENU_ITEM}
-              >
-                <User size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
-                Profile
-              </button>
-              <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" }} />
-              <button
-                onClick={() => { router.push("/settings"); setMenuOpen(false); }}
-                style={MENU_ITEM}
-              >
-                <Settings2 size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
-                Settings
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -247,8 +232,8 @@ export function PageHeader({ user }: PageHeaderProps) {
       <div
         style={{
           position:     "relative",
-          paddingBottom: 12,
-          paddingTop:   2,
+          paddingBottom: 16,
+          paddingTop:   12,
         }}
       >
         {/* Left fade */}
@@ -380,5 +365,49 @@ export function PageHeader({ user }: PageHeaderProps) {
         </div>
       </div>
     </header>
+
+    {/* Dropdown rendered via portal so backdropFilter blurs real page content,
+        not the header's already-composited stacking context */}
+    {mounted && menuOpen && createPortal(
+      <div
+        ref={dropdownRef}
+        style={{
+          position:             "fixed",
+          right:                12,
+          top:                  60,
+          background:           "var(--color-bg-elevated)",
+          backdropFilter:       isGlassy ? "blur(var(--glass-blur, 28px)) saturate(var(--glass-saturation, 185%))" : undefined,
+          WebkitBackdropFilter: isGlassy ? "blur(var(--glass-blur, 28px)) saturate(var(--glass-saturation, 185%))" : undefined,
+          borderRadius:         16,
+          overflow:             "hidden",
+          minWidth:             164,
+          boxShadow:            isGlassy
+            ? "0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14)"
+            : "0 8px 28px rgba(0,0,0,0.45)",
+          border:               isGlassy
+            ? (dark ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.72)")
+            : (dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.10)"),
+          zIndex: 200,
+        }}
+      >
+        <button
+          onClick={() => { router.push("/profile"); setMenuOpen(false); }}
+          style={MENU_ITEM}
+        >
+          <User size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
+          Profile
+        </button>
+        <div style={{ height: 1, background: dark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.08)" }} />
+        <button
+          onClick={() => { router.push("/settings"); setMenuOpen(false); }}
+          style={MENU_ITEM}
+        >
+          <Settings2 size={16} style={{ color: "var(--color-text-muted)", flexShrink: 0 }} />
+          Settings
+        </button>
+      </div>,
+      document.body,
+    )}
+    </>
   );
 }
