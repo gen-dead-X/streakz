@@ -73,9 +73,12 @@ export function PageHeader({ user }: PageHeaderProps) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const today      = format(new Date(), "yyyy-MM-dd");
-  const month      = format(new Date(), "MMM");
-  const todayLabel = format(new Date(today + "T00:00:00"), "EEE, MMM d");
+  const today        = format(new Date(), "yyyy-MM-dd");
+  const month        = format(new Date(), "MMM");
+  const todayLabel   = format(new Date(today + "T00:00:00"), "EEE, MMM d");
+  const todayDayName = format(new Date(today + "T00:00:00"), "EEEE"); // "Friday"
+  const todayDayNum  = format(new Date(today + "T00:00:00"), "d");    // "26"
+  const todayMonth   = format(new Date(today + "T00:00:00"), "MMMM"); // "June"
 
   const windowDates = useMemo(() => buildWindowDates(today), [today]);
 
@@ -376,23 +379,25 @@ export function PageHeader({ user }: PageHeaderProps) {
                 transition={ISLAND_FADE_TRANSITION}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "14px 20px 11px",
+                  padding: "16px 20px 13px",
                   borderBottom: `1px solid ${T.divider}`,
                   flexShrink: 0,
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  {/* Live pulse dot */}
-                  <motion.div
-                    animate={LIVE_DOT_ANIMATE}
-                    transition={LIVE_DOT_TRANSITION}
-                    style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e" }}
-                  />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: T.textPrimary, letterSpacing: "0.07em", textTransform: "uppercase" }}>
-                    Today
-                  </span>
-                  <span style={{ fontSize: 11, color: T.textSub, fontWeight: 400 }}>
-                    · {todayLabel}
+                {/* Two-line date hierarchy: small Today·Month on top, big day on bottom */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <motion.div
+                      animate={LIVE_DOT_ANIMATE}
+                      transition={LIVE_DOT_TRANSITION}
+                      style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e", flexShrink: 0 }}
+                    />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: T.textSub, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                      Today · {todayMonth}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 28, fontWeight: 900, color: T.textPrimary, lineHeight: 1, letterSpacing: "-0.03em" }}>
+                    {todayDayName} {todayDayNum}
                   </span>
                 </div>
                 <button
