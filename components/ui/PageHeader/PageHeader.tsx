@@ -4,12 +4,14 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "antd";
 import { useRouter } from "next/navigation";
-import { User, Settings2, ChevronDown, Plus } from "lucide-react";
+import { User, Settings2, ChevronDown, Plus, X, Check, Flame } from "lucide-react";
 import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { format, addDays, getDay } from "date-fns";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import { useThemeStore } from "@/store/theme/theme.store";
+import { useCheckIn } from "@/hooks/checkin/useCheckIn";
+import { HabitIcon } from "@/components/ui/HabitIcon";
 import type { DaySummary } from "@/types/api/habits.types";
 
 interface PageHeaderProps {
@@ -59,10 +61,11 @@ export function PageHeader({ user }: PageHeaderProps) {
   const isGlassy     = appStyle === "glassy";
   const openAdd      = useHabitSheetStore((s) => s.openAdd);
 
-  const [menuOpen, setMenuOpen]         = useState(false);
-  const [mounted, setMounted]           = useState(false);
+  const [menuOpen, setMenuOpen]             = useState(false);
+  const [mounted, setMounted]               = useState(false);
   const [islandExpanded, setIslandExpanded] = useState(false);
   const [islandRect, setIslandRect]         = useState<DOMRect | null>(null);
+  const [pendingId, setPendingId]           = useState<string | null>(null);
 
   const menuRef        = useRef<HTMLDivElement>(null);
   const dropdownRef    = useRef<HTMLDivElement>(null);
@@ -77,6 +80,8 @@ export function PageHeader({ user }: PageHeaderProps) {
   const windowDates = useMemo(() => buildWindowDates(today), [today]);
 
   const habits   = useHabitsStore((s) => s.habits);
+  const uncheck  = useHabitsStore((s) => s.uncheck);
+  const { checkIn } = useCheckIn();
   const [summaries, setSummaries] = useState<DaySummary[]>([]);
 
   const completedHabits = habits.filter((h) => h.isCompletedToday);
@@ -89,12 +94,38 @@ export function PageHeader({ user }: PageHeaderProps) {
   const ARC_R    = 13;
   const ARC_CIRC = 2 * Math.PI * ARC_R;
   const PILL_W   = 280;
-  const PILL_H   = 216;
+  const PILL_H   = Math.min(340, Math.max(216, 180 + habits.length * 36));
 
   const islandX = islandRect
     ? Math.max(8, islandRect.left + islandRect.width / 2 - PILL_W / 2)
     : 0;
   const islandY = islandRect ? islandRect.top : 0;
+
+  /* Text/content tokens that adapt to dark/light mode.
+     The island's glass background intentionally stays liquid-black
+     in all modes (same as iOS Dynamic Island behaviour). */
+  const T = useMemo(() => ({
+    divider:      "rgba(255,255,255,0.05)",
+    textPrimary:  "rgba(255,255,255,0.9)",
+    textSub:      "rgba(255,255,255,0.28)",
+    textMuted:    "rgba(255,255,255,0.42)",
+    arcTrack:     "rgba(255,255,255,0.07)",
+    sectionDone:  "rgba(34,197,94,0.55)",
+    sectionPend:  "rgba(255,255,255,0.28)",
+    rowBorder:    "rgba(255,255,255,0.04)",
+    checkBg:      "rgba(34,197,94,0.14)",
+    checkBorder:  "rgba(34,197,94,0.55)",
+    closeBg:      "rgba(255,255,255,0.07)",
+    closeColor:   "rgba(255,255,255,0.4)",
+    footerBg:     "rgba(255,255,255,0.04)",
+    footerBorder: "rgba(255,255,255,0.07)",
+    footerText:   "rgba(255,255,255,0.9)",
+    footerMuted:  "rgba(255,255,255,0.38)",
+    pendBorder:   "rgba(255,255,255,0.16)",
+    compText:     "rgba(255,255,255,0.8)",
+    pendText:     "rgba(255,255,255,0.55)",
+    rowHoverBg:   "rgba(255,255,255,0.04)",
+  }), []);
 
   useEffect(() => {
     fetch("/api/habits/week-summary")
@@ -138,6 +169,18 @@ export function PageHeader({ user }: PageHeaderProps) {
       setIslandRect(todayCircleRef.current?.getBoundingClientRect() ?? null);
     }
     setIslandExpanded((v) => !v);
+  }
+
+  async function handleToggle(habitId: string, isCompleted: boolean) {
+    if (pendingId) return;
+    setPendingId(habitId);
+    navigator.vibrate?.(50);
+    if (isCompleted) {
+      await uncheck(habitId, today);
+    } else {
+      await checkIn(habitId, today);
+    }
+    setPendingId(null);
   }
 
   const initials = user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -220,7 +263,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       onClick={handleTodayTap}
                       style={{ position: "relative", width: 30, height: 30, cursor: "pointer" }}
                     >
-                      {/* Breathing ripple ring — CSS animation, no React state involved */}
+                      {/* Breathing ripple ring */}
                       <div
                         style={{
                           position: "absolute", inset: -5,
@@ -277,7 +320,7 @@ export function PageHeader({ user }: PageHeaderProps) {
         </div>
       </header>
 
-      {/* ── Dynamic Island — liquid glass expanded pill ── */}
+      {/* ── Dynamic Island ── */}
       {mounted && createPortal(
         <AnimatePresence>
           {islandExpanded && islandRect && (
@@ -310,7 +353,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 position:             "fixed",
                 top:                   0,
                 left:                  0,
-                /* Liquid glass */
+                /* Liquid glass — intentionally dark in all modes */
                 background:            "rgba(8, 14, 8, 0.86)",
                 backdropFilter:        "blur(40px) saturate(180%) brightness(1.06)",
                 WebkitBackdropFilter:  "blur(40px) saturate(180%) brightness(1.06)",
@@ -331,7 +374,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "13px 16px 10px",
-                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  borderBottom: `1px solid ${T.divider}`,
                   flexShrink: 0,
                 }}
               >
@@ -342,10 +385,10 @@ export function PageHeader({ user }: PageHeaderProps) {
                     transition={LIVE_DOT_TRANSITION}
                     style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e" }}
                   />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.9)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: T.textPrimary, letterSpacing: "0.07em", textTransform: "uppercase" }}>
                     Today
                   </span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", fontWeight: 400 }}>
+                  <span style={{ fontSize: 11, color: T.textSub, fontWeight: 400 }}>
                     · {todayLabel}
                   </span>
                 </div>
@@ -353,12 +396,13 @@ export function PageHeader({ user }: PageHeaderProps) {
                   onClick={() => setIslandExpanded(false)}
                   style={{
                     width: 20, height: 20, borderRadius: "50%",
-                    background: "rgba(255,255,255,0.07)", border: "none",
+                    background: T.closeBg, border: "none",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     cursor: "pointer", padding: 0, flexShrink: 0,
                   }}
+                  aria-label="Close"
                 >
-                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", lineHeight: 1 }}>✕</span>
+                  <X size={10} color={T.closeColor} />
                 </button>
               </motion.div>
 
@@ -375,9 +419,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                   {/* Arc */}
                   <div style={{ position: "relative", flexShrink: 0 }}>
                     <svg width="56" height="56" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
-                      {/* Glass track */}
-                      <circle cx="18" cy="18" r={ARC_R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2.5" />
-                      {/* Progress fill */}
+                      <circle cx="18" cy="18" r={ARC_R} fill="none" stroke={T.arcTrack} strokeWidth="2.5" />
                       <motion.circle
                         cx="18" cy="18" r={ARC_R}
                         fill="none"
@@ -392,7 +434,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       />
                     </svg>
                     <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>
+                      <span style={{ fontSize: 12, fontWeight: 800, color: T.textPrimary, lineHeight: 1 }}>
                         {Math.round(todayPct * 100)}%
                       </span>
                     </div>
@@ -405,65 +447,80 @@ export function PageHeader({ user }: PageHeaderProps) {
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
-                        style={{ fontSize: 30, fontWeight: 900, color: "#fff", lineHeight: 1 }}
+                        style={{ fontSize: 30, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
                       >
                         {todayDone}
                       </motion.span>
-                      <span style={{ fontSize: 15, fontWeight: 500, color: "rgba(255,255,255,0.28)", lineHeight: 1 }}>
+                      <span style={{ fontSize: 15, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
                         / {todayTotal}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.42)", fontWeight: 500 }}>
+                    <div style={{ fontSize: 11.5, color: T.textMuted, fontWeight: 500 }}>
                       {todayDone === todayTotal && todayTotal > 0
-                        ? "All done today 🎉"
+                        ? "All done today!"
                         : `${pendingHabits.length} remaining`}
                     </div>
                   </div>
                 </div>
 
                 {/* Thin separator */}
-                <div style={{ height: 1, background: "rgba(255,255,255,0.05)", marginLeft: 16, marginRight: 16 }} />
+                <div style={{ height: 1, background: T.divider, marginLeft: 16, marginRight: 16 }} />
 
                 {/* Completed habits */}
                 {completedHabits.length > 0 && (
                   <div style={{ padding: "10px 16px 4px" }}>
                     <div style={{
                       fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                      color: "rgba(34,197,94,0.55)", marginBottom: 6,
+                      color: T.sectionDone, marginBottom: 6,
                     }}>
                       Done
                     </div>
                     {completedHabits.map((habit, i) => (
-                      <motion.div
+                      <motion.button
                         key={habit._id}
+                        onClick={() => handleToggle(habit._id, true)}
+                        disabled={pendingId === habit._id}
                         initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        animate={{ opacity: pendingId === habit._id ? 0.55 : 1, x: 0 }}
                         transition={{ delay: 0.3 + i * 0.065, duration: 0.24, ease: "easeOut" }}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          padding: "7px 0",
+                          padding: "7px 6px",
+                          margin: "0 -6px",
+                          borderRadius: 10,
+                          width: "calc(100% + 12px)",
                           borderBottom: i < completedHabits.length - 1
-                            ? "1px solid rgba(255,255,255,0.04)" : "none",
+                            ? `1px solid ${T.rowBorder}` : "none",
+                          background: "none",
+                          border: "none",
+                          cursor: pendingId === habit._id ? "not-allowed" : "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
                         }}
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ backgroundColor: T.rowHoverBg }}
                       >
-                        <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{habit.icon}</span>
+                        <div style={{ flexShrink: 0, opacity: 0.7 }}>
+                          <HabitIcon name={habit.icon} size={15} color="#22c55e" />
+                        </div>
                         <span style={{
-                          fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.8)",
+                          fontSize: 13, fontWeight: 500, color: T.compText,
                           flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          textDecoration: "line-through", opacity: 0.7,
                         }}>
                           {habit.name}
                         </span>
                         {/* Check badge */}
                         <div style={{
                           width: 17, height: 17, borderRadius: "50%",
-                          background: "rgba(34,197,94,0.14)",
-                          border: "1.5px solid rgba(34,197,94,0.55)",
+                          background: T.checkBg,
+                          border: `1.5px solid ${T.checkBorder}`,
                           display: "flex", alignItems: "center", justifyContent: "center",
                           flexShrink: 0,
                         }}>
-                          <span style={{ fontSize: 9, color: "#22c55e", lineHeight: 1 }}>✓</span>
+                          <Check size={9} color="#22c55e" />
                         </div>
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </div>
                 )}
@@ -472,40 +529,54 @@ export function PageHeader({ user }: PageHeaderProps) {
                 {pendingHabits.length > 0 && (
                   <div style={{ padding: completedHabits.length > 0 ? "4px 16px" : "10px 16px 4px" }}>
                     {completedHabits.length > 0 && (
-                      <div style={{ height: 1, background: "rgba(255,255,255,0.04)", marginBottom: 10 }} />
+                      <div style={{ height: 1, background: T.divider, marginBottom: 10 }} />
                     )}
                     <div style={{
                       fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                      color: "rgba(255,255,255,0.28)", marginBottom: 6,
+                      color: T.sectionPend, marginBottom: 6,
                     }}>
                       Remaining
                     </div>
                     {pendingHabits.map((habit, i) => (
-                      <motion.div
+                      <motion.button
                         key={habit._id}
+                        onClick={() => handleToggle(habit._id, false)}
+                        disabled={pendingId === habit._id}
                         initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        animate={{ opacity: pendingId === habit._id ? 0.4 : 0.65, x: 0 }}
                         transition={{ delay: 0.35 + (completedHabits.length + i) * 0.065, duration: 0.24, ease: "easeOut" }}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          padding: "7px 0", opacity: 0.6,
+                          padding: "7px 6px",
+                          margin: "0 -6px",
+                          borderRadius: 10,
+                          width: "calc(100% + 12px)",
                           borderBottom: i < pendingHabits.length - 1
-                            ? "1px solid rgba(255,255,255,0.04)" : "none",
+                            ? `1px solid ${T.rowBorder}` : "none",
+                          background: "none",
+                          border: "none",
+                          cursor: pendingId === habit._id ? "not-allowed" : "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
                         }}
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ opacity: 0.9, backgroundColor: T.rowHoverBg }}
                       >
-                        <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{habit.icon}</span>
+                        <div style={{ flexShrink: 0 }}>
+                          <HabitIcon name={habit.icon} size={15} color={T.pendText} />
+                        </div>
                         <span style={{
-                          fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.55)",
+                          fontSize: 13, fontWeight: 400, color: T.pendText,
                           flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                         }}>
                           {habit.name}
                         </span>
                         <div style={{
                           width: 17, height: 17, borderRadius: "50%",
-                          border: "1.5px solid rgba(255,255,255,0.16)",
+                          border: `1.5px solid ${T.pendBorder}`,
                           flexShrink: 0,
                         }} />
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </div>
                 )}
@@ -520,19 +591,19 @@ export function PageHeader({ user }: PageHeaderProps) {
                       margin: "10px 16px 16px",
                       padding: "10px 14px",
                       borderRadius: 14,
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.07)",
+                      background: T.footerBg,
+                      border: `1px solid ${T.footerBorder}`,
                       backdropFilter: "blur(8px)",
                       display: "flex", alignItems: "center", gap: 10,
                     }}
                   >
-                    <span style={{ fontSize: 18, lineHeight: 1 }}>🔥</span>
+                    <Flame size={18} color="#f97316" style={{ filter: "drop-shadow(0 0 6px rgba(249,115,22,0.5))", flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,0.9)" }}>{maxStreak}</span>
-                        <span style={{ fontSize: 12, fontWeight: 400, color: "rgba(255,255,255,0.38)" }}>day streak</span>
+                        <span style={{ fontSize: 15, fontWeight: 800, color: T.footerText }}>{maxStreak}</span>
+                        <span style={{ fontSize: 12, fontWeight: 400, color: T.footerMuted }}>day streak</span>
                       </div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.28)", marginTop: 1 }}>Keep it going!</div>
+                      <div style={{ fontSize: 10, color: T.footerMuted, marginTop: 1 }}>Keep it going!</div>
                     </div>
                   </motion.div>
                 )}
