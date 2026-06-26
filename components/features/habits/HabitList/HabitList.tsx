@@ -4,7 +4,6 @@ import { Skeleton } from "antd";
 import { format } from "date-fns";
 import { Flame, Settings, Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { StreakCardPager } from "@/components/features/habits/StreakCardPager";
 import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { HabitIcon } from "@/components/ui/HabitIcon";
@@ -27,7 +26,6 @@ function DesktopHabitRow({
   onCheckIn: (id: string, date: string) => void;
   onUncheck: (id: string, date: string) => void;
 }) {
-  const router   = useRouter();
   const openEdit = useHabitSheetStore((s) => s.openEdit);
 
   function handleToggle() {

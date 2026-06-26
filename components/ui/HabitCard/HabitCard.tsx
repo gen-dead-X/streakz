@@ -3,7 +3,6 @@ import "./HabitCard.css";
 import { useRef, useCallback, useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Flame, MoreHorizontal, Eye, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import confetti from "canvas-confetti";
@@ -88,7 +87,6 @@ export function HabitCard({
   onUncheck,
   loading,
 }: HabitCardProps) {
-  const router   = useRouter();
   const openEdit = useHabitSheetStore((s) => s.openEdit);
   const style: CardStyle = habit.cardStyle ?? "wavy";
   const gradient = GRADIENTS[style];

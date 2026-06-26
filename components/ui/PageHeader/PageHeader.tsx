@@ -19,21 +19,6 @@ interface PageHeaderProps {
 const DOW_LABEL = ["M", "T", "W", "T", "F", "S", "S"];
 const CELL_W    = 44;
 
-// Stable object references — framer-motion uses reference equality to decide
-// whether to restart an animation. Inline objects recreated on every render
-// caused it to cancel-and-restart the repeat:Infinity breathing ring on each
-// render cycle, creating a tight render loop.
-// Stable object references — framer-motion uses reference equality to decide
-// whether to restart an animation. Inline objects recreated on every render
-// caused it to cancel-and-restart the repeat:Infinity breathing ring on each
-// render cycle, creating a tight render loop.
-const BREATHE_ANIMATE = { scale: [1, 1.48, 1.48] as [number, number, number], opacity: [0.6, 0, 0] as [number, number, number] };
-const BREATHE_ANIMATE_OFF = { scale: 1, opacity: 0 };
-const BREATHE_TRANSITION = { duration: 2.4, repeat: Infinity, repeatDelay: 0.7, ease: "easeOut" as const };
-const BREATHE_TRANSITION_OFF = { duration: 0.15 };
-const CIRCLE_ANIMATE_VISIBLE = { opacity: 1 };
-const CIRCLE_ANIMATE_HIDDEN  = { opacity: 0 };
-const CIRCLE_TRANSITION = { duration: 0.08 };
 const LIVE_DOT_ANIMATE = { scale: [1, 1.35, 1] as [number, number, number], opacity: [1, 0.55, 1] as [number, number, number] };
 const LIVE_DOT_TRANSITION = { duration: 1.9, repeat: Infinity, ease: "easeInOut" as const };
 const ISLAND_FADE_TRANSITION = { delay: 0.14, duration: 0.22 };
@@ -235,30 +220,31 @@ export function PageHeader({ user }: PageHeaderProps) {
                       onClick={handleTodayTap}
                       style={{ position: "relative", width: 30, height: 30, cursor: "pointer" }}
                     >
-                      {/* Breathing ripple ring */}
-                      <motion.div
+                      {/* Breathing ripple ring — CSS animation, no React state involved */}
+                      <div
                         style={{
                           position: "absolute", inset: -5,
                           borderRadius: "50%",
                           border: "1.5px solid var(--color-brand)",
                           pointerEvents: "none",
+                          animation: islandExpanded ? "none" : "breatheRing 3.1s ease-out infinite",
+                          opacity: islandExpanded ? 0 : undefined,
+                          transition: islandExpanded ? "opacity 0.15s" : undefined,
                         }}
-                        animate={islandExpanded ? BREATHE_ANIMATE_OFF : BREATHE_ANIMATE}
-                        transition={islandExpanded ? BREATHE_TRANSITION_OFF : BREATHE_TRANSITION}
                       />
-                      <motion.div
-                        animate={islandExpanded ? CIRCLE_ANIMATE_HIDDEN : CIRCLE_ANIMATE_VISIBLE}
-                        transition={CIRCLE_TRANSITION}
+                      <div
                         style={{
                           width: 30, height: 30, borderRadius: "50%",
                           background: "var(--color-brand)",
                           display: "flex", alignItems: "center", justifyContent: "center",
+                          opacity: islandExpanded ? 0 : 1,
+                          transition: "opacity 0.08s",
                         }}
                       >
                         <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-bg-page)", lineHeight: 1 }}>
                           {dayNum}
                         </span>
-                      </motion.div>
+                      </div>
                     </div>
                   ) : (
                     <div style={{
