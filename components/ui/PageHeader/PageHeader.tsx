@@ -93,12 +93,11 @@ export function PageHeader({ user }: PageHeaderProps) {
 
   const ARC_R    = 13;
   const ARC_CIRC = 2 * Math.PI * ARC_R;
-  const PILL_W   = 280;
-  const PILL_H   = Math.min(340, Math.max(216, 180 + habits.length * 36));
+  // Full-width island with 8px gutters on each side
+  const PILL_W   = mounted ? window.innerWidth - 16 : 360;
+  const PILL_H   = Math.min(400, Math.max(240, 200 + habits.length * 36));
 
-  const islandX = islandRect
-    ? Math.max(8, islandRect.left + islandRect.width / 2 - PILL_W / 2)
-    : 0;
+  const islandX = 8;
   const islandY = islandRect ? islandRect.top : 0;
 
   /* Text/content tokens that adapt to dark/light mode.
@@ -249,7 +248,8 @@ export function PageHeader({ user }: PageHeaderProps) {
                 <div key={date} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: CELL_W, flexShrink: 0 }}>
                   {/* Day letter */}
                   <span style={{
-                    fontSize: 10, fontWeight: 500,
+                    fontSize: isToday ? 11 : 10,
+                    fontWeight: isToday ? 700 : 500,
                     color: isToday ? "var(--color-brand)" : "var(--color-text-muted)",
                     letterSpacing: "0.03em", lineHeight: 1,
                   }}>
@@ -258,10 +258,11 @@ export function PageHeader({ user }: PageHeaderProps) {
 
                   {/* Date circle */}
                   {isToday ? (
-                    <div
+                    <motion.div
                       ref={todayCircleRef}
                       onClick={handleTodayTap}
-                      style={{ position: "relative", width: 30, height: 30, cursor: "pointer" }}
+                      whileTap={{ scale: 0.82 }}
+                      style={{ position: "relative", width: 38, height: 38, cursor: "pointer" }}
                     >
                       {/* Breathing ripple ring */}
                       <div
@@ -275,23 +276,25 @@ export function PageHeader({ user }: PageHeaderProps) {
                           transition: islandExpanded ? "opacity 0.15s" : undefined,
                         }}
                       />
+                      {/* Circle blooms outward as island opens — creates "part of it" illusion */}
                       <div
                         style={{
-                          width: 30, height: 30, borderRadius: "50%",
+                          width: 38, height: 38, borderRadius: "50%",
                           background: "var(--color-brand)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           opacity: islandExpanded ? 0 : 1,
-                          transition: "opacity 0.08s",
+                          transform: islandExpanded ? "scale(1.35)" : "scale(1)",
+                          transition: "opacity 0.14s ease-out, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
                         }}
                       >
-                        <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-bg-page)", lineHeight: 1 }}>
+                        <span style={{ fontSize: 16, fontWeight: 900, color: "var(--color-bg-page)", lineHeight: 1 }}>
                           {dayNum}
                         </span>
                       </div>
-                    </div>
+                    </motion.div>
                   ) : (
                     <div style={{
-                      width: 30, height: 30, borderRadius: "50%",
+                      width: 38, height: 38, borderRadius: "50%",
                       background: "transparent",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       boxShadow: dotColor === "var(--color-brand)" ? "inset 0 0 0 1.5px var(--color-brand)" : undefined,
@@ -373,7 +376,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 transition={ISLAND_FADE_TRANSITION}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "13px 16px 10px",
+                  padding: "14px 20px 11px",
                   borderBottom: `1px solid ${T.divider}`,
                   flexShrink: 0,
                 }}
@@ -415,47 +418,47 @@ export function PageHeader({ user }: PageHeaderProps) {
                 style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" as never }}
               >
                 {/* Progress summary row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px 10px" }}>
-                  {/* Arc */}
+                <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "18px 20px 14px" }}>
+                  {/* Arc — larger for full-width island */}
                   <div style={{ position: "relative", flexShrink: 0 }}>
-                    <svg width="56" height="56" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
-                      <circle cx="18" cy="18" r={ARC_R} fill="none" stroke={T.arcTrack} strokeWidth="2.5" />
+                    <svg width="84" height="84" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
+                      <circle cx="18" cy="18" r={ARC_R} fill="none" stroke={T.arcTrack} strokeWidth="2.2" />
                       <motion.circle
                         cx="18" cy="18" r={ARC_R}
                         fill="none"
                         stroke="#22c55e"
-                        strokeWidth="2.5"
+                        strokeWidth="2.2"
                         strokeLinecap="round"
                         strokeDasharray={ARC_CIRC}
                         initial={{ strokeDashoffset: ARC_CIRC }}
                         animate={{ strokeDashoffset: ARC_CIRC * (1 - todayPct) }}
                         transition={{ delay: 0.35, duration: 0.85, ease: "easeOut" }}
-                        style={{ filter: "drop-shadow(0 0 4px rgba(34,197,94,0.6))" }}
+                        style={{ filter: "drop-shadow(0 0 5px rgba(34,197,94,0.7))" }}
                       />
                     </svg>
                     <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: T.textPrimary, lineHeight: 1 }}>
+                      <span style={{ fontSize: 16, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}>
                         {Math.round(todayPct * 100)}%
                       </span>
                     </div>
                   </div>
 
                   {/* Fraction + label */}
-                  <div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginBottom: 5 }}>
                       <motion.span
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
-                        style={{ fontSize: 30, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                        style={{ fontSize: 36, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
                       >
                         {todayDone}
                       </motion.span>
-                      <span style={{ fontSize: 15, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
+                      <span style={{ fontSize: 17, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
                         / {todayTotal}
                       </span>
                     </div>
-                    <div style={{ fontSize: 11.5, color: T.textMuted, fontWeight: 500 }}>
+                    <div style={{ fontSize: 12, color: T.textMuted, fontWeight: 500 }}>
                       {todayDone === todayTotal && todayTotal > 0
                         ? "All done today!"
                         : `${pendingHabits.length} remaining`}
@@ -464,11 +467,11 @@ export function PageHeader({ user }: PageHeaderProps) {
                 </div>
 
                 {/* Thin separator */}
-                <div style={{ height: 1, background: T.divider, marginLeft: 16, marginRight: 16 }} />
+                <div style={{ height: 1, background: T.divider, marginLeft: 20, marginRight: 20 }} />
 
                 {/* Completed habits */}
                 {completedHabits.length > 0 && (
-                  <div style={{ padding: "10px 16px 4px" }}>
+                  <div style={{ padding: "10px 20px 4px" }}>
                     <div style={{
                       fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
                       color: T.sectionDone, marginBottom: 6,
@@ -527,7 +530,7 @@ export function PageHeader({ user }: PageHeaderProps) {
 
                 {/* Pending habits */}
                 {pendingHabits.length > 0 && (
-                  <div style={{ padding: completedHabits.length > 0 ? "4px 16px" : "10px 16px 4px" }}>
+                  <div style={{ padding: completedHabits.length > 0 ? "4px 20px" : "10px 20px 4px" }}>
                     {completedHabits.length > 0 && (
                       <div style={{ height: 1, background: T.divider, marginBottom: 10 }} />
                     )}
@@ -588,7 +591,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.42 + habits.length * 0.05, duration: 0.28, ease: "easeOut" }}
                     style={{
-                      margin: "10px 16px 16px",
+                      margin: "10px 20px 18px",
                       padding: "10px 14px",
                       borderRadius: 14,
                       background: T.footerBg,
