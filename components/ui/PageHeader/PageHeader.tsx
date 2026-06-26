@@ -4,12 +4,14 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "antd";
 import { useRouter } from "next/navigation";
-import { User, Settings2, ChevronDown, Plus } from "lucide-react";
+import { User, Settings2, ChevronDown, Plus, Check, Flame } from "lucide-react";
 import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { format, addDays, getDay } from "date-fns";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
 import { useThemeStore } from "@/store/theme/theme.store";
+import { useCheckIn } from "@/hooks/checkin/useCheckIn";
+import { HabitIcon } from "@/components/ui/HabitIcon";
 import type { DaySummary } from "@/types/api/habits.types";
 
 interface PageHeaderProps {
@@ -59,10 +61,12 @@ export function PageHeader({ user }: PageHeaderProps) {
   const isGlassy     = appStyle === "glassy";
   const openAdd      = useHabitSheetStore((s) => s.openAdd);
 
-  const [menuOpen, setMenuOpen]         = useState(false);
-  const [mounted, setMounted]           = useState(false);
+  const [menuOpen, setMenuOpen]             = useState(false);
+  const [mounted, setMounted]               = useState(false);
   const [islandExpanded, setIslandExpanded] = useState(false);
   const [islandRect, setIslandRect]         = useState<DOMRect | null>(null);
+  const [pendingId, setPendingId]           = useState<string | null>(null);
+  const [showPct, setShowPct]               = useState(true);
 
   const menuRef        = useRef<HTMLDivElement>(null);
   const dropdownRef    = useRef<HTMLDivElement>(null);
@@ -70,13 +74,18 @@ export function PageHeader({ user }: PageHeaderProps) {
 
   useEffect(() => { setMounted(true); }, []);
 
-  const today      = format(new Date(), "yyyy-MM-dd");
-  const month      = format(new Date(), "MMM");
-  const todayLabel = format(new Date(today + "T00:00:00"), "EEE, MMM d");
+  const today        = format(new Date(), "yyyy-MM-dd");
+  const month        = format(new Date(), "MMM");
+  const todayLabel   = format(new Date(today + "T00:00:00"), "EEE, MMM d");
+  const todayDayName = format(new Date(today + "T00:00:00"), "EEEE"); // "Friday"
+  const todayDayNum  = format(new Date(today + "T00:00:00"), "d");    // "26"
+  const todayMonth   = format(new Date(today + "T00:00:00"), "MMMM"); // "June"
 
   const windowDates = useMemo(() => buildWindowDates(today), [today]);
 
   const habits   = useHabitsStore((s) => s.habits);
+  const uncheck  = useHabitsStore((s) => s.uncheck);
+  const { checkIn } = useCheckIn();
   const [summaries, setSummaries] = useState<DaySummary[]>([]);
 
   const completedHabits = habits.filter((h) => h.isCompletedToday);
@@ -88,13 +97,38 @@ export function PageHeader({ user }: PageHeaderProps) {
 
   const ARC_R    = 13;
   const ARC_CIRC = 2 * Math.PI * ARC_R;
-  const PILL_W   = 280;
-  const PILL_H   = 216;
+  // Full-width island with 8px gutters on each side
+  const PILL_W   = mounted ? window.innerWidth - 16 : 360;
+  const PILL_H   = Math.min(520, Math.max(340, 280 + habits.length * 44));
 
-  const islandX = islandRect
-    ? Math.max(8, islandRect.left + islandRect.width / 2 - PILL_W / 2)
-    : 0;
-  const islandY = islandRect ? islandRect.top : 0;
+  const islandX = 8;
+  const islandY = 8;
+
+  /* Text/content tokens that adapt to dark/light mode.
+     The island's glass background intentionally stays liquid-black
+     in all modes (same as iOS Dynamic Island behaviour). */
+  const T = useMemo(() => ({
+    divider:      "rgba(255,255,255,0.05)",
+    textPrimary:  "rgba(255,255,255,0.9)",
+    textSub:      "rgba(255,255,255,0.28)",
+    textMuted:    "rgba(255,255,255,0.42)",
+    arcTrack:     "rgba(255,255,255,0.07)",
+    sectionDone:  "rgba(34,197,94,0.55)",
+    sectionPend:  "rgba(255,255,255,0.28)",
+    rowBorder:    "rgba(255,255,255,0.04)",
+    checkBg:      "rgba(34,197,94,0.14)",
+    checkBorder:  "rgba(34,197,94,0.55)",
+    closeBg:      "rgba(255,255,255,0.07)",
+    closeColor:   "rgba(255,255,255,0.4)",
+    footerBg:     "rgba(255,255,255,0.04)",
+    footerBorder: "rgba(255,255,255,0.07)",
+    footerText:   "rgba(255,255,255,0.9)",
+    footerMuted:  "rgba(255,255,255,0.38)",
+    pendBorder:   "rgba(255,255,255,0.16)",
+    compText:     "rgba(255,255,255,0.8)",
+    pendText:     "rgba(255,255,255,0.55)",
+    rowHoverBg:   "rgba(255,255,255,0.04)",
+  }), []);
 
   useEffect(() => {
     fetch("/api/habits/week-summary")
@@ -107,6 +141,12 @@ export function PageHeader({ user }: PageHeaderProps) {
     if (!islandExpanded) return;
     const t = setTimeout(() => setIslandExpanded(false), 8000);
     return () => clearTimeout(t);
+  }, [islandExpanded]);
+
+  useEffect(() => {
+    if (!islandExpanded) { setShowPct(true); return; }
+    const id = setInterval(() => setShowPct((v) => !v), 3000);
+    return () => clearInterval(id);
   }, [islandExpanded]);
 
   function getDotColor(date: string): string | null {
@@ -138,6 +178,18 @@ export function PageHeader({ user }: PageHeaderProps) {
       setIslandRect(todayCircleRef.current?.getBoundingClientRect() ?? null);
     }
     setIslandExpanded((v) => !v);
+  }
+
+  async function handleToggle(habitId: string, isCompleted: boolean) {
+    if (pendingId) return;
+    setPendingId(habitId);
+    navigator.vibrate?.(50);
+    if (isCompleted) {
+      await uncheck(habitId, today);
+    } else {
+      await checkIn(habitId, today);
+    }
+    setPendingId(null);
   }
 
   const initials = user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
@@ -193,7 +245,7 @@ export function PageHeader({ user }: PageHeaderProps) {
         </div>
 
         {/* ── Fixed 7-day strip · today always center ── */}
-        <div style={{ paddingTop: 10, paddingBottom: 22 }}>
+        <div style={{ paddingTop: 16, paddingBottom: 22 }}>
           <div style={{ display: "flex", justifyContent: "space-around", paddingLeft: 8, paddingRight: 8 }}>
             {windowDates.map((date) => {
               const isToday  = date === today;
@@ -206,7 +258,8 @@ export function PageHeader({ user }: PageHeaderProps) {
                 <div key={date} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: CELL_W, flexShrink: 0 }}>
                   {/* Day letter */}
                   <span style={{
-                    fontSize: 10, fontWeight: 500,
+                    fontSize: isToday ? 11 : 10,
+                    fontWeight: isToday ? 700 : 500,
                     color: isToday ? "var(--color-brand)" : "var(--color-text-muted)",
                     letterSpacing: "0.03em", lineHeight: 1,
                   }}>
@@ -215,12 +268,13 @@ export function PageHeader({ user }: PageHeaderProps) {
 
                   {/* Date circle */}
                   {isToday ? (
-                    <div
+                    <motion.div
                       ref={todayCircleRef}
                       onClick={handleTodayTap}
-                      style={{ position: "relative", width: 30, height: 30, cursor: "pointer" }}
+                      whileTap={{ scale: 0.82 }}
+                      style={{ position: "relative", width: 44, height: 44, cursor: "pointer" }}
                     >
-                      {/* Breathing ripple ring — CSS animation, no React state involved */}
+                      {/* Breathing ripple ring */}
                       <div
                         style={{
                           position: "absolute", inset: -5,
@@ -232,23 +286,25 @@ export function PageHeader({ user }: PageHeaderProps) {
                           transition: islandExpanded ? "opacity 0.15s" : undefined,
                         }}
                       />
+                      {/* Circle blooms outward as island opens — creates "part of it" illusion */}
                       <div
                         style={{
-                          width: 30, height: 30, borderRadius: "50%",
+                          width: 44, height: 44, borderRadius: "50%",
                           background: "var(--color-brand)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           opacity: islandExpanded ? 0 : 1,
-                          transition: "opacity 0.08s",
+                          transform: islandExpanded ? "scale(1.35)" : "scale(1)",
+                          transition: "opacity 0.14s ease-out, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
                         }}
                       >
-                        <span style={{ fontSize: 13, fontWeight: 800, color: "var(--color-bg-page)", lineHeight: 1 }}>
+                        <span style={{ fontSize: 24, fontWeight: 900, color: "var(--color-bg-page)", lineHeight: 1 }}>
                           {dayNum}
                         </span>
                       </div>
-                    </div>
+                    </motion.div>
                   ) : (
                     <div style={{
-                      width: 30, height: 30, borderRadius: "50%",
+                      width: 38, height: 38, borderRadius: "50%",
                       background: "transparent",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       boxShadow: dotColor === "var(--color-brand)" ? "inset 0 0 0 1.5px var(--color-brand)" : undefined,
@@ -277,9 +333,17 @@ export function PageHeader({ user }: PageHeaderProps) {
         </div>
       </header>
 
-      {/* ── Dynamic Island — liquid glass expanded pill ── */}
+      {/* ── Dynamic Island ── */}
       {mounted && createPortal(
-        <AnimatePresence>
+        <>
+          {/* Invisible backdrop — tap anywhere outside to close */}
+          {islandExpanded && islandRect && (
+            <div
+              onClick={() => setIslandExpanded(false)}
+              style={{ position: "fixed", inset: 0, zIndex: 199 }}
+            />
+          )}
+          <AnimatePresence>
           {islandExpanded && islandRect && (
             <motion.div
               key="dynamic-island"
@@ -310,7 +374,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 position:             "fixed",
                 top:                   0,
                 left:                  0,
-                /* Liquid glass */
+                /* Liquid glass — intentionally dark in all modes */
                 background:            "rgba(8, 14, 8, 0.86)",
                 backdropFilter:        "blur(40px) saturate(180%) brightness(1.06)",
                 WebkitBackdropFilter:  "blur(40px) saturate(180%) brightness(1.06)",
@@ -322,7 +386,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 flexDirection:         "column",
               }}
             >
-              {/* ── Island header ── */}
+              {/* ── Combined header: date left · arc right ── */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -330,39 +394,90 @@ export function PageHeader({ user }: PageHeaderProps) {
                 transition={ISLAND_FADE_TRANSITION}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "13px 16px 10px",
-                  borderBottom: "1px solid rgba(255,255,255,0.05)",
+                  padding: "18px 20px 18px",
+                  borderBottom: `1px solid ${T.divider}`,
                   flexShrink: 0,
+                  gap: 16,
                 }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  {/* Live pulse dot */}
-                  <motion.div
-                    animate={LIVE_DOT_ANIMATE}
-                    transition={LIVE_DOT_TRANSITION}
-                    style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e" }}
-                  />
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.9)", letterSpacing: "0.07em", textTransform: "uppercase" }}>
-                    Today
+                {/* Left: live dot + Today·Month / day name / count */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <motion.div
+                      animate={LIVE_DOT_ANIMATE}
+                      transition={LIVE_DOT_TRANSITION}
+                      style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e", flexShrink: 0 }}
+                    />
+                    <span style={{ fontSize: 14, fontWeight: 600, color: T.textSub, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                      Today · {todayMonth}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: 36, fontWeight: 900, color: T.textPrimary, lineHeight: 1, letterSpacing: "-0.03em" }}>
+                    {todayDayName} {todayDayNum}
                   </span>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.28)", fontWeight: 400 }}>
-                    · {todayLabel}
-                  </span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginTop: 6 }}>
+                    <motion.span
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
+                      style={{ fontSize: 47, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                    >
+                      {todayDone}
+                    </motion.span>
+                    <span style={{ fontSize: 22, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
+                      / {todayTotal}
+                    </span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setIslandExpanded(false)}
-                  style={{
-                    width: 20, height: 20, borderRadius: "50%",
-                    background: "rgba(255,255,255,0.07)", border: "none",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    cursor: "pointer", padding: 0, flexShrink: 0,
-                  }}
-                >
-                  <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", lineHeight: 1 }}>✕</span>
-                </button>
+
+                {/* Right: enlarged arc — ticks between 100% and 4/4 every 3s */}
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <svg width="116" height="116" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
+                    <circle cx="18" cy="18" r={ARC_R} fill="none" stroke={T.arcTrack} strokeWidth="2" />
+                    <motion.circle
+                      cx="18" cy="18" r={ARC_R}
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeDasharray={ARC_CIRC}
+                      initial={{ strokeDashoffset: ARC_CIRC }}
+                      animate={{ strokeDashoffset: ARC_CIRC * (1 - todayPct) }}
+                      transition={{ delay: 0.35, duration: 0.85, ease: "easeOut" }}
+                      style={{ filter: "drop-shadow(0 0 6px rgba(34,197,94,0.75))" }}
+                    />
+                  </svg>
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                    <AnimatePresence mode="wait">
+                      {showPct ? (
+                        <motion.span
+                          key="pct"
+                          initial={{ y: 22, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -22, opacity: 0 }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                          style={{ fontSize: 22, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                        >
+                          {Math.round(todayPct * 100)}%
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="frac"
+                          initial={{ y: 22, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -22, opacity: 0 }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                          style={{ fontSize: 19, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                        >
+                          {todayDone}/{todayTotal}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* ── Scrollable body ── */}
+              {/* ── Scrollable body: habit list only ── */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -370,142 +485,117 @@ export function PageHeader({ user }: PageHeaderProps) {
                 transition={ISLAND_BODY_TRANSITION}
                 style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" as never }}
               >
-                {/* Progress summary row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 16px 10px" }}>
-                  {/* Arc */}
-                  <div style={{ position: "relative", flexShrink: 0 }}>
-                    <svg width="56" height="56" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
-                      {/* Glass track */}
-                      <circle cx="18" cy="18" r={ARC_R} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="2.5" />
-                      {/* Progress fill */}
-                      <motion.circle
-                        cx="18" cy="18" r={ARC_R}
-                        fill="none"
-                        stroke="#22c55e"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        strokeDasharray={ARC_CIRC}
-                        initial={{ strokeDashoffset: ARC_CIRC }}
-                        animate={{ strokeDashoffset: ARC_CIRC * (1 - todayPct) }}
-                        transition={{ delay: 0.35, duration: 0.85, ease: "easeOut" }}
-                        style={{ filter: "drop-shadow(0 0 4px rgba(34,197,94,0.6))" }}
-                      />
-                    </svg>
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 12, fontWeight: 800, color: "rgba(255,255,255,0.88)", lineHeight: 1 }}>
-                        {Math.round(todayPct * 100)}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Fraction + label */}
-                  <div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-                      <motion.span
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
-                        style={{ fontSize: 30, fontWeight: 900, color: "#fff", lineHeight: 1 }}
-                      >
-                        {todayDone}
-                      </motion.span>
-                      <span style={{ fontSize: 15, fontWeight: 500, color: "rgba(255,255,255,0.28)", lineHeight: 1 }}>
-                        / {todayTotal}
-                      </span>
-                    </div>
-                    <div style={{ fontSize: 11.5, color: "rgba(255,255,255,0.42)", fontWeight: 500 }}>
-                      {todayDone === todayTotal && todayTotal > 0
-                        ? "All done today 🎉"
-                        : `${pendingHabits.length} remaining`}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thin separator */}
-                <div style={{ height: 1, background: "rgba(255,255,255,0.05)", marginLeft: 16, marginRight: 16 }} />
-
                 {/* Completed habits */}
                 {completedHabits.length > 0 && (
-                  <div style={{ padding: "10px 16px 4px" }}>
+                  <div style={{ padding: "10px 20px 4px" }}>
                     <div style={{
-                      fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                      color: "rgba(34,197,94,0.55)", marginBottom: 6,
+                      fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                      color: T.sectionDone, marginBottom: 6,
                     }}>
                       Done
                     </div>
                     {completedHabits.map((habit, i) => (
-                      <motion.div
+                      <motion.button
                         key={habit._id}
+                        onClick={() => handleToggle(habit._id, true)}
+                        disabled={pendingId === habit._id}
                         initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        animate={{ opacity: pendingId === habit._id ? 0.55 : 1, x: 0 }}
                         transition={{ delay: 0.3 + i * 0.065, duration: 0.24, ease: "easeOut" }}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          padding: "7px 0",
+                          padding: "7px 6px",
+                          margin: "0 -6px",
+                          borderRadius: 10,
+                          width: "calc(100% + 12px)",
                           borderBottom: i < completedHabits.length - 1
-                            ? "1px solid rgba(255,255,255,0.04)" : "none",
+                            ? `1px solid ${T.rowBorder}` : "none",
+                          background: "none",
+                          border: "none",
+                          cursor: pendingId === habit._id ? "not-allowed" : "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
                         }}
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ backgroundColor: T.rowHoverBg }}
                       >
-                        <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{habit.icon}</span>
+                        <div style={{ flexShrink: 0, opacity: 0.7 }}>
+                          <HabitIcon name={habit.icon} size={19} color="#22c55e" />
+                        </div>
                         <span style={{
-                          fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,0.8)",
+                          fontSize: 17, fontWeight: 500, color: T.compText,
                           flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                          textDecoration: "line-through", opacity: 0.7,
                         }}>
                           {habit.name}
                         </span>
                         {/* Check badge */}
                         <div style={{
                           width: 17, height: 17, borderRadius: "50%",
-                          background: "rgba(34,197,94,0.14)",
-                          border: "1.5px solid rgba(34,197,94,0.55)",
+                          background: T.checkBg,
+                          border: `1.5px solid ${T.checkBorder}`,
                           display: "flex", alignItems: "center", justifyContent: "center",
                           flexShrink: 0,
                         }}>
-                          <span style={{ fontSize: 9, color: "#22c55e", lineHeight: 1 }}>✓</span>
+                          <Check size={9} color="#22c55e" />
                         </div>
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </div>
                 )}
 
                 {/* Pending habits */}
                 {pendingHabits.length > 0 && (
-                  <div style={{ padding: completedHabits.length > 0 ? "4px 16px" : "10px 16px 4px" }}>
+                  <div style={{ padding: completedHabits.length > 0 ? "4px 20px" : "10px 20px 4px" }}>
                     {completedHabits.length > 0 && (
-                      <div style={{ height: 1, background: "rgba(255,255,255,0.04)", marginBottom: 10 }} />
+                      <div style={{ height: 1, background: T.divider, marginBottom: 10 }} />
                     )}
                     <div style={{
-                      fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
-                      color: "rgba(255,255,255,0.28)", marginBottom: 6,
+                      fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                      color: T.sectionPend, marginBottom: 6,
                     }}>
                       Remaining
                     </div>
                     {pendingHabits.map((habit, i) => (
-                      <motion.div
+                      <motion.button
                         key={habit._id}
+                        onClick={() => handleToggle(habit._id, false)}
+                        disabled={pendingId === habit._id}
                         initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
+                        animate={{ opacity: pendingId === habit._id ? 0.4 : 0.65, x: 0 }}
                         transition={{ delay: 0.35 + (completedHabits.length + i) * 0.065, duration: 0.24, ease: "easeOut" }}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          padding: "7px 0", opacity: 0.6,
+                          padding: "7px 6px",
+                          margin: "0 -6px",
+                          borderRadius: 10,
+                          width: "calc(100% + 12px)",
                           borderBottom: i < pendingHabits.length - 1
-                            ? "1px solid rgba(255,255,255,0.04)" : "none",
+                            ? `1px solid ${T.rowBorder}` : "none",
+                          background: "none",
+                          border: "none",
+                          cursor: pendingId === habit._id ? "not-allowed" : "pointer",
+                          textAlign: "left",
+                          transition: "background 0.15s",
                         }}
+                        whileTap={{ scale: 0.97 }}
+                        whileHover={{ opacity: 0.9, backgroundColor: T.rowHoverBg }}
                       >
-                        <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{habit.icon}</span>
+                        <div style={{ flexShrink: 0 }}>
+                          <HabitIcon name={habit.icon} size={19} color={T.pendText} />
+                        </div>
                         <span style={{
-                          fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.55)",
+                          fontSize: 17, fontWeight: 400, color: T.pendText,
                           flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                         }}>
                           {habit.name}
                         </span>
                         <div style={{
                           width: 17, height: 17, borderRadius: "50%",
-                          border: "1.5px solid rgba(255,255,255,0.16)",
+                          border: `1.5px solid ${T.pendBorder}`,
                           flexShrink: 0,
                         }} />
-                      </motion.div>
+                      </motion.button>
                     ))}
                   </div>
                 )}
@@ -517,29 +607,30 @@ export function PageHeader({ user }: PageHeaderProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.42 + habits.length * 0.05, duration: 0.28, ease: "easeOut" }}
                     style={{
-                      margin: "10px 16px 16px",
+                      margin: "10px 20px 18px",
                       padding: "10px 14px",
                       borderRadius: 14,
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.07)",
+                      background: T.footerBg,
+                      border: `1px solid ${T.footerBorder}`,
                       backdropFilter: "blur(8px)",
                       display: "flex", alignItems: "center", gap: 10,
                     }}
                   >
-                    <span style={{ fontSize: 18, lineHeight: 1 }}>🔥</span>
+                    <Flame size={23} color="#f97316" style={{ filter: "drop-shadow(0 0 6px rgba(249,115,22,0.5))", flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: "rgba(255,255,255,0.9)" }}>{maxStreak}</span>
-                        <span style={{ fontSize: 12, fontWeight: 400, color: "rgba(255,255,255,0.38)" }}>day streak</span>
+                        <span style={{ fontSize: 19, fontWeight: 800, color: T.footerText }}>{maxStreak}</span>
+                        <span style={{ fontSize: 16, fontWeight: 400, color: T.footerMuted }}>day streak</span>
                       </div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.28)", marginTop: 1 }}>Keep it going!</div>
+                      <div style={{ fontSize: 13, color: T.footerMuted, marginTop: 1 }}>Keep it going!</div>
                     </div>
                   </motion.div>
                 )}
               </motion.div>
             </motion.div>
           )}
-        </AnimatePresence>,
+          </AnimatePresence>
+        </>,
         document.body,
       )}
 

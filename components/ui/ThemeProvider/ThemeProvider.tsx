@@ -37,8 +37,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (appStyle === 'glassy') {
       document.documentElement.style.setProperty('--glass-opacity', String(glassOpacity));
+      // Set derived values directly so inline-style backdrop-filter repaints reliably
+      // (browsers don't always repaint when only an upstream CSS var changes via JS)
+      document.documentElement.style.setProperty('--glass-blur', `${glassOpacity * 36}px`);
+      document.documentElement.style.setProperty('--glass-saturation', '185%');
     } else {
       document.documentElement.style.removeProperty('--glass-opacity');
+      document.documentElement.style.removeProperty('--glass-blur');
+      document.documentElement.style.removeProperty('--glass-saturation');
     }
   }, [appStyle, glassOpacity]);
 
