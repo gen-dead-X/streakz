@@ -51,7 +51,7 @@ interface CalendarGridProps {
 
 function CalendarGrid({ year, month, today, summaries }: CalendarGridProps) {
   function getSummary(date: string): DaySummary {
-    return summaries.find((s) => s.date === date) ?? { date, total: 0, completed: 0 };
+    return summaries.find((s) => s.date === date) ?? { date: date, total: 0, completed: 0 };
   }
 
   const grid = buildGrid(year, month);

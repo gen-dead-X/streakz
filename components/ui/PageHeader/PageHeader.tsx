@@ -113,9 +113,9 @@ export function PageHeader({ user }: PageHeaderProps) {
     if (date > today) return null;
     let s: DaySummary;
     if (date === today) {
-      s = { date, total: habits.length, completed: habits.filter((h) => h.isCompletedToday).length };
+      s = { date: date, total: habits.length, completed: habits.filter((h) => h.isCompletedToday).length };
     } else {
-      s = summaries.find((x) => x.date === date) ?? { date, total: 0, completed: 0 };
+      s = summaries.find((x) => x.date === date) ?? { date: date, total: 0, completed: 0 };
     }
     if (s.total === 0) return null;
     if (s.completed >= s.total) return "#22c55e";
