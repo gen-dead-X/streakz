@@ -4,9 +4,11 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { BottomNav } from "@/components/ui/BottomNav";
 import { SideNav } from "@/components/ui/SideNav";
-import { SplashScreen } from "@/components/ui/SplashScreen";
+import { SplashScreenLoader } from "@/components/ui/SplashScreen/SplashScreenLoader";
 import { PushPermissionBanner } from "@/components/ui/PushPermissionBanner";
 import { NotificationTonePlayer } from "@/components/ui/NotificationTonePlayer";
+import { BottomSheetBackground } from "@/components/ui/BottomSheet";
+import { HabitFormSheet } from "@/components/features/habits/HabitFormSheet";
 
 export default async function AppLayout({
   children,
@@ -26,28 +28,29 @@ export default async function AppLayout({
       className="min-h-screen"
       style={{ background: "var(--color-bg-page)" }}
     >
-      <SplashScreen />
+      <SplashScreenLoader />
 
-      {/* Desktop sidebar — hidden on mobile */}
+      {/* Fixed chrome — lives OUTSIDE the transformed wrapper so position:fixed works */}
       <SideNav user={user} />
-
-      {/* Mobile header — hidden on desktop */}
       <PageHeader user={user} />
-
-      {/* Main content */}
-      <div className="md:ml-[240px]" style={{ minHeight: "100dvh" }}>
-        <main
-          className="mx-auto px-4 md:px-8 pt-20 pb-24 md:py-8"
-          style={{ maxWidth: 900 }}
-        >
-          {children}
-        </main>
-      </div>
-
-      {/* Mobile bottom nav — hidden on desktop */}
       <BottomNav />
       <PushPermissionBanner />
       <NotificationTonePlayer />
+
+      {/* Only the scrollable content area gets the iOS zoom-out transform */}
+      <BottomSheetBackground>
+        <div className="md:ml-[240px]">
+          <main
+            className="mx-auto px-4 md:px-8 pt-[152px] md:pt-8 pb-24 md:pb-8"
+            style={{ maxWidth: 900 }}
+          >
+            {children}
+          </main>
+        </div>
+      </BottomSheetBackground>
+
+      {/* Global habit form sheet — portals to document.body */}
+      <HabitFormSheet />
     </div>
   );
 }

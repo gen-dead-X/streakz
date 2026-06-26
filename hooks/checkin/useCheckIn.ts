@@ -14,7 +14,7 @@ export function useCheckIn() {
       addNewAchievements(result.newAchievements);
       for (const a of result.newAchievements) {
         const meta = ACHIEVEMENT_META[a.type];
-        notify(`${meta.icon} Achievement unlocked: ${meta.label}`, 'success');
+        notify(`Achievement unlocked: ${meta.label}`, 'success');
       }
     }
   }

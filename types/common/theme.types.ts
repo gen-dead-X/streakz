@@ -6,8 +6,10 @@ export type ColorScheme =
   | 'sage'
   | 'sky'
   | 'ocean'
-  | 'teal'
-  | 'classy';
+  | 'teal';
+
+/** Visual treatment — independent of color scheme */
+export type AppStyle = 'classy' | 'glassy';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 

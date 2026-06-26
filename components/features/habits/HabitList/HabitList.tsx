@@ -4,8 +4,8 @@ import { Skeleton } from "antd";
 import { format } from "date-fns";
 import { Flame, Settings, Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { StreakCardPager } from "@/components/features/habits/StreakCardPager";
+import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { HabitIcon } from "@/components/ui/HabitIcon";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useCheckIn } from "@/hooks/checkin/useCheckIn";
@@ -26,7 +26,7 @@ function DesktopHabitRow({
   onCheckIn: (id: string, date: string) => void;
   onUncheck: (id: string, date: string) => void;
 }) {
-  const router = useRouter();
+  const openEdit = useHabitSheetStore((s) => s.openEdit);
 
   function handleToggle() {
     navigator.vibrate?.(100);
@@ -115,7 +115,7 @@ function DesktopHabitRow({
 
       {/* Edit */}
       <button
-        onClick={() => router.push(`/habits/${habit._id}/edit`)}
+        onClick={() => openEdit(habit._id)}
         style={{
           background: "none",
           border: "none",
@@ -169,8 +169,9 @@ export function HabitList() {
   const today = format(new Date(), "yyyy-MM-dd");
 
   useEffect(() => {
-    fetchHabits();
-  }, [fetchHabits]);
+    void fetchHabits();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleCheckIn(habitId: string, date: string) {
     setPendingId(habitId);

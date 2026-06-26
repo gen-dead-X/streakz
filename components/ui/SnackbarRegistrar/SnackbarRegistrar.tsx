@@ -1,12 +1,4 @@
-'use client';
-import { useEffect } from 'react';
-import { useSnackbar } from 'notistack';
-import { setEnqueueSnackbar } from '@/lib/snackbar';
-
+// Replaced by NotificationRegistrar — kept as empty stub to avoid import errors in older files.
 export function SnackbarRegistrar() {
-  const { enqueueSnackbar } = useSnackbar();
-  useEffect(() => {
-    setEnqueueSnackbar(enqueueSnackbar);
-  }, [enqueueSnackbar]);
   return null;
 }

@@ -1,8 +1,10 @@
 'use client';
-import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Avatar, Typography } from 'antd';
 import { CalendarDays, BarChart3, Plus, Flame, Settings2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { ProjectSwitcher } from '@/components/ui/ProjectSwitcher';
+import { useHabitSheetStore } from '@/store/habitSheet/habitSheet.store';
 
 const { Text } = Typography;
 
@@ -12,7 +14,7 @@ interface SideNavProps {
 
 export function SideNav({ user }: SideNavProps) {
   const pathname = usePathname();
-  const router = useRouter();
+  const openAdd  = useHabitSheetStore((s) => s.openAdd);
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -25,14 +27,10 @@ export function SideNav({ user }: SideNavProps) {
     .toUpperCase()
     .slice(0, 2);
 
-  const navItem = (
-    icon: React.ReactNode,
-    label: string,
-    active: boolean,
-    onClick: () => void,
-  ) => (
-    <button
-      onClick={onClick}
+  const navItem = (icon: React.ReactNode, label: string, active: boolean, href: string) => (
+    <Link
+      href={href}
+      prefetch={active ? false : undefined}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -40,19 +38,18 @@ export function SideNav({ user }: SideNavProps) {
         width: '100%',
         padding: '10px 16px',
         borderRadius: 12,
-        border: 'none',
         cursor: 'pointer',
         background: active ? 'rgb(var(--brand-rgb) / 0.12)' : 'transparent',
         color: active ? 'var(--color-brand)' : 'var(--color-text-muted)',
         transition: 'all 0.15s ease',
-        textAlign: 'left',
+        textDecoration: 'none',
       }}
     >
       {icon}
-      <Text style={{ fontSize: 15, fontWeight: active ? 600 : 400, color: 'inherit' }}>
+      <Text style={{ fontSize: 16, fontWeight: active ? 600 : 400, color: 'inherit' }}>
         {label}
       </Text>
-    </button>
+    </Link>
   );
 
   return (
@@ -82,65 +79,37 @@ export function SideNav({ user }: SideNavProps) {
         >
           <Flame size={20} style={{ color: 'var(--color-bg-page)' }} />
         </div>
-        <Text strong style={{ fontSize: 18, color: 'var(--color-text-heading)' }}>
+        <Text strong style={{ fontSize: 20, color: 'var(--color-text-heading)' }}>
           Streak Counter
         </Text>
       </div>
 
-      {/* Date context — shown only when viewing Today */}
-      {isToday && (
-        <div className="px-2 mb-6">
-          <p
-            style={{
-              fontSize: 11,
-              color: 'var(--color-text-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.08em',
-              margin: '0 0 2px',
-              lineHeight: 1,
-            }}
-          >
-            {format(new Date(), 'EEEE, MMM d')}
-          </p>
-          <p
-            style={{
-              fontSize: 20,
-              fontWeight: 800,
-              color: 'var(--color-text-heading)',
-              margin: 0,
-              lineHeight: 1.2,
-            }}
-          >
-            Your Streaks
-          </p>
-        </div>
-      )}
+      {/* Project switcher */}
+      <div className="px-2 mb-4">
+        <p
+          style={{
+            fontSize:      11,
+            color:         'var(--color-text-muted)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            margin:        '0 0 4px',
+          }}
+        >
+          Viewing
+        </p>
+        <ProjectSwitcher />
+      </div>
 
       {/* Nav items */}
       <nav className="flex flex-col gap-1 flex-1">
-        {navItem(
-          <CalendarDays size={20} />,
-          'Today',
-          isToday,
-          () => router.push('/today'),
-        )}
-        {navItem(
-          <BarChart3 size={20} />,
-          'Insights',
-          isInsights,
-          () => router.push('/insights'),
-        )}
-        {navItem(
-          <Settings2 size={20} />,
-          'Settings',
-          isSettings,
-          () => router.push('/settings'),
-        )}
+        {navItem(<CalendarDays size={20} />, 'Today',    isToday,    '/today')}
+        {navItem(<BarChart3   size={20} />, 'Insights', isInsights, '/insights')}
+        {navItem(<Settings2   size={20} />, 'Settings', isSettings, '/settings')}
       </nav>
 
       {/* Add Habit button */}
       <button
-        onClick={() => router.push('/habits/new')}
+        onClick={() => openAdd()}
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -148,13 +117,13 @@ export function SideNav({ user }: SideNavProps) {
           width: '100%',
           padding: '12px 16px',
           borderRadius: 12,
-          border: 'none',
-          cursor: 'pointer',
           background: 'var(--color-brand)',
           color: 'var(--color-bg-page)',
           marginBottom: 16,
           fontWeight: 600,
-          fontSize: 15,
+          fontSize: 16,
+          border: 'none',
+          cursor: 'pointer',
         }}
       >
         <Plus size={20} />
@@ -162,8 +131,8 @@ export function SideNav({ user }: SideNavProps) {
       </button>
 
       {/* User */}
-      <button
-        onClick={() => router.push('/profile')}
+      <Link
+        href="/profile"
         style={{
           display: 'flex',
           alignItems: 'center',
@@ -171,11 +140,10 @@ export function SideNav({ user }: SideNavProps) {
           padding: '12px 8px',
           borderRadius: 12,
           background: 'var(--color-bg-elevated)',
-          border: 'none',
-          cursor: 'pointer',
           width: '100%',
           textAlign: 'left',
           transition: 'background 0.15s ease',
+          textDecoration: 'none',
         }}
       >
         <Avatar
@@ -205,7 +173,7 @@ export function SideNav({ user }: SideNavProps) {
             {user.name}
           </Text>
         </div>
-      </button>
+      </Link>
     </aside>
   );
 }

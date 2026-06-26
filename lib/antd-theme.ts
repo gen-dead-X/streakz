@@ -1,6 +1,6 @@
 import type { ThemeConfig } from 'antd';
 import { theme } from 'antd';
-import type { ColorScheme, ResolvedMode } from '@/types/common/theme.types';
+import type { ColorScheme, ResolvedMode, AppStyle } from '@/types/common/theme.types';
 import { SCHEME_PRIMARY } from '@/constants/themes/themes.constants';
 
 const darkBase = {
@@ -21,6 +21,25 @@ const lightBase = {
   colorTextSecondary: '#6A6A6A',
 } as const;
 
+/* Glassy: semi-transparent so backdrop-filter shows through */
+const glassyDarkBase = {
+  colorBgBase:      '#0A110A',
+  colorBgContainer: 'rgba(20, 32, 22, 0.55)',
+  colorBgElevated:  'rgba(30, 46, 32, 0.65)',
+  colorBgLayout:    'rgba(6, 12, 8, 0.40)',
+  colorText:        '#D2D2D2',
+  colorTextSecondary: '#8C8C8C',
+} as const;
+
+const glassyLightBase = {
+  colorBgBase:      '#EDF5F1',
+  colorBgContainer: 'rgba(255, 255, 255, 0.62)',
+  colorBgElevated:  'rgba(255, 255, 255, 0.78)',
+  colorBgLayout:    'rgba(238, 248, 242, 0.50)',
+  colorText:        '#1A2A20',
+  colorTextSecondary: '#5A7A68',
+} as const;
+
 const sharedTokens = {
   colorSuccess:  '#20974C',
   colorWarning:  '#F29E0D',
@@ -36,10 +55,17 @@ const sharedTokens = {
   motionDurationSlow: '200ms',
 } as const;
 
-export function getAntdTheme(scheme: ColorScheme, mode: ResolvedMode): ThemeConfig {
+export function getAntdTheme(
+  scheme: ColorScheme,
+  mode: ResolvedMode,
+  appStyle: AppStyle = 'classy',
+): ThemeConfig {
   const isDark = mode === 'dark';
   const colorPrimary = SCHEME_PRIMARY[scheme][mode];
-  const base = isDark ? darkBase : lightBase;
+
+  const base = appStyle === 'glassy'
+    ? (isDark ? glassyDarkBase : glassyLightBase)
+    : (isDark ? darkBase : lightBase);
 
   return {
     algorithm: isDark ? theme.darkAlgorithm : theme.defaultAlgorithm,

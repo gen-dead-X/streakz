@@ -1,16 +1,40 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Lottie from "lottie-react";
 import lottieData from "../../../public/lottie/Loading_Lottie.json";
 
+// Read data-mode synchronously before first paint to avoid bg flash.
+const useDarkMode = () => {
+  const [dark, setDark] = useState(true);
+
+  useLayoutEffect(() => {
+    const read = () =>
+      document.documentElement.getAttribute("data-mode") !== "light";
+    setDark(read());
+
+    const observer = new MutationObserver(() => setDark(read()));
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-mode"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
+  return dark;
+};
+
 export function SplashScreen() {
   const [visible, setVisible] = useState(true);
+  const dark = useDarkMode();
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(false), 1100);
+    const timer = setTimeout(() => setVisible(false), 600);
     return () => clearTimeout(timer);
   }, []);
+
+  const bg = dark ? "#0d0d0d" : "#f5f5f5";
+  const textColor = dark ? "#ffffff" : "#0a0a0a";
 
   return (
     <AnimatePresence>
@@ -24,9 +48,7 @@ export function SplashScreen() {
             position: "fixed",
             inset: 0,
             zIndex: 9999,
-            /* Very light tint: 14% brand blended into the page bg — soft, themed, not saturated */
-            backgroundColor:
-              "color-mix(in srgb, var(--color-brand) 14%, var(--color-bg-page))",
+            backgroundColor: bg,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -50,7 +72,7 @@ export function SplashScreen() {
                 fontSize: 36,
                 fontWeight: 800,
                 letterSpacing: "-0.02em",
-                color: "var(--color-brand)",
+                color: textColor,
                 marginTop: -64,
                 fontFamily: "var(--font-family-sans)",
                 userSelect: "none",
@@ -59,7 +81,6 @@ export function SplashScreen() {
               StreakZ
             </motion.span>
           </motion.div>
-          {/* Brand name */}
         </motion.div>
       )}
     </AnimatePresence>

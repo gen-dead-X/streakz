@@ -74,6 +74,7 @@ export function StreakCardPager({ habits, today, pendingId, onCheckIn, onUncheck
                 style={{
                   position: 'absolute', inset: 0, zIndex,
                   x, rotate: frontRotate, // motion values — tilt follows drag
+                  cursor: 'grab',
                 }}
                 animate={{ scale: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
