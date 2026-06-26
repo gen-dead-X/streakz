@@ -98,7 +98,7 @@ export function PageHeader({ user }: PageHeaderProps) {
   const PILL_H   = Math.min(400, Math.max(240, 200 + habits.length * 36));
 
   const islandX = 8;
-  const islandY = islandRect ? islandRect.top : 0;
+  const islandY = 8;
 
   /* Text/content tokens that adapt to dark/light mode.
      The island's glass background intentionally stays liquid-black
@@ -262,7 +262,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       ref={todayCircleRef}
                       onClick={handleTodayTap}
                       whileTap={{ scale: 0.82 }}
-                      style={{ position: "relative", width: 38, height: 38, cursor: "pointer" }}
+                      style={{ position: "relative", width: 44, height: 44, cursor: "pointer" }}
                     >
                       {/* Breathing ripple ring */}
                       <div
@@ -279,7 +279,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       {/* Circle blooms outward as island opens — creates "part of it" illusion */}
                       <div
                         style={{
-                          width: 38, height: 38, borderRadius: "50%",
+                          width: 44, height: 44, borderRadius: "50%",
                           background: "var(--color-brand)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           opacity: islandExpanded ? 0 : 1,
@@ -287,7 +287,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                           transition: "opacity 0.14s ease-out, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
                         }}
                       >
-                        <span style={{ fontSize: 16, fontWeight: 900, color: "var(--color-bg-page)", lineHeight: 1 }}>
+                        <span style={{ fontSize: 24, fontWeight: 900, color: "var(--color-bg-page)", lineHeight: 1 }}>
                           {dayNum}
                         </span>
                       </div>
