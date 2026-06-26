@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Avatar } from "antd";
 import { useRouter } from "next/navigation";
-import { User, Settings2, ChevronDown, Plus, X, Check, Flame } from "lucide-react";
+import { User, Settings2, ChevronDown, Plus, Check, Flame } from "lucide-react";
 import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { format, addDays, getDay } from "date-fns";
 import { useHabitsStore } from "@/store/habits/habits.store";
@@ -66,6 +66,7 @@ export function PageHeader({ user }: PageHeaderProps) {
   const [islandExpanded, setIslandExpanded] = useState(false);
   const [islandRect, setIslandRect]         = useState<DOMRect | null>(null);
   const [pendingId, setPendingId]           = useState<string | null>(null);
+  const [showPct, setShowPct]               = useState(true);
 
   const menuRef        = useRef<HTMLDivElement>(null);
   const dropdownRef    = useRef<HTMLDivElement>(null);
@@ -98,7 +99,7 @@ export function PageHeader({ user }: PageHeaderProps) {
   const ARC_CIRC = 2 * Math.PI * ARC_R;
   // Full-width island with 8px gutters on each side
   const PILL_W   = mounted ? window.innerWidth - 16 : 360;
-  const PILL_H   = Math.min(400, Math.max(240, 200 + habits.length * 36));
+  const PILL_H   = Math.min(520, Math.max(340, 280 + habits.length * 44));
 
   const islandX = 8;
   const islandY = 8;
@@ -140,6 +141,12 @@ export function PageHeader({ user }: PageHeaderProps) {
     if (!islandExpanded) return;
     const t = setTimeout(() => setIslandExpanded(false), 8000);
     return () => clearTimeout(t);
+  }, [islandExpanded]);
+
+  useEffect(() => {
+    if (!islandExpanded) { setShowPct(true); return; }
+    const id = setInterval(() => setShowPct((v) => !v), 3000);
+    return () => clearInterval(id);
   }, [islandExpanded]);
 
   function getDotColor(date: string): string | null {
@@ -328,7 +335,15 @@ export function PageHeader({ user }: PageHeaderProps) {
 
       {/* ── Dynamic Island ── */}
       {mounted && createPortal(
-        <AnimatePresence>
+        <>
+          {/* Invisible backdrop — tap anywhere outside to close */}
+          {islandExpanded && islandRect && (
+            <div
+              onClick={() => setIslandExpanded(false)}
+              style={{ position: "fixed", inset: 0, zIndex: 199 }}
+            />
+          )}
+          <AnimatePresence>
           {islandExpanded && islandRect && (
             <motion.div
               key="dynamic-island"
@@ -371,7 +386,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 flexDirection:         "column",
               }}
             >
-              {/* ── Island header ── */}
+              {/* ── Combined header: date left · arc right ── */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -379,13 +394,14 @@ export function PageHeader({ user }: PageHeaderProps) {
                 transition={ISLAND_FADE_TRANSITION}
                 style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "16px 20px 13px",
+                  padding: "18px 20px 18px",
                   borderBottom: `1px solid ${T.divider}`,
                   flexShrink: 0,
+                  gap: 16,
                 }}
               >
-                {/* Two-line date hierarchy: small Today·Month on top, big day on bottom */}
-                <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                {/* Left: live dot + Today·Month / day name / count */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <motion.div
                       animate={LIVE_DOT_ANIMATE}
@@ -399,22 +415,69 @@ export function PageHeader({ user }: PageHeaderProps) {
                   <span style={{ fontSize: 36, fontWeight: 900, color: T.textPrimary, lineHeight: 1, letterSpacing: "-0.03em" }}>
                     {todayDayName} {todayDayNum}
                   </span>
+                  <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginTop: 6 }}>
+                    <motion.span
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
+                      style={{ fontSize: 47, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                    >
+                      {todayDone}
+                    </motion.span>
+                    <span style={{ fontSize: 22, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
+                      / {todayTotal}
+                    </span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setIslandExpanded(false)}
-                  style={{
-                    width: 20, height: 20, borderRadius: "50%",
-                    background: T.closeBg, border: "none",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    cursor: "pointer", padding: 0, flexShrink: 0,
-                  }}
-                  aria-label="Close"
-                >
-                  <X size={10} color={T.closeColor} />
-                </button>
+
+                {/* Right: enlarged arc — ticks between 100% and 4/4 every 3s */}
+                <div style={{ position: "relative", flexShrink: 0 }}>
+                  <svg width="116" height="116" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
+                    <circle cx="18" cy="18" r={ARC_R} fill="none" stroke={T.arcTrack} strokeWidth="2" />
+                    <motion.circle
+                      cx="18" cy="18" r={ARC_R}
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeDasharray={ARC_CIRC}
+                      initial={{ strokeDashoffset: ARC_CIRC }}
+                      animate={{ strokeDashoffset: ARC_CIRC * (1 - todayPct) }}
+                      transition={{ delay: 0.35, duration: 0.85, ease: "easeOut" }}
+                      style={{ filter: "drop-shadow(0 0 6px rgba(34,197,94,0.75))" }}
+                    />
+                  </svg>
+                  <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                    <AnimatePresence mode="wait">
+                      {showPct ? (
+                        <motion.span
+                          key="pct"
+                          initial={{ y: 22, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -22, opacity: 0 }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                          style={{ fontSize: 22, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                        >
+                          {Math.round(todayPct * 100)}%
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="frac"
+                          initial={{ y: 22, opacity: 0 }}
+                          animate={{ y: 0, opacity: 1 }}
+                          exit={{ y: -22, opacity: 0 }}
+                          transition={{ duration: 0.4, ease: "easeOut" }}
+                          style={{ fontSize: 19, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                        >
+                          {todayDone}/{todayTotal}
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                </div>
               </motion.div>
 
-              {/* ── Scrollable body ── */}
+              {/* ── Scrollable body: habit list only ── */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -422,53 +485,6 @@ export function PageHeader({ user }: PageHeaderProps) {
                 transition={ISLAND_BODY_TRANSITION}
                 style={{ flex: 1, overflowY: "auto", scrollbarWidth: "none" as never }}
               >
-                {/* Progress summary row */}
-                <div style={{ display: "flex", alignItems: "center", gap: 20, padding: "18px 20px 14px" }}>
-                  {/* Arc — larger for full-width island */}
-                  <div style={{ position: "relative", flexShrink: 0 }}>
-                    <svg width="84" height="84" viewBox="0 0 36 36" style={{ transform: "rotate(-90deg)", display: "block" }}>
-                      <circle cx="18" cy="18" r={ARC_R} fill="none" stroke={T.arcTrack} strokeWidth="2.2" />
-                      <motion.circle
-                        cx="18" cy="18" r={ARC_R}
-                        fill="none"
-                        stroke="#22c55e"
-                        strokeWidth="2.2"
-                        strokeLinecap="round"
-                        strokeDasharray={ARC_CIRC}
-                        initial={{ strokeDashoffset: ARC_CIRC }}
-                        animate={{ strokeDashoffset: ARC_CIRC * (1 - todayPct) }}
-                        transition={{ delay: 0.35, duration: 0.85, ease: "easeOut" }}
-                        style={{ filter: "drop-shadow(0 0 5px rgba(34,197,94,0.7))" }}
-                      />
-                    </svg>
-                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 21, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}>
-                        {Math.round(todayPct * 100)}%
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Fraction + label */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 5, marginBottom: 5 }}>
-                      <motion.span
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
-                        style={{ fontSize: 47, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
-                      >
-                        {todayDone}
-                      </motion.span>
-                      <span style={{ fontSize: 22, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
-                        / {todayTotal}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thin separator */}
-                <div style={{ height: 1, background: T.divider, marginLeft: 20, marginRight: 20 }} />
-
                 {/* Completed habits */}
                 {completedHabits.length > 0 && (
                   <div style={{ padding: "10px 20px 4px" }}>
@@ -613,7 +629,8 @@ export function PageHeader({ user }: PageHeaderProps) {
               </motion.div>
             </motion.div>
           )}
-        </AnimatePresence>,
+          </AnimatePresence>
+        </>,
         document.body,
       )}
 
