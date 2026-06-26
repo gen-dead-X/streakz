@@ -238,7 +238,7 @@ export function PageHeader({ user }: PageHeaderProps) {
         </div>
 
         {/* ── Fixed 7-day strip · today always center ── */}
-        <div style={{ paddingTop: 10, paddingBottom: 22 }}>
+        <div style={{ paddingTop: 16, paddingBottom: 22 }}>
           <div style={{ display: "flex", justifyContent: "space-around", paddingLeft: 8, paddingRight: 8 }}>
             {windowDates.map((date) => {
               const isToday  = date === today;
@@ -392,11 +392,11 @@ export function PageHeader({ user }: PageHeaderProps) {
                       transition={LIVE_DOT_TRANSITION}
                       style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e", flexShrink: 0 }}
                     />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: T.textSub, letterSpacing: "0.07em", textTransform: "uppercase" }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: T.textSub, letterSpacing: "0.07em", textTransform: "uppercase" }}>
                       Today · {todayMonth}
                     </span>
                   </div>
-                  <span style={{ fontSize: 28, fontWeight: 900, color: T.textPrimary, lineHeight: 1, letterSpacing: "-0.03em" }}>
+                  <span style={{ fontSize: 36, fontWeight: 900, color: T.textPrimary, lineHeight: 1, letterSpacing: "-0.03em" }}>
                     {todayDayName} {todayDayNum}
                   </span>
                 </div>
@@ -442,7 +442,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       />
                     </svg>
                     <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <span style={{ fontSize: 16, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}>
+                      <span style={{ fontSize: 21, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}>
                         {Math.round(todayPct * 100)}%
                       </span>
                     </div>
@@ -455,18 +455,13 @@ export function PageHeader({ user }: PageHeaderProps) {
                         initial={{ opacity: 0, y: 6 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.28, duration: 0.3, ease: "easeOut" }}
-                        style={{ fontSize: 36, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
+                        style={{ fontSize: 47, fontWeight: 900, color: T.textPrimary, lineHeight: 1 }}
                       >
                         {todayDone}
                       </motion.span>
-                      <span style={{ fontSize: 17, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
+                      <span style={{ fontSize: 22, fontWeight: 500, color: T.textSub, lineHeight: 1 }}>
                         / {todayTotal}
                       </span>
-                    </div>
-                    <div style={{ fontSize: 12, color: T.textMuted, fontWeight: 500 }}>
-                      {todayDone === todayTotal && todayTotal > 0
-                        ? "All done today!"
-                        : `${pendingHabits.length} remaining`}
                     </div>
                   </div>
                 </div>
@@ -478,7 +473,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                 {completedHabits.length > 0 && (
                   <div style={{ padding: "10px 20px 4px" }}>
                     <div style={{
-                      fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                      fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
                       color: T.sectionDone, marginBottom: 6,
                     }}>
                       Done
@@ -509,10 +504,10 @@ export function PageHeader({ user }: PageHeaderProps) {
                         whileHover={{ backgroundColor: T.rowHoverBg }}
                       >
                         <div style={{ flexShrink: 0, opacity: 0.7 }}>
-                          <HabitIcon name={habit.icon} size={15} color="#22c55e" />
+                          <HabitIcon name={habit.icon} size={19} color="#22c55e" />
                         </div>
                         <span style={{
-                          fontSize: 13, fontWeight: 500, color: T.compText,
+                          fontSize: 17, fontWeight: 500, color: T.compText,
                           flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                           textDecoration: "line-through", opacity: 0.7,
                         }}>
@@ -540,7 +535,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       <div style={{ height: 1, background: T.divider, marginBottom: 10 }} />
                     )}
                     <div style={{
-                      fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
+                      fontSize: 12, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase",
                       color: T.sectionPend, marginBottom: 6,
                     }}>
                       Remaining
@@ -571,10 +566,10 @@ export function PageHeader({ user }: PageHeaderProps) {
                         whileHover={{ opacity: 0.9, backgroundColor: T.rowHoverBg }}
                       >
                         <div style={{ flexShrink: 0 }}>
-                          <HabitIcon name={habit.icon} size={15} color={T.pendText} />
+                          <HabitIcon name={habit.icon} size={19} color={T.pendText} />
                         </div>
                         <span style={{
-                          fontSize: 13, fontWeight: 400, color: T.pendText,
+                          fontSize: 17, fontWeight: 400, color: T.pendText,
                           flex: 1, minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
                         }}>
                           {habit.name}
@@ -605,13 +600,13 @@ export function PageHeader({ user }: PageHeaderProps) {
                       display: "flex", alignItems: "center", gap: 10,
                     }}
                   >
-                    <Flame size={18} color="#f97316" style={{ filter: "drop-shadow(0 0 6px rgba(249,115,22,0.5))", flexShrink: 0 }} />
+                    <Flame size={23} color="#f97316" style={{ filter: "drop-shadow(0 0 6px rgba(249,115,22,0.5))", flexShrink: 0 }} />
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "baseline", gap: 4 }}>
-                        <span style={{ fontSize: 15, fontWeight: 800, color: T.footerText }}>{maxStreak}</span>
-                        <span style={{ fontSize: 12, fontWeight: 400, color: T.footerMuted }}>day streak</span>
+                        <span style={{ fontSize: 19, fontWeight: 800, color: T.footerText }}>{maxStreak}</span>
+                        <span style={{ fontSize: 16, fontWeight: 400, color: T.footerMuted }}>day streak</span>
                       </div>
-                      <div style={{ fontSize: 10, color: T.footerMuted, marginTop: 1 }}>Keep it going!</div>
+                      <div style={{ fontSize: 13, color: T.footerMuted, marginTop: 1 }}>Keep it going!</div>
                     </div>
                   </motion.div>
                 )}
