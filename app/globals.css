@@ -1,850 +1,208 @@
 @import "tailwindcss";
 
 @theme {
-  /* BRAND */
+  /* SEMANTIC COLOR TOKENS (map to CSS vars set per mode below) */
   --color-brand: var(--brand-default);
-  --color-brand-dark: var(--brand-dark);
-  --color-brand-light: var(--brand-light);
-  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
   --color-brand-foreground: var(--brand-foreground);
+  --color-violet: var(--violet-default);
+  --color-violet-soft: var(--violet-soft);
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-sunken: var(--bg-sunken);
+  --color-heading: var(--text-heading);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-inverse: var(--text-inverse);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-success: var(--success-default);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning-default);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-error: var(--error-default);
+  --color-error-subtle: var(--error-subtle);
 
-  /* ACCENT */
-  --color-accent: var(--accent-default);
-  --color-accent-dark: var(--accent-dark);
-  --color-accent-light: var(--accent-light);
-  --color-accent-subtle: var(--accent-subtle);
-  --color-accent-foreground: var(--accent-foreground);
+  /* GRADIENTS */
+  --background-image-ember: var(--gradient-ember);
+  --background-image-ember-soft: var(--gradient-ember-soft);
+  --background-image-violet: var(--gradient-violet);
 
-  /* NEUTRAL */
-  --color-neutral-50: var(--neutral-50);
-  --color-neutral-100: var(--neutral-100);
-  --color-neutral-200: var(--neutral-200);
-  --color-neutral-300: var(--neutral-300);
-  --color-neutral-400: var(--neutral-400);
-  --color-neutral-500: var(--neutral-500);
-  --color-neutral-600: var(--neutral-600);
-  --color-neutral-700: var(--neutral-700);
-  --color-neutral-800: var(--neutral-800);
-  --color-neutral-900: var(--neutral-900);
+  /* SHADOWS */
+  --shadow-soft: var(--shadow-soft);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-floating: var(--shadow-floating);
+  --shadow-ember: var(--shadow-ember);
 
-  /* TEXT */
-  --color-text-heading: var(--text-heading);
-  --color-text-body: var(--text-body);
-  --color-text-muted: var(--text-muted);
-  --color-text-inverse: var(--text-inverse);
-  --color-text-link: var(--text-link);
+  /* RADII */
+  --radius-control: 14px;
+  --radius-card: 24px;
+  --radius-sheet: 32px;
 
-  /* BACKGROUND */
+  /* TYPOGRAPHY */
+  --font-sans: var(--font-family-sans), system-ui, sans-serif;
+  --font-display: var(--font-family-display), var(--font-family-sans), sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-4xl: 44px;
+}
+
+/* ============ DARK (default) ============ */
+:root {
+  --brand-default: hsl(18 100% 62%);
+  --brand-strong: hsl(18 100% 55%);
+  --brand-soft: hsl(18 100% 62% / 0.12);
+  --brand-foreground: hsl(240 10% 5%);
+  --violet-default: hsl(258 90% 66%);
+  --violet-soft: hsl(258 90% 66% / 0.14);
+
+  --bg-page: hsl(240 10% 5%);
+  --bg-surface: hsl(240 8% 7%);
+  --bg-elevated: hsl(240 7% 10%);
+  --bg-sunken: hsl(240 10% 3.5%);
+  --bg-glass: hsl(240 8% 8% / 0.72);
+
+  --text-heading: hsl(40 30% 96%);
+  --text-body: hsl(240 6% 70%);
+  --text-muted: hsl(240 5% 48%);
+  --text-inverse: hsl(240 12% 9%);
+
+  --border-subtle: hsl(0 0% 100% / 0.06);
+  --border-default: hsl(0 0% 100% / 0.10);
+
+  --success-default: hsl(152 60% 45%);
+  --success-subtle: hsl(152 60% 45% / 0.14);
+  --warning-default: hsl(40 95% 55%);
+  --warning-subtle: hsl(40 95% 55% / 0.14);
+  --error-default: hsl(0 80% 60%);
+  --error-subtle: hsl(0 80% 60% / 0.14);
+
+  --gradient-ember: linear-gradient(135deg, #ff6b3d 0%, #ffb02e 100%);
+  --gradient-ember-soft: linear-gradient(135deg, hsl(18 100% 62% / 0.18) 0%, hsl(38 100% 59% / 0.10) 100%);
+  --gradient-violet: linear-gradient(135deg, hsl(258 90% 66%) 0%, hsl(280 85% 70%) 100%);
+
+  --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.25);
+  --shadow-raised: 0 2px 4px hsl(0 0% 0% / 0.35), 0 16px 40px hsl(0 0% 0% / 0.35);
+  --shadow-floating: 0 8px 16px hsl(0 0% 0% / 0.4), 0 24px 64px hsl(0 0% 0% / 0.5);
+  --shadow-ember: 0 4px 24px hsl(18 100% 55% / 0.35);
+  --edge-highlight: inset 0 1px 0 hsl(0 0% 100% / 0.04);
+
+  --ring: hsl(18 100% 62% / 0.55);
+  --overlay: hsl(240 10% 3% / 0.6);
+  --skeleton: hsl(240 6% 14%);
+  --selection-background: hsl(18 100% 62% / 0.35);
+}
+
+/* ============ LIGHT ============ */
+[data-mode="light"] {
+  --brand-default: hsl(18 95% 55%);
+  --brand-strong: hsl(18 95% 48%);
+  --brand-soft: hsl(18 95% 55% / 0.10);
+  --brand-foreground: hsl(0 0% 100%);
+  --violet-default: hsl(258 75% 56%);
+  --violet-soft: hsl(258 75% 56% / 0.10);
+
+  --bg-page: hsl(40 25% 97%);
+  --bg-surface: hsl(0 0% 100%);
+  --bg-elevated: hsl(0 0% 100%);
+  --bg-sunken: hsl(40 20% 94%);
+  --bg-glass: hsl(40 25% 98% / 0.78);
+
+  --text-heading: hsl(240 12% 9%);
+  --text-body: hsl(240 8% 32%);
+  --text-muted: hsl(240 5% 52%);
+  --text-inverse: hsl(40 30% 96%);
+
+  --border-subtle: hsl(240 12% 9% / 0.06);
+  --border-default: hsl(240 12% 9% / 0.10);
+
+  --success-default: hsl(152 65% 34%);
+  --success-subtle: hsl(152 65% 34% / 0.10);
+  --warning-default: hsl(38 95% 44%);
+  --warning-subtle: hsl(38 95% 44% / 0.10);
+  --error-default: hsl(0 72% 50%);
+  --error-subtle: hsl(0 72% 50% / 0.08);
+
+  --shadow-soft: 0 1px 2px hsl(240 12% 9% / 0.05), 0 8px 24px hsl(240 12% 9% / 0.06);
+  --shadow-raised: 0 2px 4px hsl(240 12% 9% / 0.06), 0 16px 40px hsl(240 12% 9% / 0.10);
+  --shadow-floating: 0 8px 16px hsl(240 12% 9% / 0.10), 0 24px 64px hsl(240 12% 9% / 0.16);
+  --shadow-ember: 0 4px 24px hsl(18 95% 55% / 0.30);
+  --edge-highlight: none;
+
+  --ring: hsl(18 95% 55% / 0.45);
+  --overlay: hsl(240 12% 9% / 0.35);
+  --skeleton: hsl(40 15% 90%);
+  --selection-background: hsl(18 95% 55% / 0.25);
+}
+
+/* ============================================
+   LEGACY ALIAS BRIDGE — temporary
+   A handful of not-yet-migrated screens (rebuilt in later tasks of the
+   Ink & Ember plan) still read pre-revamp `--color-*` variable names
+   directly via inline styles. These aliases keep them rendering with the
+   correct Ember tokens until each screen is touched; remove per-alias as
+   call sites migrate to the new semantic names above, and delete this
+   block entirely in Task 15.
+   ============================================ */
+:root {
   --color-bg-page: var(--bg-page);
   --color-bg-surface: var(--bg-surface);
   --color-bg-elevated: var(--bg-elevated);
   --color-bg-sunken: var(--bg-sunken);
-
-  /* BORDER */
-  --color-border: var(--border-default);
-  --color-border-strong: var(--border-strong);
-  --color-border-subtle: var(--border-subtle);
-  --color-border-focus: var(--border-focus);
-
-  /* STATUS */
-  --color-success: var(--success-default);
-  --color-success-light: var(--success-light);
-  --color-warning: var(--warning-default);
-  --color-warning-light: var(--warning-light);
-  --color-error: var(--error-default);
-  --color-error-light: var(--error-light);
-  --color-info: var(--info-default);
-  --color-info-light: var(--info-light);
-
-  /* GRADIENTS */
-  --background-image-brand: var(--gradient-brand);
-  --background-image-accent: var(--gradient-accent);
-  --background-image-hero: var(--gradient-hero);
-  --background-image-surface: var(--gradient-surface);
-  --background-image-card: var(--gradient-card);
-
-  /* SHADOWS */
-  --shadow-sm: var(--shadow-sm);
-  --shadow-md: var(--shadow-md);
-  --shadow-lg: var(--shadow-lg);
-  --shadow-xl: var(--shadow-xl);
-  --shadow-brand: var(--shadow-brand);
-
-  /* RADIUS */
-  --radius-sm: var(--radius-sm);
-  --radius-md: var(--radius-md);
-  --radius-lg: var(--radius-lg);
-  --radius-xl: var(--radius-xl);
-  --radius-2xl: var(--radius-2xl);
-  --radius-3xl: var(--radius-3xl);
-  --radius-full: var(--radius-full);
-
-  /* TYPOGRAPHY */
-  --font-sans: var(--font-family-sans);
-  --font-mono: var(--font-family-mono);
-  --text-xs: var(--font-size-xs);
-  --text-sm: var(--font-size-sm);
-  --text-base: var(--font-size-base);
-  --text-lg: var(--font-size-lg);
-  --text-xl: var(--font-size-xl);
-  --text-2xl: var(--font-size-2xl);
-  --text-3xl: var(--font-size-3xl);
-  --text-4xl: var(--font-size-4xl);
-  --font-weight-normal: var(--font-weight-normal);
-  --font-weight-medium: var(--font-weight-medium);
-  --font-weight-bold: var(--font-weight-bold);
-  --font-weight-black: var(--font-weight-black);
-  --line-height-none: var(--line-height-none);
-  --line-height-tight: var(--line-height-tight);
-  --line-height-snug: var(--line-height-snug);
-  --line-height-normal: var(--line-height-normal);
-  --line-height-relaxed: var(--line-height-relaxed);
-  --line-height-loose: var(--line-height-loose);
-
-  /* SPACING */
-  --spacing-0: var(--spacing-0);
-  --spacing-1: var(--spacing-1);
-  --spacing-2: var(--spacing-2);
-  --spacing-3: var(--spacing-3);
-  --spacing-4: var(--spacing-4);
-  --spacing-5: var(--spacing-5);
-  --spacing-6: var(--spacing-6);
-  --spacing-8: var(--spacing-8);
-  --spacing-10: var(--spacing-10);
-  --spacing-12: var(--spacing-12);
-  --spacing-16: var(--spacing-16);
-  --spacing-20: var(--spacing-20);
-  --spacing-24: var(--spacing-24);
-  --spacing-32: var(--spacing-32);
-
-  /* COMMON */
-  --base-white: var(--base-white);
-  --base-black: var(--base-black);
-  --selection-background: var(--selection-background);
-  --selection-foreground: var(--selection-foreground);
-  --overlay: var(--overlay);
-  --ring: var(--ring);
-  --skeleton: var(--skeleton);
-
-  /* BRAND SHADES */
-  --color-brand-50: var(--brand-50);
-  --color-brand-100: var(--brand-100);
-  --color-brand-200: var(--brand-200);
-  --color-brand-300: var(--brand-300);
-  --color-brand-400: var(--brand-400);
-  --color-brand-500: var(--brand-500);
-  --color-brand-600: var(--brand-600);
-  --color-brand-700: var(--brand-700);
-  --color-brand-800: var(--brand-800);
-  --color-brand-900: var(--brand-900);
-  --color-brand-950: var(--brand-950);
-
-  /* COMPONENT TOKENS */
-  --color-button-primary: var(--color-brand);
-  --color-button-primary-hover: var(--color-brand-dark);
-  --color-button-primary-text: var(--color-brand-foreground);
-  --color-card-bg: var(--color-bg-surface);
-  --color-card-border: var(--color-border-subtle);
-  --color-input-bg: var(--color-bg-sunken);
-  --color-input-border: var(--color-border);
-  --color-input-focus: var(--color-border-focus);
-
-  /* LAYOUT TOKENS */
-  --container-width: 1280px;
-  --section-padding: 80px;
-  --card-padding: 24px;
-}
-
-/* ============================================
-   MODE-INDEPENDENT TOKENS
-   (radius, spacing, typography, status, accent)
-   ============================================ */
-:root {
-  /* RADIUS */
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 12px;
-  --radius-2xl: 16px;
-  --radius-3xl: 24px;
-  --radius-full: 9999px;
-
-  /* TYPOGRAPHY */
-  --font-family-sans: Inter, system-ui, -apple-system, sans-serif;
-  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-base: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 30px;
-  --font-size-4xl: 36px;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-bold: 700;
-  --font-weight-black: 900;
-  --line-height-none: 1;
-  --line-height-tight: 1.25;
-  --line-height-snug: 1.375;
-  --line-height-normal: 1.5;
-  --line-height-relaxed: 1.625;
-  --line-height-loose: 2;
-
-  /* SPACING */
-  --spacing-0: 0px;
-  --spacing-1: 4px;
-  --spacing-2: 8px;
-  --spacing-3: 12px;
-  --spacing-4: 16px;
-  --spacing-5: 20px;
-  --spacing-6: 24px;
-  --spacing-8: 32px;
-  --spacing-10: 40px;
-  --spacing-12: 48px;
-  --spacing-16: 64px;
-  --spacing-20: 80px;
-  --spacing-24: 96px;
-  --spacing-32: 128px;
-
-  /* STATUS COLORS (mode-independent) */
-  --success-default: hsl(142, 65%, 36%);
-  --success-light: hsl(135, 66%, 67%);
-  --warning-default: hsl(38, 90%, 50%);
-  --warning-light: hsl(51, 100%, 70%);
-  --error-default: hsl(0, 84%, 60%);
-  --error-light: hsl(6, 100%, 76%);
-  --info-default: hsl(217, 90%, 60%);
-  --info-light: hsl(211, 100%, 80%);
-
-  /* BASE */
-  --base-white: #ffffff;
-  --base-black: #000000;
-
-  /* ACCENT */
-  --accent-default: hsl(0, 11%, 9%);
-  --accent-dark: hsl(0, 0%, 0%);
-  --accent-light: hsl(0, 4%, 24%);
-  --accent-subtle: hsl(0, 11%, 9%);
-  --accent-foreground: hsl(0, 0%, 100%);
-
-  /* BRAND SHADES (emerald scale, used by antd) */
-  --brand-50: hsl(129, 100%, 90%);
-  --brand-100: hsl(128, 86%, 86%);
-  --brand-200: hsl(130, 72%, 75%);
-  --brand-300: hsl(135, 65%, 59%);
-  --brand-400: hsl(139, 65%, 44%);
-  --brand-500: hsl(140, 100%, 29%);
-  --brand-600: hsl(128, 100%, 24%);
-  --brand-700: hsl(120, 100%, 19%);
-  --brand-800: hsl(120, 100%, 14%);
-  --brand-900: hsl(120, 100%, 10%);
-  --brand-950: hsl(120, 100%, 7%);
-}
-
-/* ============================================
-   DARK MODE  (default — also used on :root so
-   SSR renders correctly before JS runs)
-   ============================================ */
-:root,
-[data-mode="dark"] {
-  /* Brand defaults — overridden by [data-theme] */
-  --brand-default: hsl(141, 73%, 42%);
-  --brand-dark:    hsl(143, 100%, 31%);
-  --brand-light:   hsl(134, 78%, 65%);
-  --brand-subtle:  hsl(141, 73%, 52%);
-  --brand-foreground: hsl(0, 0%, 8%);
-  --brand-rgb: 29 185 84;
-
-  /* BACKGROUNDS */
-  --bg-page:     hsl(0, 0%, 7%);
-  --bg-surface:  hsl(0, 0%, 9%);
-  --bg-elevated: hsl(0, 0%, 16%);
-  --bg-sunken:   hsl(0, 0%, 3%);
-
-  /* TEXT */
-  --text-heading: hsl(0, 0%, 100%);
-  --text-body:    hsl(0, 0%, 70%);
-  --text-muted:   hsl(180, 0%, 53%);
-  --text-inverse: hsl(0, 0%, 8%);
-  --text-link:    var(--brand-default);
-
-  /* BORDERS */
-  --border-default: hsl(0, 0%, 20%);
-  --border-strong:  hsl(0, 0%, 30%);
-  --border-subtle:  hsl(0, 0%, 14%);
-  --border-focus:   var(--brand-default);
-
-  /* NEUTRALS */
-  --neutral-50:  hsl(0, 0%, 98%);
-  --neutral-100: hsl(0, 0%, 86%);
-  --neutral-200: hsl(0, 0%, 75%);
-  --neutral-300: hsl(0, 0%, 64%);
-  --neutral-400: hsl(0, 0%, 53%);
-  --neutral-500: hsl(0, 0%, 43%);
-  --neutral-600: hsl(0, 0%, 32%);
-  --neutral-700: hsl(0, 0%, 23%);
-  --neutral-800: hsl(0, 0%, 14%);
-  --neutral-900: hsl(0, 0%, 6%);
-
-  /* SHADOWS */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
-  --shadow-brand: 0 0 20px rgb(var(--brand-rgb) / 0.25);
-
-  /* GRADIENTS */
-  --gradient-brand:   linear-gradient(135deg, var(--brand-dark) 0%, var(--bg-sunken) 100%);
-  --gradient-accent:  linear-gradient(135deg, hsl(0,0%,10%) 0%, hsl(0,0%,18%) 100%);
-  --gradient-hero:    linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-default) 50%, var(--bg-page) 100%);
-  --gradient-surface: linear-gradient(to bottom, var(--bg-elevated) 0%, var(--bg-page) 100%);
-  --gradient-card:    linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
-
-  /* MISC */
-  --selection-background: rgb(var(--brand-rgb) / 0.28);
-  --selection-foreground: inherit;
-  --overlay: rgba(0, 0, 0, 0.6);
-  --ring: rgb(var(--brand-rgb) / 0.42);
-  --skeleton: hsl(0, 0%, 14%);
-}
-
-/* ============================================
-   LIGHT MODE
-   ============================================ */
-[data-mode="light"] {
-  /* Brand defaults for light — overridden by [data-theme][data-mode="light"] */
-  --brand-default:    hsl(141, 73%, 36%);
-  --brand-dark:       hsl(143, 85%, 27%);
-  --brand-light:      hsl(134, 68%, 52%);
-  --brand-subtle:     hsl(141, 73%, 44%);
-  --brand-foreground: hsl(0, 0%, 98%);
-  --brand-rgb: 20 148 55;
-
-  /* BACKGROUNDS */
-  --bg-page:     hsl(220, 18%, 96%);
-  --bg-surface:  hsl(0, 0%, 100%);
-  --bg-elevated: hsl(220, 14%, 92%);
-  --bg-sunken:   hsl(220, 16%, 93%);
-
-  /* TEXT */
-  --text-heading: hsl(220, 15%, 10%);
-  --text-body:    hsl(220, 8%, 30%);
-  --text-muted:   hsl(220, 5%, 54%);
-  --text-inverse: hsl(0, 0%, 100%);
-  --text-link:    var(--brand-default);
-
-  /* BORDERS */
-  --border-default: rgba(0, 0, 0, 0.10);
-  --border-strong:  rgba(0, 0, 0, 0.18);
-  --border-subtle:  rgba(0, 0, 0, 0.05);
-  --border-focus:   var(--brand-default);
-
-  /* NEUTRALS (light scale) */
-  --neutral-50:  hsl(220, 18%, 97%);
-  --neutral-100: hsl(220, 14%, 93%);
-  --neutral-200: hsl(220, 10%, 87%);
-  --neutral-300: hsl(220, 7%, 76%);
-  --neutral-400: hsl(220, 5%, 62%);
-  --neutral-500: hsl(220, 3%, 48%);
-  --neutral-600: hsl(220, 5%, 38%);
-  --neutral-700: hsl(220, 8%, 28%);
-  --neutral-800: hsl(220, 10%, 18%);
-  --neutral-900: hsl(220, 12%, 10%);
-
-  /* SHADOWS */
-  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.07);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.09), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03);
-  --shadow-brand: 0 0 20px rgb(var(--brand-rgb) / 0.22);
-
-  /* GRADIENTS */
-  --gradient-brand:   linear-gradient(135deg, var(--brand-default) 0%, var(--bg-elevated) 100%);
-  --gradient-accent:  linear-gradient(135deg, hsl(220,14%,90%) 0%, hsl(220,10%,96%) 100%);
-  --gradient-hero:    linear-gradient(135deg, var(--brand-dark) 0%, var(--brand-default) 50%, var(--bg-page) 100%);
-  --gradient-surface: linear-gradient(to bottom, hsl(0,0%,100%) 0%, hsl(220,14%,95%) 100%);
-  --gradient-card:    linear-gradient(180deg, rgba(0,0,0,0.02) 0%, rgba(0,0,0,0) 100%);
-
-  /* MISC */
-  --selection-background: rgb(var(--brand-rgb) / 0.18);
-  --selection-foreground: inherit;
-  --overlay: rgba(0, 0, 0, 0.35);
-  --ring: rgb(var(--brand-rgb) / 0.35);
-  --skeleton: hsl(220, 14%, 88%);
-}
-
-/* ============================================
-   COLOR SCHEMES — DARK MODE
-   (each block only overrides brand tokens)
-   ============================================ */
-
-/* Emerald — dark bg gets a subtle green tint */
-[data-theme="emerald"] {
-  --bg-page:     hsl(141, 6%, 7%);
-  --bg-surface:  hsl(141, 7%, 9%);
-  --bg-elevated: hsl(141, 5%, 16%);
-  --bg-sunken:   hsl(141, 8%, 3%);
-}
-
-[data-theme="amber"] {
-  --brand-default: hsl(45, 91%, 54%);
-  --brand-dark:    hsl(42, 95%, 43%);
-  --brand-light:   hsl(48, 95%, 72%);
-  --brand-subtle:  hsl(45, 91%, 64%);
-  --brand-foreground: hsl(30, 40%, 8%);
-  --brand-rgb: 245 190 42;
-  --shadow-brand: 0 0 20px rgb(245 190 42 / 0.28);
-  --bg-page:     hsl(45, 6%, 7%);
-  --bg-surface:  hsl(45, 7%, 9%);
-  --bg-elevated: hsl(45, 5%, 16%);
-  --bg-sunken:   hsl(45, 8%, 3%);
-}
-
-[data-theme="sunset"] {
-  --brand-default: hsl(22, 90%, 58%);
-  --brand-dark:    hsl(20, 88%, 46%);
-  --brand-light:   hsl(28, 90%, 72%);
-  --brand-subtle:  hsl(22, 90%, 68%);
-  --brand-foreground: hsl(20, 30%, 8%);
-  --brand-rgb: 240 113 57;
-  --shadow-brand: 0 0 20px rgb(240 113 57 / 0.28);
-  --bg-page:     hsl(22, 6%, 7%);
-  --bg-surface:  hsl(22, 7%, 9%);
-  --bg-elevated: hsl(22, 5%, 16%);
-  --bg-sunken:   hsl(22, 8%, 3%);
-}
-
-[data-theme="violet"] {
-  --brand-default: hsl(262, 80%, 68%);
-  --brand-dark:    hsl(260, 85%, 57%);
-  --brand-light:   hsl(265, 78%, 82%);
-  --brand-subtle:  hsl(262, 80%, 75%);
-  --brand-foreground: hsl(260, 20%, 8%);
-  --brand-rgb: 155 115 245;
-  --shadow-brand: 0 0 20px rgb(155 115 245 / 0.28);
-  --bg-page:     hsl(262, 8%, 7%);
-  --bg-surface:  hsl(262, 9%, 9%);
-  --bg-elevated: hsl(262, 6%, 16%);
-  --bg-sunken:   hsl(262, 10%, 3%);
-}
-
-[data-theme="sage"] {
-  --brand-default: hsl(158, 50%, 50%);
-  --brand-dark:    hsl(158, 55%, 40%);
-  --brand-light:   hsl(155, 48%, 66%);
-  --brand-subtle:  hsl(158, 50%, 58%);
-  --brand-foreground: hsl(158, 20%, 8%);
-  --brand-rgb: 65 168 130;
-  --shadow-brand: 0 0 20px rgb(65 168 130 / 0.25);
-  --bg-page:     hsl(158, 6%, 7%);
-  --bg-surface:  hsl(158, 7%, 9%);
-  --bg-elevated: hsl(158, 5%, 16%);
-  --bg-sunken:   hsl(158, 8%, 3%);
-}
-
-[data-theme="sky"] {
-  --brand-default: hsl(194, 80%, 54%);
-  --brand-dark:    hsl(192, 86%, 43%);
-  --brand-light:   hsl(197, 78%, 70%);
-  --brand-subtle:  hsl(194, 80%, 62%);
-  --brand-foreground: hsl(194, 20%, 8%);
-  --brand-rgb: 29 175 212;
-  --shadow-brand: 0 0 20px rgb(29 175 212 / 0.25);
-  --bg-page:     hsl(194, 7%, 7%);
-  --bg-surface:  hsl(194, 8%, 9%);
-  --bg-elevated: hsl(194, 6%, 16%);
-  --bg-sunken:   hsl(194, 9%, 3%);
-}
-
-[data-theme="ocean"] {
-  --brand-default: hsl(215, 85%, 60%);
-  --brand-dark:    hsl(214, 90%, 50%);
-  --brand-light:   hsl(215, 82%, 76%);
-  --brand-subtle:  hsl(215, 85%, 68%);
-  --brand-foreground: hsl(215, 20%, 8%);
-  --brand-rgb: 59 139 239;
-  --shadow-brand: 0 0 20px rgb(59 139 239 / 0.28);
-  --bg-page:     hsl(215, 8%, 7%);
-  --bg-surface:  hsl(215, 9%, 9%);
-  --bg-elevated: hsl(215, 7%, 16%);
-  --bg-sunken:   hsl(215, 10%, 3%);
-}
-
-[data-theme="teal"] {
-  --brand-default: hsl(174, 62%, 48%);
-  --brand-dark:    hsl(175, 68%, 38%);
-  --brand-light:   hsl(172, 58%, 65%);
-  --brand-subtle:  hsl(174, 62%, 56%);
-  --brand-foreground: hsl(174, 20%, 8%);
-  --brand-rgb: 29 181 158;
-  --shadow-brand: 0 0 20px rgb(29 181 158 / 0.25);
-  --bg-page:     hsl(174, 7%, 7%);
-  --bg-surface:  hsl(174, 8%, 9%);
-  --bg-elevated: hsl(174, 6%, 16%);
-  --bg-sunken:   hsl(174, 9%, 3%);
-}
-
-
-/* ============================================
-   COLOR SCHEMES — LIGHT MODE ADJUSTMENTS
-   (darker/richer brand for legibility on light bg)
-   ============================================ */
-
-[data-theme="emerald"][data-mode="light"] {
-  --brand-default: hsl(141, 73%, 36%);
-  --brand-dark:    hsl(143, 85%, 27%);
-  --brand-light:   hsl(134, 68%, 52%);
-  --brand-subtle:  hsl(141, 73%, 44%);
-  --brand-rgb: 20 148 55;
-  --shadow-brand: 0 0 20px rgb(20 148 55 / 0.22);
-  --bg-page:     hsl(141, 18%, 96%);
-  --bg-surface:  hsl(141, 12%, 100%);
-  --bg-elevated: hsl(141, 14%, 92%);
-  --bg-sunken:   hsl(141, 15%, 93%);
-}
-
-[data-theme="amber"][data-mode="light"] {
-  --brand-default: hsl(42, 92%, 44%);
-  --brand-dark:    hsl(40, 96%, 35%);
-  --brand-light:   hsl(46, 88%, 58%);
-  --brand-subtle:  hsl(43, 90%, 50%);
-  --brand-foreground: hsl(0, 0%, 98%);
-  --brand-rgb: 196 136 8;
-  --shadow-brand: 0 0 20px rgb(196 136 8 / 0.22);
-  --bg-page:     hsl(45, 22%, 97%);
-  --bg-surface:  hsl(45, 14%, 100%);
-  --bg-elevated: hsl(45, 18%, 93%);
-  --bg-sunken:   hsl(45, 18%, 94%);
-}
-
-[data-theme="sunset"][data-mode="light"] {
-  --brand-default: hsl(20, 88%, 50%);
-  --brand-dark:    hsl(18, 90%, 40%);
-  --brand-light:   hsl(26, 85%, 62%);
-  --brand-subtle:  hsl(22, 88%, 56%);
-  --brand-rgb: 217 91 18;
-  --shadow-brand: 0 0 20px rgb(217 91 18 / 0.22);
-  --bg-page:     hsl(22, 20%, 97%);
-  --bg-surface:  hsl(22, 12%, 100%);
-  --bg-elevated: hsl(22, 16%, 93%);
-  --bg-sunken:   hsl(22, 16%, 94%);
-}
-
-[data-theme="violet"][data-mode="light"] {
-  --brand-default: hsl(262, 70%, 52%);
-  --brand-dark:    hsl(260, 78%, 42%);
-  --brand-light:   hsl(265, 65%, 66%);
-  --brand-subtle:  hsl(262, 68%, 58%);
-  --brand-rgb: 107 63 212;
-  --shadow-brand: 0 0 20px rgb(107 63 212 / 0.22);
-  --bg-page:     hsl(262, 20%, 97%);
-  --bg-surface:  hsl(262, 12%, 100%);
-  --bg-elevated: hsl(262, 16%, 93%);
-  --bg-sunken:   hsl(262, 16%, 94%);
-}
-
-[data-theme="sage"][data-mode="light"] {
-  --brand-default: hsl(158, 52%, 40%);
-  --brand-dark:    hsl(158, 58%, 32%);
-  --brand-light:   hsl(155, 46%, 55%);
-  --brand-subtle:  hsl(158, 50%, 46%);
-  --brand-rgb: 46 138 104;
-  --shadow-brand: 0 0 20px rgb(46 138 104 / 0.20);
-  --bg-page:     hsl(158, 18%, 96%);
-  --bg-surface:  hsl(158, 10%, 100%);
-  --bg-elevated: hsl(158, 14%, 92%);
-  --bg-sunken:   hsl(158, 15%, 93%);
-}
-
-[data-theme="sky"][data-mode="light"] {
-  --brand-default: hsl(194, 82%, 42%);
-  --brand-dark:    hsl(192, 88%, 34%);
-  --brand-light:   hsl(197, 76%, 56%);
-  --brand-subtle:  hsl(194, 80%, 48%);
-  --brand-rgb: 13 141 175;
-  --shadow-brand: 0 0 20px rgb(13 141 175 / 0.20);
-  --bg-page:     hsl(194, 20%, 96%);
-  --bg-surface:  hsl(194, 12%, 100%);
-  --bg-elevated: hsl(194, 16%, 92%);
-  --bg-sunken:   hsl(194, 17%, 93%);
-}
-
-[data-theme="ocean"][data-mode="light"] {
-  --brand-default: hsl(215, 82%, 50%);
-  --brand-dark:    hsl(214, 88%, 42%);
-  --brand-light:   hsl(215, 78%, 64%);
-  --brand-subtle:  hsl(215, 80%, 56%);
-  --brand-rgb: 26 110 216;
-  --shadow-brand: 0 0 20px rgb(26 110 216 / 0.22);
-  --bg-page:     hsl(215, 22%, 96%);
-  --bg-surface:  hsl(215, 14%, 100%);
-  --bg-elevated: hsl(215, 18%, 92%);
-  --bg-sunken:   hsl(215, 18%, 93%);
-}
-
-[data-theme="teal"][data-mode="light"] {
-  --brand-default: hsl(174, 64%, 38%);
-  --brand-dark:    hsl(175, 72%, 30%);
-  --brand-light:   hsl(172, 58%, 52%);
-  --brand-subtle:  hsl(174, 62%, 44%);
-  --brand-rgb: 14 148 132;
-  --shadow-brand: 0 0 20px rgb(14 148 132 / 0.20);
-  --bg-page:     hsl(174, 18%, 96%);
-  --bg-surface:  hsl(174, 10%, 100%);
-  --bg-elevated: hsl(174, 14%, 92%);
-  --bg-sunken:   hsl(174, 15%, 93%);
-}
-
-/* ============================================
-   GLASSY — iOS / macOS liquid glass morphism
-   Applies on top of any [data-theme="X"] color.
-
-   Core principle (Apple Liquid Glass 2025-2026):
-   - Glass material is a NEUTRAL DARK BASE, not white
-   - Brand color glows through from the body gradient behind it
-   - Slider increases blur intensity + base opacity (more "frosted")
-   - This keeps surfaces dark and branded at all slider values
-   ============================================ */
-[data-style="glassy"] {
-  /* Blur scales with opacity: 30% → 11px, 80% → 29px, 95% → 34px */
-  --glass-blur: calc(var(--glass-opacity) * 36px);
-  --glass-saturation: 185%;
-  --glass-opacity: 0.65;  /* overwritten live by ThemeProvider */
-
-  /* ── NEUTRAL DARK GLASS SURFACES ──
-     Opacity maps 1-to-1: glassOpacity=0.80 → surfaces at ~80-85% dark.
-     Slider range 0.30–0.95; never turns white — brand gradient shines through.
-  */
-  --bg-page:     hsl(0, 0%, 5%);
-  --bg-surface:  rgba(12, 14, 12, var(--glass-opacity));
-  --bg-elevated: rgba(18, 20, 18, min(calc(var(--glass-opacity) + 0.05), 1));
-  --bg-sunken:   rgba(5, 6, 5,   min(calc(var(--glass-opacity) + 0.08), 1));
-
-  /* Borders — thin luminous specular highlight on glass edge */
-  --border-default: rgba(255, 255, 255, 0.13);
-  --border-strong:  rgba(255, 255, 255, 0.20);
-  --border-subtle:  rgba(255, 255, 255, 0.05);
-  --border-focus:   var(--brand-default);
-
-  /* Text */
-  --text-heading: hsl(0, 0%, 100%);
-  --text-body:    hsl(0, 0%, 82%);
-  --text-muted:   hsl(0, 0%, 54%);
-  --text-inverse: hsl(0, 0%, 8%);
-  --text-link:    var(--brand-default);
-
-  /* Neutrals */
-  --neutral-50:  hsl(0, 0%, 98%);
-  --neutral-100: hsl(0, 0%, 88%);
-  --neutral-200: hsl(0, 0%, 76%);
-  --neutral-300: hsl(0, 0%, 64%);
-  --neutral-400: hsl(0, 0%, 52%);
-  --neutral-500: hsl(0, 0%, 40%);
-  --neutral-600: hsl(0, 0%, 30%);
-  --neutral-700: hsl(0, 0%, 22%);
-  --neutral-800: hsl(0, 0%, 14%);
-  --neutral-900: hsl(0, 0%, 7%);
-
-  /* Shadows: deep drop + specular inner edge (top highlight) */
-  --shadow-sm: 0 1px 4px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.12);
-  --shadow-md: 0 4px 18px rgba(0,0,0,0.44), inset 0 1px 0 rgba(255,255,255,0.14);
-  --shadow-lg: 0 8px 34px rgba(0,0,0,0.54), inset 0 1px 0 rgba(255,255,255,0.16);
-  --shadow-xl: 0 16px 52px rgba(0,0,0,0.64), inset 0 1px 0 rgba(255,255,255,0.18);
-  --shadow-brand: 0 0 28px rgb(var(--brand-rgb) / 0.44);
-
-  /* Gradients — brand-aware (adapts to any color theme) */
-  --gradient-brand:   linear-gradient(135deg, rgb(var(--brand-rgb) / 0.36) 0%, rgba(0,0,0,0.60) 100%);
-  --gradient-accent:  linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.08) 100%);
-  --gradient-hero:    linear-gradient(135deg, rgb(var(--brand-rgb) / 0.46) 0%, rgb(var(--brand-rgb) / 0.18) 50%, rgba(0,0,0,0.72) 100%);
-  --gradient-surface: linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.03) 100%);
-  --gradient-card:    linear-gradient(180deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.00) 100%);
-
-  /* Misc */
-  --selection-background: rgb(var(--brand-rgb) / 0.32);
-  --selection-foreground: inherit;
-  --overlay: rgba(0, 0, 0, 0.60);
-  --ring: rgb(var(--brand-rgb) / 0.46);
-  --skeleton: rgba(255, 255, 255, 0.07);
-}
-
-/* Body: vivid brand ambient scene that shows through the glass */
-[data-style="glassy"] body {
-  background:
-    radial-gradient(ellipse 150% 90%  at  8%  0%, rgb(var(--brand-rgb) / 0.28) 0%, transparent 45%),
-    radial-gradient(ellipse  90% 150% at 92% 100%, rgb(var(--brand-rgb) / 0.18) 0%, transparent 45%),
-    radial-gradient(ellipse  70%  70% at 50%  55%, rgb(var(--brand-rgb) / 0.08) 0%, transparent 55%),
-    hsl(0, 0%, 5%);
-  background-attachment: fixed;
-}
-
-/* Antd container glass */
-[data-style="glassy"] .ant-card,
-[data-style="glassy"] .ant-modal-content,
-[data-style="glassy"] .ant-drawer-content,
-[data-style="glassy"] .ant-popover-inner,
-[data-style="glassy"] .ant-select-dropdown,
-[data-style="glassy"] .ant-dropdown-menu,
-[data-style="glassy"] .ant-tooltip-inner {
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  background: rgba(12, 14, 12, var(--glass-opacity)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.10) !important;
-  box-shadow: var(--shadow-md) !important;
-}
-
-/* ── GLASSY LIGHT MODE ──
-   Frosted white glass on light ambient backdrop.
-   At 0.80 (default): ~80% white → crisp glass look with color showing through.
-*/
-[data-style="glassy"][data-mode="light"] {
-  --bg-page:     hsl(220, 22%, 95%);
-  --bg-surface:  rgba(255, 255, 255, var(--glass-opacity));
-  --bg-elevated: rgba(248, 248, 248, min(calc(var(--glass-opacity) + 0.05), 1));
-  --bg-sunken:   rgba(0, 0, 0, 0.03);
-
-  --border-default: rgba(0, 0, 0, 0.08);
-  --border-strong:  rgba(0, 0, 0, 0.14);
-  --border-subtle:  rgba(255, 255, 255, 0.72);
-  --border-focus:   var(--brand-default);
-
-  --text-heading: hsl(220, 15%, 10%);
-  --text-body:    hsl(220, 8%, 28%);
-  --text-muted:   hsl(220, 5%, 52%);
-  --text-inverse: hsl(0, 0%, 100%);
-  --text-link:    var(--brand-default);
-
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.96);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.88);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.10), inset 0 1px 0 rgba(255,255,255,0.78);
-  --shadow-xl: 0 16px 40px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.68);
-
-  --skeleton: rgba(0, 0, 0, 0.04);
-  --overlay: rgba(0, 0, 0, 0.35);
-}
-
-[data-style="glassy"][data-mode="light"] body {
-  background:
-    radial-gradient(ellipse 150% 90%  at  8%  0%, rgb(var(--brand-rgb) / 0.14) 0%, transparent 45%),
-    radial-gradient(ellipse  90% 140% at 92%  100%, rgb(var(--brand-rgb) / 0.09) 0%, transparent 45%),
-    hsl(220, 22%, 95%);
-  background-attachment: fixed;
-}
-
-[data-style="glassy"][data-mode="light"] .ant-card,
-[data-style="glassy"][data-mode="light"] .ant-modal-content,
-[data-style="glassy"][data-mode="light"] .ant-drawer-content,
-[data-style="glassy"][data-mode="light"] .ant-popover-inner,
-[data-style="glassy"][data-mode="light"] .ant-select-dropdown,
-[data-style="glassy"][data-mode="light"] .ant-dropdown-menu {
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturation));
-  background: rgba(255, 255, 255, var(--glass-opacity)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.80) !important;
-  box-shadow: var(--shadow-md) !important;
+  --color-text-heading: var(--text-heading);
+  --color-text-body: var(--text-body);
+  --color-text-muted: var(--text-muted);
+  --color-brand-subtle: var(--brand-soft);
+  --shadow-brand: var(--shadow-ember);
 }
 
 @layer base {
-  * {
-    box-sizing: border-box;
-    border-color: var(--color-border);
-  }
-  ::selection {
-    background-color: var(--selection-background);
-    color: var(--selection-foreground);
-  }
+  * { border-color: var(--border-subtle); }
+  ::selection { background: var(--selection-background); }
   body {
-    background-color: var(--color-bg-page);
-    color: var(--color-text-body);
+    background-color: var(--bg-page);
+    color: var(--text-body);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: var(--color-text-heading);
-    font-weight: 700;
-  }
-  a {
-    color: var(--color-text-link);
-  }
+  h1, h2, h3, h4 { color: var(--text-heading); }
+  :focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  .text-pretty {
-    text-wrap: pretty;
-  }
-  .bg-elevated {
-    background-color: var(--color-bg-elevated);
-  }
-  .bg-sunken {
-    background-color: var(--color-bg-sunken);
-  }
-  .shadow-brand {
-    box-shadow: var(--shadow-brand);
-  }
-
-  /* Glass surface — apply backdrop-filter + transparent bg from CSS vars */
   .glass {
-    backdrop-filter: blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%));
-    -webkit-backdrop-filter: blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%));
-    background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
+    background: var(--bg-glass);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid var(--border-subtle);
+  }
+  .edge-highlight { box-shadow: var(--edge-highlight); }
+  .tnum { font-variant-numeric: tabular-nums; }
+  .text-gradient-ember {
+    background: var(--gradient-ember);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 }
 
-/* ============================================
-   GLASS OPACITY SLIDER — iOS-style range input
-   ============================================ */
-.glass-opacity-slider {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
-  transition: opacity 0.15s ease;
-}
-
-.glass-opacity-slider::-webkit-slider-thumb {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.32), 0 0 0 1px rgba(0,0,0,0.10);
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
-}
-
-.glass-opacity-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.18);
-  box-shadow: 0 3px 14px rgba(0,0,0,0.40), 0 0 0 1px rgba(0,0,0,0.12);
-}
-
-.glass-opacity-slider::-webkit-slider-thumb:active {
-  transform: scale(1.10);
-}
-
-.glass-opacity-slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border: none;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.32);
-  cursor: pointer;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ============================================
    REACT-CALENDAR — CUSTOM DARK MINIMAL THEME
+   (still used by MiniCalendar — token names updated to Ink & Ember)
    ============================================ */
 .react-calendar {
   width: 100%;
@@ -852,7 +210,7 @@
   border: none;
   font-family: var(--font-sans);
   line-height: 1.5;
-  color: var(--color-text-body);
+  color: var(--color-body);
 }
 
 /* Navigation bar */
@@ -869,7 +227,7 @@
   border: none;
   cursor: pointer;
   border-radius: 8px;
-  color: var(--color-text-muted);
+  color: var(--color-muted);
   font-size: 14px;
   font-weight: 500;
   transition:
@@ -879,8 +237,8 @@
 }
 
 .react-calendar__navigation button:hover:not(:disabled) {
-  background: var(--color-bg-elevated);
-  color: var(--color-text-heading);
+  background: var(--color-elevated);
+  color: var(--color-heading);
 }
 
 .react-calendar__navigation button:disabled {
@@ -892,7 +250,7 @@
   flex: 1;
   font-size: 14px;
   font-weight: 600;
-  color: var(--color-text-heading) !important;
+  color: var(--color-heading) !important;
   text-align: center;
 }
 
@@ -915,7 +273,7 @@
   text-decoration: none;
   font-size: 11px;
   font-weight: 600;
-  color: var(--color-text-muted);
+  color: var(--color-muted);
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -929,7 +287,7 @@
   border-radius: 50%;
   font-size: 13px;
   font-weight: 400;
-  color: var(--color-text-body);
+  color: var(--color-body);
   aspect-ratio: 1 / 1;
   height: auto;
   display: flex;
@@ -955,8 +313,8 @@
 }
 
 .react-calendar__tile:hover:not(:disabled) {
-  background: var(--color-bg-elevated);
-  color: var(--color-text-heading);
+  background: var(--color-elevated);
+  color: var(--color-heading);
 }
 
 .react-calendar__tile:active:not(:disabled) {
@@ -971,35 +329,35 @@
 /* Today */
 .react-calendar__tile--now {
   background: transparent;
-  color: var(--color-text-heading);
+  color: var(--color-heading);
   font-weight: 700;
   box-shadow: inset 0 0 0 2px var(--color-brand);
 }
 
 .react-calendar__tile--now:hover {
-  background: var(--color-bg-elevated);
+  background: var(--color-elevated);
 }
 
 /* Selected (active) */
 .react-calendar__tile--active,
 .react-calendar__tile--hasActive {
   background: var(--color-brand) !important;
-  color: var(--color-bg-page) !important;
+  color: var(--color-page) !important;
   font-weight: 600;
 }
 
 .react-calendar__tile--active:hover {
-  background: var(--color-brand-dark) !important;
+  background: var(--color-brand-strong) !important;
 }
 
 /* Outside days (neighboring month) */
 .react-calendar__month-view__days__day--neighboringMonth {
-  color: var(--color-border-strong);
+  color: var(--color-muted);
 }
 
 /* Weekend */
 .react-calendar__month-view__days__day--weekend {
-  color: var(--color-text-body);
+  color: var(--color-body);
 }
 
 /* --- CALENDAR DATE TEXT — brand colored on default tiles --- */
@@ -1029,28 +387,6 @@
 .tile-missed abbr,
 .tile-missed time {
   color: hsl(0, 0%, 98%) !important;
-}
-
-/* --- LEGACY INTENSITY TILES (kept for compatibility) --- */
-.tile-low {
-  background: rgb(var(--brand-rgb) / 0.25) !important;
-  color: var(--color-text-body) !important;
-}
-
-.tile-mid {
-  background: rgb(var(--brand-rgb) / 0.55) !important;
-  color: var(--color-text-heading) !important;
-}
-
-.tile-high {
-  background: rgb(var(--brand-rgb) / 0.90) !important;
-  color: var(--color-bg-page) !important;
-  font-weight: 700;
-}
-
-/* Multi-month layout for HeatmapCalendar */
-.calendar-heatmap .react-calendar__navigation__label {
-  font-size: 13px;
 }
 
 /* ============================================

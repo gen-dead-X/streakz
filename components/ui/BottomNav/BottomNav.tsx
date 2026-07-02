@@ -6,7 +6,6 @@ import { CalendarDays, BarChart3, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDarkMode } from '@/hooks/theme/useDarkMode';
 import { useHabitSheetStore } from '@/store/habitSheet/habitSheet.store';
-import { useThemeStore } from '@/store/theme/theme.store';
 
 const { Text } = Typography;
 
@@ -14,8 +13,6 @@ export function BottomNav() {
   const pathname = usePathname();
   const dark = useDarkMode();
   const openAdd = useHabitSheetStore((s) => s.openAdd);
-  const appStyle = useThemeStore((s) => s.appStyle);
-  const isGlassy = appStyle === 'glassy';
 
   const isToday = pathname === '/today' || pathname === '/';
   const isInsights = pathname.startsWith('/insights');
@@ -28,15 +25,10 @@ export function BottomNav() {
       className="fixed bottom-0 left-0 right-0 z-40 flex items-center md:hidden"
       style={{
         height: 72,
-        background: isGlassy
-          ? 'var(--color-bg-elevated)'
-          : (dark ? 'rgba(8,8,8,0.88)' : 'rgba(255,255,255,0.94)'),
-        backdropFilter: 'blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))',
-        WebkitBackdropFilter: 'blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))',
-        borderTop: isGlassy
-          ? (dark ? '1px solid rgba(255,255,255,0.12)' : '1px solid rgba(255,255,255,0.60)')
-          : (dark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)'),
-        boxShadow: isGlassy ? 'inset 0 1px 0 rgba(255,255,255,0.08)' : undefined,
+        background: dark ? 'rgba(8,8,8,0.88)' : 'rgba(255,255,255,0.94)',
+        backdropFilter: 'blur(20px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+        borderTop: dark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)',
       }}
     >
       <Link
@@ -59,9 +51,7 @@ export function BottomNav() {
             height: 62,
             borderRadius: '50%',
             background: 'var(--color-brand)',
-            boxShadow: isGlassy
-              ? `0 0 0 4px var(--color-bg-elevated), var(--shadow-brand)`
-              : '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
+            boxShadow: '0 0 0 5px var(--color-bg-sunken), var(--shadow-brand)',
             marginTop: -24,
             border: 'none',
             cursor: 'pointer',

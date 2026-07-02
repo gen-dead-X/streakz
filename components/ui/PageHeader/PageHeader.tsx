@@ -9,7 +9,6 @@ import { useHabitSheetStore } from "@/store/habitSheet/habitSheet.store";
 import { format, addDays, getDay } from "date-fns";
 import { useHabitsStore } from "@/store/habits/habits.store";
 import { useDarkMode } from "@/hooks/theme/useDarkMode";
-import { useThemeStore } from "@/store/theme/theme.store";
 import { useCheckIn } from "@/hooks/checkin/useCheckIn";
 import { HabitIcon } from "@/components/ui/HabitIcon";
 import type { DaySummary } from "@/types/api/habits.types";
@@ -57,8 +56,6 @@ function dowIndex(dateStr: string): number {
 export function PageHeader({ user }: PageHeaderProps) {
   const router       = useRouter();
   const dark         = useDarkMode();
-  const appStyle     = useThemeStore((s) => s.appStyle);
-  const isGlassy     = appStyle === "glassy";
   const openAdd      = useHabitSheetStore((s) => s.openAdd);
 
   const [menuOpen, setMenuOpen]             = useState(false);
@@ -199,12 +196,11 @@ export function PageHeader({ user }: PageHeaderProps) {
       <header
         className="fixed top-0 left-0 right-0 z-40 md:hidden"
         style={{
-          background:           isGlassy ? "var(--color-bg-elevated)" : (dark ? "rgba(14,16,15,0.92)" : "rgba(252,252,252,0.94)"),
-          backdropFilter:       "blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))",
-          WebkitBackdropFilter: "blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))",
-          borderBottom:         isGlassy ? (dark ? "1px solid rgba(255,255,255,0.10)" : "1px solid rgba(255,255,255,0.55)") : (dark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.07)"),
+          background:           dark ? "rgba(14,16,15,0.92)" : "rgba(252,252,252,0.94)",
+          backdropFilter:       "blur(20px) saturate(180%)",
+          WebkitBackdropFilter: "blur(20px) saturate(180%)",
+          borderBottom:         dark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.07)",
           borderRadius:         "0 0 20px 20px",
-          boxShadow:            isGlassy ? "var(--shadow-md)" : undefined,
         }}
       >
         {/* ── Top row ── */}
@@ -643,17 +639,11 @@ export function PageHeader({ user }: PageHeaderProps) {
             right:                12,
             top:                  60,
             background:           "var(--color-bg-elevated)",
-            backdropFilter:       isGlassy ? "blur(var(--glass-blur, 28px)) saturate(var(--glass-saturation, 185%))" : undefined,
-            WebkitBackdropFilter: isGlassy ? "blur(var(--glass-blur, 28px)) saturate(var(--glass-saturation, 185%))" : undefined,
             borderRadius:         16,
             overflow:             "hidden",
             minWidth:             164,
-            boxShadow:            isGlassy
-              ? "0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14)"
-              : "0 8px 28px rgba(0,0,0,0.45)",
-            border: isGlassy
-              ? (dark ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.72)")
-              : (dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.10)"),
+            boxShadow:            "0 8px 28px rgba(0,0,0,0.45)",
+            border: dark ? "1px solid rgba(255,255,255,0.08)" : "1px solid rgba(0,0,0,0.10)",
             zIndex: 200,
           }}
         >

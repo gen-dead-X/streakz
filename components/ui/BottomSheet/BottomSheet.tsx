@@ -7,7 +7,6 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { useThemeStore } from '@/store/theme/theme.store';
 import { createPortal } from 'react-dom';
 import {
   animate,
@@ -99,8 +98,6 @@ export function BottomSheet({
   const fallbackHeight = useMotionValue(900);
   const fallbackY = useMotionValue(900);
   const { sheetY, heightMV } = ctx ?? { sheetY: fallbackY, heightMV: fallbackHeight };
-  const appStyle = useThemeStore((s) => s.appStyle);
-  const isGlassy = appStyle === 'glassy';
 
   const [mounted, setMounted] = useState(false);
   const snapRef = useRef<'full' | 'half'>('full');
@@ -174,7 +171,7 @@ export function BottomSheet({
     }
   }
 
-  const backdropMax = isGlassy ? 0.38 : 0.55;
+  const backdropMax = 0.55;
   const backdropOpacity = useTransform([sheetY, heightMV], ([y, h]: number[]) => {
     if (h === 0) return 0;
     const fullY = h * SNAP_FULL;
@@ -217,22 +214,13 @@ export function BottomSheet({
           bottom: 0,
           height: '100dvh',
           y: sheetY,
-          background: isGlassy ? 'var(--color-bg-elevated)' : 'var(--color-bg-surface)',
-          backdropFilter: isGlassy
-            ? 'blur(var(--glass-blur, 22px)) saturate(var(--glass-saturation, 185%))'
-            : undefined,
-          WebkitBackdropFilter: isGlassy
-            ? 'blur(var(--glass-blur, 22px)) saturate(var(--glass-saturation, 185%))'
-            : undefined,
+          background: 'var(--color-bg-surface)',
           borderRadius: '28px 28px 0 0',
-          border: isGlassy ? '1px solid rgba(255,255,255,0.12)' : undefined,
           borderBottom: 'none',
           display: 'flex',
           flexDirection: 'column',
           willChange: 'transform',
-          boxShadow: isGlassy
-            ? '0 -12px 64px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.14)'
-            : '0 -12px 64px rgba(0,0,0,0.45)',
+          boxShadow: '0 -12px 64px rgba(0,0,0,0.45)',
           overflow: 'hidden',
         }}
         drag="y"
@@ -266,8 +254,8 @@ export function BottomSheet({
               width: 36,
               height: 4,
               borderRadius: 99,
-              background: isGlassy ? 'rgba(255,255,255,0.30)' : 'var(--color-text-muted)',
-              opacity: isGlassy ? 1 : 0.35,
+              background: 'var(--color-text-muted)',
+              opacity: 0.35,
               pointerEvents: 'none',
             }}
           />

@@ -1,392 +1,296 @@
-# We will be using this theme overall as our brand Guideline no matter whatever the Design Suggests
+# Ink & Ember — Brand Law
 
-```
+> We will be using this theme overall as our brand guideline no matter whatever the design suggests.
+
+Streakz has **one brand** — Ink & Ember — and **two modes**: light and dark, plus a `system` option that
+follows the OS preference. There are no color schemes (no "emerald" / "amber" / "sunset" / etc.) and no
+`glassy`/`classy` style variants. If a design calls for a different accent color or a frosted-glass
+surface, it does not apply here — reconcile it to this file instead.
+
+Raw color values (`hsl(...)`, hex) may exist **only** in `app/globals.css` and this file. Every other file
+in the codebase must reference colors via the CSS variables and Tailwind utilities documented below.
+
+---
+
+## Token Layer (`app/globals.css`)
+
+```css
 @import "tailwindcss";
 
 @theme {
-/_ BRAND _/
---color-brand: var(--brand-default);
---color-brand-dark: var(--brand-dark);
---color-brand-light: var(--brand-light);
---color-brand-subtle: var(--brand-subtle);
---color-brand-foreground: var(--brand-foreground);
+  /* SEMANTIC COLOR TOKENS (map to CSS vars set per mode below) */
+  --color-brand: var(--brand-default);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-violet: var(--violet-default);
+  --color-violet-soft: var(--violet-soft);
+  --color-page: var(--bg-page);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-sunken: var(--bg-sunken);
+  --color-heading: var(--text-heading);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-inverse: var(--text-inverse);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-success: var(--success-default);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning-default);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-error: var(--error-default);
+  --color-error-subtle: var(--error-subtle);
 
-/_ ACCENT _/
---color-accent: var(--accent-default);
---color-accent-dark: var(--accent-dark);
---color-accent-light: var(--accent-light);
---color-accent-subtle: var(--accent-subtle);
---color-accent-foreground: var(--accent-foreground);
+  /* GRADIENTS */
+  --background-image-ember: var(--gradient-ember);
+  --background-image-ember-soft: var(--gradient-ember-soft);
+  --background-image-violet: var(--gradient-violet);
 
-/_ NEUTRAL _/
---color-neutral-50: var(--neutral-50);
---color-neutral-100: var(--neutral-100);
---color-neutral-200: var(--neutral-200);
---color-neutral-300: var(--neutral-300);
---color-neutral-400: var(--neutral-400);
---color-neutral-500: var(--neutral-500);
---color-neutral-600: var(--neutral-600);
---color-neutral-700: var(--neutral-700);
---color-neutral-800: var(--neutral-800);
---color-neutral-900: var(--neutral-900);
+  /* SHADOWS */
+  --shadow-soft: var(--shadow-soft);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-floating: var(--shadow-floating);
+  --shadow-ember: var(--shadow-ember);
 
-/_ TEXT _/
---color-text-heading: var(--text-heading);
---color-text-body: var(--text-body);
---color-text-muted: var(--text-muted);
---color-text-inverse: var(--text-inverse);
---color-text-link: var(--text-link);
+  /* RADII */
+  --radius-control: 14px;
+  --radius-card: 24px;
+  --radius-sheet: 32px;
 
-/_ BACKGROUND _/
---color-bg-page: var(--bg-page);
---color-bg-surface: var(--bg-surface);
---color-bg-elevated: var(--bg-elevated);
---color-bg-sunken: var(--bg-sunken);
-
-/_ BORDER _/
---color-border: var(--border-default);
---color-border-strong: var(--border-strong);
---color-border-subtle: var(--border-subtle);
---color-border-focus: var(--border-focus);
-
-/_ STATUS _/
---color-success: var(--success-default);
---color-success-light: var(--success-light);
---color-warning: var(--warning-default);
---color-warning-light: var(--warning-light);
---color-error: var(--error-default);
---color-error-light: var(--error-light);
---color-info: var(--info-default);
---color-info-light: var(--info-light);
-
-/_ GRADIENTS _/
---background-image-brand: var(--gradient-brand);
---background-image-accent: var(--gradient-accent);
---background-image-hero: var(--gradient-hero);
---background-image-surface: var(--gradient-surface);
---background-image-card: var(--gradient-card);
-
-/_ SHADOWS _/
---shadow-sm: var(--shadow-sm);
---shadow-md: var(--shadow-md);
---shadow-lg: var(--shadow-lg);
---shadow-xl: var(--shadow-xl);
---shadow-brand: var(--shadow-brand);
-
-/_ RADIUS _/
---radius-sm: var(--radius-sm);
---radius-md: var(--radius-md);
---radius-lg: var(--radius-lg);
---radius-xl: var(--radius-xl);
---radius-2xl: var(--radius-2xl);
---radius-3xl: var(--radius-3xl);
---radius-full: var(--radius-full);
-
-/_ TYPOGRAPHY _/
---font-sans: var(--font-family-sans);
---font-mono: var(--font-family-mono);
---text-xs: var(--font-size-xs);
---text-sm: var(--font-size-sm);
---text-base: var(--font-size-base);
---text-lg: var(--font-size-lg);
---text-xl: var(--font-size-xl);
---text-2xl: var(--font-size-2xl);
---text-3xl: var(--font-size-3xl);
---text-4xl: var(--font-size-4xl);
---font-weight-normal: var(--font-weight-normal);
---font-weight-medium: var(--font-weight-medium);
---font-weight-bold: var(--font-weight-bold);
---font-weight-black: var(--font-weight-black);
---line-height-none: var(--line-height-none);
---line-height-tight: var(--line-height-tight);
---line-height-snug: var(--line-height-snug);
---line-height-normal: var(--line-height-normal);
---line-height-relaxed: var(--line-height-relaxed);
---line-height-loose: var(--line-height-loose);
-
-/_ SPACING _/
---spacing-0: var(--spacing-0);
---spacing-1: var(--spacing-1);
---spacing-2: var(--spacing-2);
---spacing-3: var(--spacing-3);
---spacing-4: var(--spacing-4);
---spacing-5: var(--spacing-5);
---spacing-6: var(--spacing-6);
---spacing-8: var(--spacing-8);
---spacing-10: var(--spacing-10);
---spacing-12: var(--spacing-12);
---spacing-16: var(--spacing-16);
---spacing-20: var(--spacing-20);
---spacing-24: var(--spacing-24);
---spacing-32: var(--spacing-32);
-
-/_ COMMON _/
---base-white: var(--base-white);
---base-black: var(--base-black);
---selection-background: var(--selection-background);
---selection-foreground: var(--selection-foreground);
---overlay: var(--overlay);
---ring: var(--ring);
---skeleton: var(--skeleton);
-
-/_ BRAND SHADES _/
---color-brand-50: var(--brand-50);
---color-brand-100: var(--brand-100);
---color-brand-200: var(--brand-200);
---color-brand-300: var(--brand-300);
---color-brand-400: var(--brand-400);
---color-brand-500: var(--brand-500);
---color-brand-600: var(--brand-600);
---color-brand-700: var(--brand-700);
---color-brand-800: var(--brand-800);
---color-brand-900: var(--brand-900);
---color-brand-950: var(--brand-950);
-
-/_ COMPONENT TOKENS (Semantic Aliases) _/
---color-button-primary: var(--color-brand);
---color-button-primary-hover: var(--color-brand-dark);
---color-button-primary-text: var(--color-brand-foreground);
---color-card-bg: var(--color-bg-surface);
---color-card-border: var(--color-border-subtle);
---color-input-bg: var(--color-bg-sunken);
---color-input-border: var(--color-border);
---color-input-focus: var(--color-border-focus);
-
-/_ LAYOUT TOKENS _/
---container-width: 1280px;
---section-padding: 80px;
---card-padding: 24px;
+  /* TYPOGRAPHY */
+  --font-sans: var(--font-family-sans), system-ui, sans-serif;
+  --font-display: var(--font-family-display), var(--font-family-sans), sans-serif;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-4xl: 44px;
 }
 
+/* ============ DARK (default) ============ */
 :root {
-/_ BRAND _/
---brand-default: hsl(141, 73%, 42%);
---brand-dark: hsl(143, 100%, 31%);
---brand-light: hsl(134, 78%, 65%);
---brand-subtle: hsl(141, 73%, 42%);
---brand-foreground: hsl(240, 6%, 10%);
+  --brand-default: hsl(18 100% 62%);
+  --brand-strong: hsl(18 100% 55%);
+  --brand-soft: hsl(18 100% 62% / 0.12);
+  --brand-foreground: hsl(240 10% 5%);
+  --violet-default: hsl(258 90% 66%);
+  --violet-soft: hsl(258 90% 66% / 0.14);
 
-/_ ACCENT _/
---accent-default: hsl(0, 11%, 9%);
---accent-dark: hsl(0, 0%, 0%);
---accent-light: hsl(0, 4%, 24%);
---accent-subtle: hsl(0, 11%, 9%);
---accent-foreground: hsl(0, 0%, 100%);
+  --bg-page: hsl(240 10% 5%);
+  --bg-surface: hsl(240 8% 7%);
+  --bg-elevated: hsl(240 7% 10%);
+  --bg-sunken: hsl(240 10% 3.5%);
+  --bg-glass: hsl(240 8% 8% / 0.72);
 
-/_ NEUTRAL _/
---neutral-50: hsl(0, 0%, 98%);
---neutral-100: hsl(0, 0%, 86%);
---neutral-200: hsl(0, 0%, 75%);
---neutral-300: hsl(120, 1%, 64%);
---neutral-400: hsl(180, 0%, 53%);
---neutral-500: hsl(120, 0%, 43%);
---neutral-600: hsl(180, 1%, 32%);
---neutral-700: hsl(180, 1%, 23%);
---neutral-800: hsl(150, 3%, 14%);
---neutral-900: hsl(150, 8%, 5%);
+  --text-heading: hsl(40 30% 96%);
+  --text-body: hsl(240 6% 70%);
+  --text-muted: hsl(240 5% 48%);
+  --text-inverse: hsl(240 12% 9%);
 
-/_ TEXT _/
---text-heading: hsl(0, 0%, 100%);
---text-body: hsl(0, 0%, 70%);
---text-muted: hsl(180, 0%, 53%);
---text-inverse: hsl(0, 0%, 100%);
---text-link: hsl(141, 73%, 42%);
+  --border-subtle: hsl(0 0% 100% / 0.06);
+  --border-default: hsl(0 0% 100% / 0.10);
 
-/_ BACKGROUND _/
---bg-page: hsl(0, 0%, 7%);
---bg-surface: hsl(0, 0%, 9%);
---bg-elevated: hsl(0, 0%, 16%);
---bg-sunken: hsl(0, 0%, 3%);
+  --success-default: hsl(152 60% 45%);
+  --success-subtle: hsl(152 60% 45% / 0.14);
+  --warning-default: hsl(40 95% 55%);
+  --warning-subtle: hsl(40 95% 55% / 0.14);
+  --error-default: hsl(0 80% 60%);
+  --error-subtle: hsl(0 80% 60% / 0.14);
 
-/_ BORDER _/
---border-default: hsl(0, 0%, 100%);
---border-strong: hsl(0, 0%, 100%);
---border-subtle: hsl(0, 0%, 100%);
---border-focus: hsl(0, 0%, 100%);
+  --gradient-ember: linear-gradient(135deg, #ff6b3d 0%, #ffb02e 100%);
+  --gradient-ember-soft: linear-gradient(135deg, hsl(18 100% 62% / 0.18) 0%, hsl(38 100% 59% / 0.10) 100%);
+  --gradient-violet: linear-gradient(135deg, hsl(258 90% 66%) 0%, hsl(280 85% 70%) 100%);
 
-/_ STATUS _/
---success-default: hsl(142, 65%, 36%);
---success-light: hsl(135, 66%, 67%);
---warning-default: hsl(38, 90%, 50%);
---warning-light: hsl(51, 100%, 70%);
---error-default: hsl(0, 84%, 60%);
---error-light: hsl(6, 100%, 76%);
---info-default: hsl(217, 90%, 60%);
---info-light: hsl(211, 100%, 80%);
+  --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.3), 0 8px 24px hsl(0 0% 0% / 0.25);
+  --shadow-raised: 0 2px 4px hsl(0 0% 0% / 0.35), 0 16px 40px hsl(0 0% 0% / 0.35);
+  --shadow-floating: 0 8px 16px hsl(0 0% 0% / 0.4), 0 24px 64px hsl(0 0% 0% / 0.5);
+  --shadow-ember: 0 4px 24px hsl(18 100% 55% / 0.35);
+  --edge-highlight: inset 0 1px 0 hsl(0 0% 100% / 0.04);
 
-/_ GRADIENTS _/
---gradient-brand: linear-gradient(135deg, #00a03d 0%, #191414 100%);
---gradient-accent: linear-gradient(135deg, #191414 0%, #3f3a3a 100%);
---gradient-hero: linear-gradient(135deg, #00a03d 0%, #1db954 50%, #191414 100%);
---gradient-surface: linear-gradient(to bottom, #ffffff 0%, #fbfdfc 100%);
---gradient-card: linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%);
-
-/_ SHADOWS _/
---shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
---shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
---shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
---shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
---shadow-brand: 0 0 20px rgb(29 185 84 / 0.2);
-
-/_ RADIUS _/
---radius-sm: 4px;
---radius-md: 6px;
---radius-lg: 8px;
---radius-xl: 12px;
---radius-2xl: 16px;
---radius-3xl: 24px;
---radius-full: 9999px;
-
-/_ TYPOGRAPHY _/
---font-family-sans: Inter, system-ui, -apple-system, sans-serif;
---font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
---font-size-xs: 12px;
---font-size-sm: 14px;
---font-size-base: 16px;
---font-size-lg: 18px;
---font-size-xl: 20px;
---font-size-2xl: 24px;
---font-size-3xl: 30px;
---font-size-4xl: 36px;
---font-weight-normal: 400;
---font-weight-medium: 500;
---font-weight-bold: 700;
---font-weight-black: 900;
---line-height-none: 1;
---line-height-tight: 1.25;
---line-height-snug: 1.375;
---line-height-normal: 1.5;
---line-height-relaxed: 1.625;
---line-height-loose: 2;
-
-/_ SPACING _/
---spacing-0: 0px;
---spacing-1: 4px;
---spacing-2: 8px;
---spacing-3: 12px;
---spacing-4: 16px;
---spacing-5: 20px;
---spacing-6: 24px;
---spacing-8: 32px;
---spacing-10: 40px;
---spacing-12: 48px;
---spacing-16: 64px;
---spacing-20: 80px;
---spacing-24: 96px;
---spacing-32: 128px;
-
-/_ COMMON _/
---base-white: #ffffff;
---base-black: #000000;
---selection-background: rgb(29 185 84 / 0.3);
---selection-foreground: inherit;
---overlay: rgba(0, 0, 0, 0.4);
---ring: rgb(29 185 84 / 0.4);
---skeleton: #dcdcdc;
-
-/_ BRAND SHADES _/
---brand-50: hsl(129, 100%, 90%);
---brand-100: hsl(128, 86%, 86%);
---brand-200: hsl(130, 72%, 75%);
---brand-300: hsl(135, 65%, 59%);
---brand-400: hsl(139, 65%, 44%);
---brand-500: hsl(140, 100%, 29%);
---brand-600: hsl(128, 100%, 24%);
---brand-700: hsl(120, 100%, 19%);
---brand-800: hsl(120, 100%, 14%);
---brand-900: hsl(120, 100%, 10%);
---brand-950: hsl(120, 100%, 7%);
-
+  --ring: hsl(18 100% 62% / 0.55);
+  --overlay: hsl(240 10% 3% / 0.6);
+  --skeleton: hsl(240 6% 14%);
+  --selection-background: hsl(18 100% 62% / 0.35);
 }
 
-.dark {
-/_ BRAND _/
---brand-default: hsl(141, 73%, 42%);
---brand-dark: hsl(143, 63%, 55%);
---brand-light: hsl(140, 93%, 71%);
---brand-subtle: hsl(141, 73%, 62%);
---brand-foreground: hsl(240, 6%, 10%);
+/* ============ LIGHT ============ */
+[data-mode="light"] {
+  --brand-default: hsl(18 95% 55%);
+  --brand-strong: hsl(18 95% 48%);
+  --brand-soft: hsl(18 95% 55% / 0.10);
+  --brand-foreground: hsl(0 0% 100%);
+  --violet-default: hsl(258 75% 56%);
+  --violet-soft: hsl(258 75% 56% / 0.10);
 
-/_ ACCENT _/
---accent-default: hsl(0, 11%, 9%);
---accent-dark: hsl(0, 9%, 55%);
---accent-light: hsl(0, 14%, 68%);
---accent-subtle: hsl(0, 11%, 60%);
---accent-foreground: hsl(240, 6%, 10%);
+  --bg-page: hsl(40 25% 97%);
+  --bg-surface: hsl(0 0% 100%);
+  --bg-elevated: hsl(0 0% 100%);
+  --bg-sunken: hsl(40 20% 94%);
+  --bg-glass: hsl(40 25% 98% / 0.78);
 
-/_ TEXT _/
---text-heading: hsl(0, 0%, 100%);
---text-body: hsl(0, 0%, 70%);
---text-muted: hsl(180, 0%, 51%);
---text-link: hsl(140, 93%, 71%);
+  --text-heading: hsl(240 12% 9%);
+  --text-body: hsl(240 8% 32%);
+  --text-muted: hsl(240 5% 52%);
+  --text-inverse: hsl(40 30% 96%);
 
-/_ BACKGROUND _/
---bg-page: hsl(0, 0%, 7%);
---bg-surface: hsl(0, 0%, 9%);
---bg-elevated: hsl(0, 0%, 16%);
---bg-sunken: hsl(0, 0%, 3%);
+  --border-subtle: hsl(240 12% 9% / 0.06);
+  --border-default: hsl(240 12% 9% / 0.10);
 
-/_ BORDER _/
---border-default: hsl(0, 0%, 100%);
---border-strong: hsl(0, 0%, 100%);
---border-subtle: hsl(0, 0%, 100%);
---border-focus: hsl(0, 0%, 100%);
+  --success-default: hsl(152 65% 34%);
+  --success-subtle: hsl(152 65% 34% / 0.10);
+  --warning-default: hsl(38 95% 44%);
+  --warning-subtle: hsl(38 95% 44% / 0.10);
+  --error-default: hsl(0 72% 50%);
+  --error-subtle: hsl(0 72% 50% / 0.08);
 
-/_ NEUTRAL _/
---neutral-50: hsl(180, 4%, 5%);
---neutral-100: hsl(0, 0%, 14%);
---neutral-200: hsl(0, 0%, 22%);
---neutral-300: hsl(180, 1%, 32%);
---neutral-400: hsl(120, 0%, 41%);
---neutral-500: hsl(180, 0%, 51%);
---neutral-600: hsl(120, 1%, 62%);
---neutral-700: hsl(150, 1%, 73%);
---neutral-800: hsl(120, 1%, 84%);
---neutral-900: hsl(120, 4%, 95%);
+  --shadow-soft: 0 1px 2px hsl(240 12% 9% / 0.05), 0 8px 24px hsl(240 12% 9% / 0.06);
+  --shadow-raised: 0 2px 4px hsl(240 12% 9% / 0.06), 0 16px 40px hsl(240 12% 9% / 0.10);
+  --shadow-floating: 0 8px 16px hsl(240 12% 9% / 0.10), 0 24px 64px hsl(240 12% 9% / 0.16);
+  --shadow-ember: 0 4px 24px hsl(18 95% 55% / 0.30);
+  --edge-highlight: none;
 
-/_ COMMON _/
---selection-background: hsl(141, 73%, 62%);
---selection-foreground: hsl(0, 0%, 100%);
---overlay: hsl(0, 0%, 0%);
---ring: hsl(141, 73%, 62%);
---skeleton: hsl(0, 0%, 14%);
---shadow-brand: 0 0 20px rgb(87 229 137 / 0.35);
-
-/_ DARK BRAND SHADES _/
---brand-50: hsl(129, 100%, 90%);
---brand-100: hsl(128, 86%, 86%);
---brand-200: hsl(130, 72%, 75%);
---brand-300: hsl(135, 65%, 59%);
---brand-400: hsl(139, 65%, 44%);
---brand-500: hsl(140, 100%, 29%);
---brand-600: hsl(128, 100%, 24%);
---brand-700: hsl(120, 100%, 19%);
---brand-800: hsl(120, 100%, 14%);
---brand-900: hsl(120, 100%, 10%);
---brand-950: hsl(120, 100%, 7%);
-
-}
-
-@layer base {
-
-- { border-color: var(--color-border); }
-  body {
-  background-color: var(--color-bg-page);
-  color: var(--color-text-body);
-  font-family: var(--font-sans);
-  }
-  h1, h2, h3, h4, h5, h6 {
-  color: var(--color-text-heading);
-  font-weight: 700;
-  }
-  a { color: var(--color-text-link); }
-  }
-
-@layer utilities {
-.text-balance { text-wrap: balance; }
-.text-pretty { text-wrap: pretty; }
-.bg-elevated { background-color: var(--color-bg-elevated); }
-.bg-sunken { background-color: var(--color-bg-sunken); }
-.shadow-brand { box-shadow: var(--shadow-brand); }
+  --ring: hsl(18 95% 55% / 0.45);
+  --overlay: hsl(240 12% 9% / 0.35);
+  --skeleton: hsl(40 15% 90%);
+  --selection-background: hsl(18 95% 55% / 0.25);
 }
 ```
+
+`:root` holds the dark palette (dark is the default mode, and also what SSR renders before the inline
+theme script runs). `[data-mode="light"]` overrides every token for light mode. Nothing else — no
+`[data-theme="..."]`, no `[data-style="..."]`.
+
+---
+
+## Usage Table
+
+| Token (CSS var) | Tailwind utility | Use case |
+|---|---|---|
+| `--color-brand` | `bg-brand`, `text-brand`, `border-brand` | Primary Ember accent — CTAs, active states, links |
+| `--color-brand-strong` | `bg-brand-strong` | Hover/active shade of brand accent |
+| `--color-brand-soft` | `bg-brand-soft` | Faint brand tint background (badges, selected rows) |
+| `--color-brand-foreground` | `text-brand-foreground` | Text/icon color placed *on top of* a solid brand background |
+| `--color-violet` | `bg-violet`, `text-violet` | Secondary accent (XP, achievements, highlights) |
+| `--color-violet-soft` | `bg-violet-soft` | Faint violet tint background |
+| `--color-page` | `bg-page` | App/page background (outermost canvas) |
+| `--color-surface` | `bg-surface` | Cards, sheets, panels — first elevation above page |
+| `--color-elevated` | `bg-elevated` | Popovers, dropdowns, modals — second elevation |
+| `--color-sunken` | `bg-sunken` | Recessed wells (input backgrounds, inset containers) |
+| `--color-heading` | `text-heading` | Headings (`h1`–`h4`), high-emphasis titles |
+| `--color-body` | `text-body` | Default body copy |
+| `--color-muted` | `text-muted` | Secondary/de-emphasized text, captions, placeholders |
+| `--color-inverse` | `text-inverse` | Text placed on a solid brand/dark-on-light or light-on-dark surface |
+| `--color-border-subtle` | `border-border-subtle` | Hairline dividers, faint card outlines |
+| `--color-border-default` | `border-border-default` | Standard input/control borders |
+| `--color-success` / `--color-success-subtle` | `bg-success`, `bg-success-subtle` | Streak-kept, positive states |
+| `--color-warning` / `--color-warning-subtle` | `bg-warning`, `bg-warning-subtle` | At-risk streak, caution states |
+| `--color-error` / `--color-error-subtle` | `bg-error`, `bg-error-subtle` | Missed streak, destructive actions |
+| `--gradient-ember` | `bg-ember` | Hero/CTA gradient fills |
+| `--gradient-ember-soft` | `bg-ember-soft` | Subtle ambient gradient backgrounds |
+| `--gradient-violet` | `bg-violet` (background-image) | XP/achievement gradient accents |
+| `--shadow-soft` | `shadow-soft` | Resting elevation for cards |
+| `--shadow-raised` | `shadow-raised` | Hover/active elevation |
+| `--shadow-floating` | `shadow-floating` | Sheets, floating action buttons |
+| `--shadow-ember` | `shadow-ember` | Glow shadow under brand-colored elements (e.g. the Add button) |
+| `--radius-control` (14px) | `rounded-control` | Inputs, buttons, small controls |
+| `--radius-card` (24px) | `rounded-card` | Cards, panels |
+| `--radius-sheet` (32px) | `rounded-sheet` | Bottom sheets, large modals |
+| `--font-sans` | `font-sans` | Default UI font (Geist) |
+| `--font-display` | `font-display` | Headlines, large numerals, celebratory moments (Bricolage Grotesque) |
+
+Non-color/type tokens that don't have a Tailwind utility but are used via `var(...)` directly:
+`--ring` (focus ring), `--overlay` (backdrop scrims), `--skeleton` (loading placeholders),
+`--selection-background` (`::selection`), `--edge-highlight` (top inner highlight on dark glass/cards),
+`--bg-glass` (used by the `.glass` utility class).
+
+---
+
+## Fonts
+
+- **Display** — Bricolage Grotesque (`--font-family-display`), weights 500/600/700/800. Used for headings,
+  streak numerals, and celebratory moments via `font-display`.
+- **Sans** — Geist (`--font-family-sans`). Used for everything else via `font-sans` (also the default
+  `body` font).
+
+Both are loaded via `next/font/google` in `app/layout.tsx` — never via `<link>` tags.
+
+---
+
+## Motion (`constants/motion/motion.constants.ts`)
+
+```ts
+export const SPRINGS = {
+  snappy: { type: 'spring', stiffness: 420, damping: 30 },
+  gentle: { type: 'spring', stiffness: 200, damping: 26 },
+  bouncy: { type: 'spring', stiffness: 500, damping: 18 },
+} as const;
+
+export const DURATIONS = { fast: 0.15, base: 0.25, slow: 0.4 } as const;
+
+export const STAGGER_INTERVAL = 0.04;
+```
+
+- `SPRINGS.snappy` — default for most interactive transitions (button presses, toggles).
+- `SPRINGS.gentle` — page/sheet transitions, larger surfaces.
+- `SPRINGS.bouncy` — celebratory moments (check-ins, achievements unlocking).
+- `DURATIONS` — plain-easing fallback durations (seconds) for opacity/fade transitions that don't need a spring.
+- `STAGGER_INTERVAL` — delay (seconds) between staggered list-item animations.
+
+Respect `prefers-reduced-motion` — `app/globals.css` already forces near-zero animation/transition
+durations at the `@media (prefers-reduced-motion: reduce)` level; don't fight it with `!important` overrides.
+
+---
+
+## Theme Mode
+
+`types/common/theme.types.ts` exports a single type:
+
+```ts
+export type ThemeMode = 'light' | 'dark' | 'system';
+```
+
+`useThemeStore` (`store/theme/theme.store.ts`) holds `{ mode: ThemeMode; setMode(mode) }`, persisted to
+`localStorage` under `streakz-theme` (v2). `components/ui/ThemeProvider/ThemeProvider.tsx` resolves
+`system` via `matchMedia('(prefers-color-scheme: dark)')` and writes the resolved value to
+`document.documentElement.dataset.mode` — the single attribute every color token in this file reacts to.
+An inline script in `app/layout.tsx` applies the same resolution before first paint to avoid a flash of
+the wrong mode.
+
+There is no color-scheme picker and no glass/classy style picker. `MODE_OPTIONS` in
+`constants/themes/themes.constants.ts` is the only theme-related constant list left:
+
+```ts
+export const MODE_OPTIONS: { id: ThemeMode; name: string }[] = [
+  { id: 'light', name: 'Light' },
+  { id: 'dark', name: 'Dark' },
+  { id: 'system', name: 'System' },
+];
+```
+
+---
+
+## Legacy Alias Bridge (temporary)
+
+A small set of screens not yet migrated to the Ink & Ember token names still read pre-revamp
+`--color-*` variables directly via inline `style={{ ... }}`. `app/globals.css` defines a short-lived
+alias block (clearly marked `LEGACY ALIAS BRIDGE`) mapping those old names
+(`--color-bg-page`, `--color-bg-surface`, `--color-bg-elevated`, `--color-bg-sunken`,
+`--color-text-heading`, `--color-text-body`, `--color-text-muted`, `--color-brand-subtle`,
+`--shadow-brand`) onto the new tokens above. As later tasks rebuild each screen, update its inline
+styles to the new names and this bridge shrinks; it is deleted entirely in Task 15 (antd removal +
+final polish).
+
+---
+
+## Rules
+
+- Raw `hsl()`/hex values: **only** in `app/globals.css` and this file.
+- Never hardcode a pixel radius when `rounded-control` / `rounded-card` / `rounded-sheet` (or a Tailwind
+  default like `rounded-full`) covers it.
+- Prefer the Tailwind utility form (`bg-page`, `text-heading`, …) in `className`. Use `style={{ background:
+  'var(--color-page)' }}` only where Tailwind can't reach (AntD internals, dynamic/computed values).
+- One brand. Two modes. No exceptions without updating this file first.
