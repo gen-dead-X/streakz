@@ -64,7 +64,7 @@ export function MemberList({ project, members, currentUserId }: MemberListProps)
               borderRadius: 14,
               background:   'var(--color-bg-surface)',
               border:       isAdmin
-                ? '1px solid rgba(var(--brand-rgb), 0.18)'
+                ? '1px solid rgb(var(--brand-rgb) / 0.18)'
                 : '1px solid rgba(255,255,255,0.04)',
             }}
           >

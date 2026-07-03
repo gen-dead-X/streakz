@@ -161,6 +161,13 @@
   --color-text-muted: var(--text-muted);
   --color-brand-subtle: var(--brand-soft);
   --shadow-brand: var(--shadow-ember);
+  --color-border-strong: var(--border-default);
+  /* Decomposed RGB triplet of --brand-default, consumed as rgb(var(--brand-rgb) / a) */
+  --brand-rgb: 255 119 61;
+}
+
+[data-mode="light"] {
+  --brand-rgb: 249 97 31;
 }
 
 @layer base {
