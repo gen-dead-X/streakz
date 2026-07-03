@@ -15,8 +15,7 @@ export function Avatar({ name, src, size = 40 }: AvatarProps) {
     <div
       className="relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-elevated font-medium text-heading"
       style={{ width: size, height: size, fontSize: size * 0.4 }}
-      role="img"
-      aria-label={name}
+      {...(src ? {} : { role: 'img', 'aria-label': name })}
     >
       {src ? (
         <Image src={src} alt={name} fill sizes={`${size}px`} className="object-cover" />

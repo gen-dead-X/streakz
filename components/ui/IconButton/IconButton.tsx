@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 import { SPRINGS } from '@/constants/motion/motion.constants';
 
@@ -26,18 +26,10 @@ export function IconButton({
   className,
   children,
   ref,
-  // Destructured (but unused) so they're excluded from `...rest` below — their native DOM
-  // event-handler types conflict with framer-motion's own drag/animation prop types.
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  onDrag,
-  onDragStart,
-  onDragEnd,
-  onAnimationStart,
-  onAnimationEnd,
-  onAnimationIteration,
-  /* eslint-enable @typescript-eslint/no-unused-vars */
   ...rest
 }: IconButtonProps) {
+  const prefersReducedMotion = useReducedMotion();
+
   const classes = [
     'inline-flex shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
     variantClasses[variant],
@@ -52,7 +44,7 @@ export function IconButton({
       ref={ref}
       type={rest.type ?? 'button'}
       aria-label={label}
-      whileTap={disabled ? undefined : { scale: 0.97 }}
+      whileTap={disabled || prefersReducedMotion ? undefined : { scale: 0.97 }}
       transition={SPRINGS.snappy}
       disabled={disabled}
       className={classes}

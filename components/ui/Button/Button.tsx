@@ -1,7 +1,7 @@
 'use client';
 
 import { LoaderCircle } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 import { SPRINGS } from '@/constants/motion/motion.constants';
 
@@ -38,18 +38,9 @@ export function Button({
   className,
   children,
   ref,
-  // Destructured (but unused) so they're excluded from `...rest` below — their native DOM
-  // event-handler types conflict with framer-motion's own drag/animation prop types.
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  onDrag,
-  onDragStart,
-  onDragEnd,
-  onAnimationStart,
-  onAnimationEnd,
-  onAnimationIteration,
-  /* eslint-enable @typescript-eslint/no-unused-vars */
   ...rest
 }: ButtonProps) {
+  const prefersReducedMotion = useReducedMotion();
   const isDisabled = disabled || loading;
 
   const classes = [
@@ -66,7 +57,7 @@ export function Button({
     <motion.button
       ref={ref}
       type={rest.type ?? 'button'}
-      whileTap={isDisabled ? undefined : { scale: 0.97 }}
+      whileTap={isDisabled || prefersReducedMotion ? undefined : { scale: 0.97 }}
       transition={SPRINGS.snappy}
       disabled={isDisabled}
       aria-busy={loading || undefined}
