@@ -41,7 +41,7 @@ export default async function AppLayout({
       <BottomSheetBackground>
         <div className="md:ml-[240px]">
           <main
-            className="mx-auto px-4 md:px-8 pt-[152px] md:pt-8 pb-24 md:pb-8"
+            className="mx-auto px-4 md:px-8 pt-[calc(20px+var(--mobile-header-height))] md:pt-8 pb-24 md:pb-8"
             style={{ maxWidth: 900 }}
           >
             {children}

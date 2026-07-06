@@ -71,8 +71,23 @@ export function PageHeader({ user }: PageHeaderProps) {
   const menuRef        = useRef<HTMLDivElement>(null);
   const dropdownRef    = useRef<HTMLDivElement>(null);
   const todayCircleRef = useRef<HTMLDivElement>(null);
+  const headerRef      = useRef<HTMLElement>(null);
 
   useEffect(() => { setMounted(true); }, []);
+
+  /* Keep --mobile-header-height in sync with the real, rendered header —
+     the fixed header and the main content's top offset must never drift apart. */
+  useEffect(() => {
+    const el = headerRef.current;
+    if (!el) return;
+    const sync = () => {
+      document.documentElement.style.setProperty("--mobile-header-height", `${el.offsetHeight}px`);
+    };
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const today        = format(new Date(), "yyyy-MM-dd");
   const month        = format(new Date(), "MMM");
@@ -197,6 +212,7 @@ export function PageHeader({ user }: PageHeaderProps) {
   return (
     <>
       <header
+        ref={headerRef}
         className="fixed top-0 left-0 right-0 z-40 md:hidden"
         style={{
           background:           isGlassy ? "var(--color-bg-elevated)" : (dark ? "rgba(14,16,15,0.92)" : "rgba(252,252,252,0.94)"),
@@ -245,7 +261,7 @@ export function PageHeader({ user }: PageHeaderProps) {
         </div>
 
         {/* ── Fixed 7-day strip · today always center ── */}
-        <div style={{ paddingTop: 16, paddingBottom: 22 }}>
+        <div style={{ paddingTop: 8, paddingBottom: 12 }}>
           <div style={{ display: "flex", justifyContent: "space-around", paddingLeft: 8, paddingRight: 8 }}>
             {windowDates.map((date) => {
               const isToday  = date === today;
@@ -255,10 +271,10 @@ export function PageHeader({ user }: PageHeaderProps) {
               const dotColor = getDotColor(date);
 
               return (
-                <div key={date} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, width: CELL_W, flexShrink: 0 }}>
+                <div key={date} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3, width: CELL_W, flexShrink: 0 }}>
                   {/* Day letter */}
                   <span style={{
-                    fontSize: isToday ? 11 : 10,
+                    fontSize: isToday ? 10 : 9,
                     fontWeight: isToday ? 700 : 500,
                     color: isToday ? "var(--color-brand)" : "var(--color-text-muted)",
                     letterSpacing: "0.03em", lineHeight: 1,
@@ -272,12 +288,12 @@ export function PageHeader({ user }: PageHeaderProps) {
                       ref={todayCircleRef}
                       onClick={handleTodayTap}
                       whileTap={{ scale: 0.82 }}
-                      style={{ position: "relative", width: 44, height: 44, cursor: "pointer" }}
+                      style={{ position: "relative", width: 36, height: 36, cursor: "pointer" }}
                     >
                       {/* Breathing ripple ring */}
                       <div
                         style={{
-                          position: "absolute", inset: -5,
+                          position: "absolute", inset: -4,
                           borderRadius: "50%",
                           border: "1.5px solid var(--color-brand)",
                           pointerEvents: "none",
@@ -289,7 +305,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                       {/* Circle blooms outward as island opens — creates "part of it" illusion */}
                       <div
                         style={{
-                          width: 44, height: 44, borderRadius: "50%",
+                          width: 36, height: 36, borderRadius: "50%",
                           background: "var(--color-brand)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           opacity: islandExpanded ? 0 : 1,
@@ -297,20 +313,20 @@ export function PageHeader({ user }: PageHeaderProps) {
                           transition: "opacity 0.14s ease-out, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
                         }}
                       >
-                        <span style={{ fontSize: 24, fontWeight: 900, color: "var(--color-bg-page)", lineHeight: 1 }}>
+                        <span style={{ fontSize: 18, fontWeight: 900, color: "var(--color-bg-page)", lineHeight: 1 }}>
                           {dayNum}
                         </span>
                       </div>
                     </motion.div>
                   ) : (
                     <div style={{
-                      width: 38, height: 38, borderRadius: "50%",
+                      width: 30, height: 30, borderRadius: "50%",
                       background: "transparent",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       boxShadow: dotColor === "var(--color-brand)" ? "inset 0 0 0 1.5px var(--color-brand)" : undefined,
                     }}>
                       <span style={{
-                        fontSize: 13, fontWeight: 400,
+                        fontSize: 12, fontWeight: 400,
                         color: isFuture ? "var(--color-text-muted)" : "var(--color-text-heading)",
                         lineHeight: 1,
                       }}>
@@ -321,7 +337,7 @@ export function PageHeader({ user }: PageHeaderProps) {
 
                   {/* Status dot */}
                   <div style={{
-                    width: 5, height: 5, borderRadius: "50%",
+                    width: 4, height: 4, borderRadius: "50%",
                     background: dotColor ?? "transparent",
                     boxShadow: dotColor && dotColor !== "var(--color-brand)" ? `0 0 5px ${dotColor}66` : undefined,
                     transition: "background 0.2s",
