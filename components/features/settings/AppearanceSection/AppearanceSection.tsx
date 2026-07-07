@@ -86,6 +86,24 @@ function StylePreview({ id }: { id: AppStyle }) {
   );
 }
 
+/* Glass Opacity slider — internal vs. displayed range.
+   See "Glass Opacity slider mapping" in docs/theme.md for the full writeup.
+   Internally, glassOpacity is clamped to 30–95% so the glass effect never
+   reads as fully transparent (unreadable) or fully opaque (indistinguishable
+   from Classy). The slider is still shown to the user as a plain 0–100 scale
+   for a simpler, "no weird bounds" feel — GLASS_MIN/GLASS_MAX map one onto
+   the other. */
+const GLASS_MIN = 30;
+const GLASS_MAX = 95;
+
+function internalToDisplay(internalPercent: number): number {
+  return Math.round(((internalPercent - GLASS_MIN) / (GLASS_MAX - GLASS_MIN)) * 100);
+}
+
+function displayToInternal(displayPercent: number): number {
+  return GLASS_MIN + (displayPercent / 100) * (GLASS_MAX - GLASS_MIN);
+}
+
 export function AppearanceSection() {
   const {
     colorScheme, appStyle, mode, glassOpacity,
@@ -93,8 +111,9 @@ export function AppearanceSection() {
   } = useThemeStore();
   const dark = useDarkMode();
 
-  const sliderValue = Math.round(glassOpacity * 100);
-  const sliderProgress = Math.round(((sliderValue - 30) / 65) * 100);
+  const internalValue = Math.round(glassOpacity * 100);
+  const sliderValue = internalToDisplay(internalValue);
+  const sliderProgress = sliderValue;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 32 }}>
@@ -185,11 +204,11 @@ export function AppearanceSection() {
               </span>
               <input
                 type="range"
-                min={30}
-                max={95}
+                min={0}
+                max={100}
                 step={1}
                 value={sliderValue}
-                onChange={(e) => setGlassOpacity(Number(e.target.value) / 100)}
+                onChange={(e) => setGlassOpacity(displayToInternal(Number(e.target.value)) / 100)}
                 className="glass-opacity-slider"
                 style={{
                   flex: 1,

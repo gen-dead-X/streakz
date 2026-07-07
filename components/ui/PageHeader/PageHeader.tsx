@@ -119,20 +119,22 @@ export function PageHeader({ user }: PageHeaderProps) {
   const islandX = 8;
   const islandY = 8;
 
-  /* Text/content tokens that adapt to dark/light mode.
-     The island's glass background intentionally stays liquid-black
-     in all modes (same as iOS Dynamic Island behaviour). */
-  const T = useMemo(() => ({
+  /* Text/glass tokens for the expanded island — switch between a dark-glass
+     and a light-glass treatment so the island actually follows dark/light mode. */
+  const T = useMemo(() => (dark ? {
+    islandBg:     "rgba(8, 14, 8, var(--glass-opacity, 0.86))",
+    islandBorder: "rgb(var(--brand-rgb) / 0.16)",
+    islandShadow: "0 20px 60px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.3), 0 0 0 1px rgb(var(--brand-rgb) / 0.09)",
     divider:      "rgba(255,255,255,0.05)",
     textPrimary:  "rgba(255,255,255,0.9)",
     textSub:      "rgba(255,255,255,0.28)",
     textMuted:    "rgba(255,255,255,0.42)",
     arcTrack:     "rgba(255,255,255,0.07)",
-    sectionDone:  "rgba(34,197,94,0.55)",
+    sectionDone:  "rgb(var(--brand-rgb) / 0.55)",
     sectionPend:  "rgba(255,255,255,0.28)",
     rowBorder:    "rgba(255,255,255,0.04)",
-    checkBg:      "rgba(34,197,94,0.14)",
-    checkBorder:  "rgba(34,197,94,0.55)",
+    checkBg:      "rgb(var(--brand-rgb) / 0.14)",
+    checkBorder:  "rgb(var(--brand-rgb) / 0.55)",
     closeBg:      "rgba(255,255,255,0.07)",
     closeColor:   "rgba(255,255,255,0.4)",
     footerBg:     "rgba(255,255,255,0.04)",
@@ -143,7 +145,31 @@ export function PageHeader({ user }: PageHeaderProps) {
     compText:     "rgba(255,255,255,0.8)",
     pendText:     "rgba(255,255,255,0.55)",
     rowHoverBg:   "rgba(255,255,255,0.04)",
-  }), []);
+  } : {
+    islandBg:     "rgba(250, 251, 249, var(--glass-opacity, 0.88))",
+    islandBorder: "rgb(var(--brand-rgb) / 0.20)",
+    islandShadow: "0 20px 50px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.04), 0 0 0 1px rgb(var(--brand-rgb) / 0.12)",
+    divider:      "rgba(0,0,0,0.07)",
+    textPrimary:  "rgba(15,17,15,0.92)",
+    textSub:      "rgba(15,17,15,0.36)",
+    textMuted:    "rgba(15,17,15,0.48)",
+    arcTrack:     "rgba(0,0,0,0.08)",
+    sectionDone:  "rgb(var(--brand-rgb) / 0.75)",
+    sectionPend:  "rgba(15,17,15,0.32)",
+    rowBorder:    "rgba(0,0,0,0.06)",
+    checkBg:      "rgb(var(--brand-rgb) / 0.14)",
+    checkBorder:  "rgb(var(--brand-rgb) / 0.65)",
+    closeBg:      "rgba(0,0,0,0.06)",
+    closeColor:   "rgba(15,17,15,0.45)",
+    footerBg:     "rgba(0,0,0,0.04)",
+    footerBorder: "rgba(0,0,0,0.08)",
+    footerText:   "rgba(15,17,15,0.92)",
+    footerMuted:  "rgba(15,17,15,0.42)",
+    pendBorder:   "rgba(0,0,0,0.16)",
+    compText:     "rgba(15,17,15,0.75)",
+    pendText:     "rgba(15,17,15,0.55)",
+    rowHoverBg:   "rgba(0,0,0,0.04)",
+  }), [dark]);
 
   useEffect(() => {
     fetch("/api/habits/week-summary")
@@ -390,12 +416,12 @@ export function PageHeader({ user }: PageHeaderProps) {
                 position:             "fixed",
                 top:                   0,
                 left:                  0,
-                /* Liquid glass — intentionally dark in all modes */
-                background:            "rgba(8, 14, 8, 0.86)",
-                backdropFilter:        "blur(40px) saturate(180%) brightness(1.06)",
-                WebkitBackdropFilter:  "blur(40px) saturate(180%) brightness(1.06)",
-                border:                "1px solid rgba(34,197,94,0.16)",
-                boxShadow:             "0 20px 60px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -1px 0 rgba(0,0,0,0.3), 0 0 0 1px rgba(34,197,94,0.09)",
+                /* Liquid glass — switches between dark and light glass with the app's mode */
+                background:            T.islandBg,
+                backdropFilter:        `blur(var(--glass-blur, 40px)) saturate(${dark ? 180 : 160}%) brightness(${dark ? 1.06 : 1})`,
+                WebkitBackdropFilter:  `blur(var(--glass-blur, 40px)) saturate(${dark ? 180 : 160}%) brightness(${dark ? 1.06 : 1})`,
+                border:                `1px solid ${T.islandBorder}`,
+                boxShadow:             T.islandShadow,
                 zIndex:                200,
                 overflow:              "hidden",
                 display:               "flex",
@@ -422,7 +448,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                     <motion.div
                       animate={LIVE_DOT_ANIMATE}
                       transition={LIVE_DOT_TRANSITION}
-                      style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 7px #22c55e", flexShrink: 0 }}
+                      style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--color-brand)", boxShadow: "0 0 7px var(--color-brand)", flexShrink: 0 }}
                     />
                     <span style={{ fontSize: 14, fontWeight: 600, color: T.textSub, letterSpacing: "0.07em", textTransform: "uppercase" }}>
                       Today · {todayMonth}
@@ -453,14 +479,13 @@ export function PageHeader({ user }: PageHeaderProps) {
                     <motion.circle
                       cx="18" cy="18" r={ARC_R}
                       fill="none"
-                      stroke="#22c55e"
                       strokeWidth="2"
                       strokeLinecap="round"
                       strokeDasharray={ARC_CIRC}
                       initial={{ strokeDashoffset: ARC_CIRC }}
                       animate={{ strokeDashoffset: ARC_CIRC * (1 - todayPct) }}
                       transition={{ delay: 0.35, duration: 0.85, ease: "easeOut" }}
-                      style={{ filter: "drop-shadow(0 0 6px rgba(34,197,94,0.75))" }}
+                      style={{ stroke: "var(--color-brand)", filter: "drop-shadow(0 0 6px rgb(var(--brand-rgb) / 0.75))" }}
                     />
                   </svg>
                   <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
@@ -536,7 +561,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                         whileHover={{ backgroundColor: T.rowHoverBg }}
                       >
                         <div style={{ flexShrink: 0, opacity: 0.7 }}>
-                          <HabitIcon name={habit.icon} size={19} color="#22c55e" />
+                          <HabitIcon name={habit.icon} size={19} color="var(--color-brand)" />
                         </div>
                         <span style={{
                           fontSize: 17, fontWeight: 500, color: T.compText,
@@ -553,7 +578,7 @@ export function PageHeader({ user }: PageHeaderProps) {
                           display: "flex", alignItems: "center", justifyContent: "center",
                           flexShrink: 0,
                         }}>
-                          <Check size={9} color="#22c55e" />
+                          <Check size={9} color="var(--color-brand)" />
                         </div>
                       </motion.button>
                     ))}
