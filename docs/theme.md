@@ -390,3 +390,34 @@
 .shadow-brand { box-shadow: var(--shadow-brand); }
 }
 ```
+
+## Glass Opacity slider mapping
+
+`components/features/settings/AppearanceSection/AppearanceSection.tsx` shows a "Glass Opacity"
+slider (Settings → Appearance, visible only when `appStyle === 'glassy'`). There are two ranges
+in play — do not confuse them:
+
+- **Internal range: 30–95%.** This is what's actually stored as `glassOpacity` in
+  `store/theme/theme.store.ts` and written to the `--glass-opacity` CSS variable by
+  `ThemeProvider.tsx`. Every glass surface in the app (`--bg-surface`, `--bg-elevated`,
+  `--bg-sunken` in `app/globals.css`, the Dynamic Island in `PageHeader.tsx`, etc.) reads this
+  value directly as an alpha channel. It's clamped to 30–95 on purpose: below ~30% the glass
+  reads as fully transparent and unreadable (this was a real bug — see the migration guard in
+  `theme.store.ts` that resets any persisted value under 0.30 back to the default); at 100% the
+  surface is fully opaque and the "glass" effect is indistinguishable from Classy mode.
+- **Displayed range: 0–100%.** The `<input type="range">` and the `NN%` label the user sees are
+  a plain 0–100 scale, purely for a simpler-feeling UI ("no weird bounds"). It does **not**
+  correspond 1:1 with the internal value.
+
+The two are linked by `GLASS_MIN`/`GLASS_MAX` (= 30/95) and the `internalToDisplay` /
+`displayToInternal` helpers at the top of `AppearanceSection.tsx`:
+
+```
+displayed = (internal - 30) / (95 - 30) * 100
+internal  = 30 + (displayed / 100) * (95 - 30)
+```
+
+So dragging the slider to 0% or 100% is really setting `glassOpacity` to 0.30 or 0.95 — never to
+0 or 1. If you ever need the *actual* alpha value that's driving the visuals (e.g. while
+debugging a "too transparent"/"too opaque" glass report), read `glassOpacity` from
+`useThemeStore()`, not the slider's displayed percentage.
