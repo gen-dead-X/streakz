@@ -324,6 +324,10 @@ export function HabitForm({ initial, onSave, onCancel, onDelete, isEdit = false,
                 items: themeMenuItems,
                 onClick: ({ key }) => setCardStyle(key as CardStyle),
                 selectedKeys: [cardStyle],
+                style: {
+                  backdropFilter: 'blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))',
+                  WebkitBackdropFilter: 'blur(var(--glass-blur, 20px)) saturate(var(--glass-saturation, 180%))',
+                },
               }}
               trigger={['click']}
             >
